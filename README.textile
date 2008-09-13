@@ -2,11 +2,11 @@ h2. modipyd
 
 This software intended to:
 
- 1. Generating python module dependency graphs
- 2. Monitoring module (file) modification
- 3. Notifying modified and dependent modules
+# Generating python module dependency graphs
+# Monitoring module (file) modification
+# Notifying modified and dependent modules
 
-So I named it **modipyd** _(modified + python)_ :-)
+So I named it **modipyd** _(modified + python)_.
 
 
 h3. Copyright

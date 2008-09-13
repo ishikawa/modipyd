@@ -1,0 +1,19 @@
+h2. modipyd
+
+This software intended to:
+
+ 1. Generating python module dependency graphs
+ 2. Monitoring module (file) modification
+ 3. Notifying modified and dependent modules
+
+So I named it **modipyd** _(modified + python)_ :-)
+
+
+h3. Copyright
+
+Copyright (c) 2008 **Takanori Ishikawa** "&lt;takanori.ishikawa&#64;gmail.com&gt;":mailto:takanori.ishikawa@gmail.com, All rights reserved.
+
+
+h3. License
+
+The MIT license. See the "@LICENSE@":http://github.com/ishikawa/modipyd/tree/master/LICENSE file for more details.

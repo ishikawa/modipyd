@@ -1,6 +1,6 @@
 h2. modipyd
 
-This software intended to:
+How this software works:
 
 # Generating python module dependency graphs
 # Monitoring module (file) modification

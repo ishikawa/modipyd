@@ -23,11 +23,13 @@ class TestCase(unittest.TestCase):
 
     def failUnlessNone(self, expr, msg=None):
         """Fail the test unless the expression is None."""
-        if expr is not None: raise self.failureException, msg
+        if expr is not None:
+            raise self.failureException, msg
 
     def failIfNone(self, expr, msg=None):
         """Fail the test if the expression is None."""
-        if expr is None: raise self.failureException, msg
+        if expr is None:
+            raise self.failureException, msg
 
     # Synonyms for assertion methods
     assertNone = failUnlessNone

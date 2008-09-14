@@ -15,7 +15,10 @@ So I named it modipyd (modified + python).
 
 """
 
+import os
 from errno import ENOENT
 
 def collect_files(filepath):
-    raise IOError(ENOENT, "No such file or directory", filepath)
+    if not os.path.exists(filepath):
+        raise IOError(ENOENT, "No such file or directory", filepath)
+    return []

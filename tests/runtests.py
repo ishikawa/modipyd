@@ -18,8 +18,23 @@ import modipyd
 # The directory contains test files.
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
+class TestCase(unittest.TestCase):
+    """Custom TestCase class"""
 
-class TestModipydCollectFiles(unittest.TestCase):
+    def failUnlessNone(self, expr, msg=None):
+        """Fail the test unless the expression is None."""
+        if expr is not None: raise self.failureException, msg
+
+    def failIfNone(self, expr, msg=None):
+        """Fail the test if the expression is None."""
+        if expr is None: raise self.failureException, msg
+
+    # Synonyms for assertion methods
+    assertNone = failUnlessNone
+    assertNotNone = failIfNone
+
+
+class TestModipydCollectFiles(TestCase):
     """Tests modipyd functionalities"""
 
     def test_files_dir_exists(self):
@@ -33,7 +48,7 @@ class TestModipydCollectFiles(unittest.TestCase):
         try:
             modipyd.collect_files(filename)
         except IOError, ioe:
-            self.assert_(ioe.errno is ENOENT)
+            self.assertEqual(ENOENT, ioe.errno)
             self.assertEqual(filename, ioe.filename)
         else:
             self.fail("Expected IOError")
@@ -49,7 +64,7 @@ class TestModipydCollectFiles(unittest.TestCase):
     def test_empty_directory(self):
         directory = self.empty_directory()
         files = list(modipyd.collect_files(directory))
-        self.assert_(files is not None)
+        self.assertNotNone(files)
         self.assertEqual(0, len(files))
 
 

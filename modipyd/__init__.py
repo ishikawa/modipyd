@@ -14,3 +14,8 @@ So I named it modipyd (modified + python).
     :license: MIT (See ``LICENSE`` file for more details)
 
 """
+
+from errno import ENOENT
+
+def collect_files(filepath):
+    raise IOError(ENOENT, "No such file or directory", filepath)

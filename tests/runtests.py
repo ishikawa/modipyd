@@ -19,7 +19,7 @@ import modipyd
 FILES_DIR = os.path.join(os.path.dirname(__file__))
 
 
-class TestModipyd(unittest.TestCase):
+class TestModipydCollectFiles(unittest.TestCase):
     """Tests modipyd functionalities"""
 
     def test_files_dir_exists(self):

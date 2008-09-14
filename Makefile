@@ -8,4 +8,4 @@ test:
 	python tests/runtests.py
 
 lint:
-	pylint --rcfile .pylintrc modipyd
+	pylint --rcfile .pylintrc modipyd tests/runtests.py

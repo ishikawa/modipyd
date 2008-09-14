@@ -4,6 +4,8 @@
 
 .PHONY: test lint
 
+all: lint test
+
 test:
 	python tests/runtests.py
 

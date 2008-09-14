@@ -23,8 +23,7 @@ class TestModipyd(unittest.TestCase):
 
     def test_files_dir_exists(self):
         self.assert_(os.path.exists(FILES_DIR))
-
-
+        self.assert_(os.path.isdir(FILES_DIR))
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 """
-Regression test for modipyd.
+Regression tests for modipyd
 """
 
 import os
@@ -11,5 +11,11 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import modipyd
 
-if __name__ == '__main__':
+
+class TestModipydFunctions(unittest.TestCase):
+    """Tests modipyd functions"""
+
     pass
+
+if __name__ == '__main__':
+    unittest.main()

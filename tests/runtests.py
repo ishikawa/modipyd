@@ -32,9 +32,9 @@ class TestModipyd(unittest.TestCase):
 
         try:
             modipyd.collect_files(filename)
-        except IOError, e:
-            self.assert_(e.errno is ENOENT)
-            self.assertEqual(filename, e.filename)
+        except IOError, ioe:
+            self.assert_(ioe.errno is ENOENT)
+            self.assertEqual(filename, ioe.filename)
         else:
             self.fail("Expected IOError")
 

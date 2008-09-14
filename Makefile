@@ -5,7 +5,7 @@
 .PHONY: test lint
 
 test:
-	python test/runtests.py
+	python tests/runtests.py
 
 lint:
 	pylint --rcfile .pylintrc modipyd

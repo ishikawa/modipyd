@@ -9,6 +9,11 @@ How this software works:
 So I named it **modipyd** _(modified + python)_.
 
 
+h3. Developer Notes
+
+* @make lint@ runs "pylint":http://www.logilab.org/857 with configuration file @.pylintrc@ in top level directory
+
+
 h3. Copyright
 
 Copyright (c) 2008 **Takanori Ishikawa** "&lt;takanori.ishikawa&#64;gmail.com&gt;":mailto:takanori.ishikawa@gmail.com, All rights reserved.

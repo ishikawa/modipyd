@@ -10,4 +10,5 @@ test:
 	python tests/runtests.py
 
 lint:
-	pylint --rcfile .pylintrc modipyd tests/runtests.py
+	pylint --rcfile .pylintrc --disable-msg=C0111 modipyd
+	pylint --rcfile .pylintrc --disable-msg=C0111,C0103,R0904 tests/runtests.py

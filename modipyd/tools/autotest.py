@@ -18,6 +18,7 @@ import os
 import sys
 import time
 import modipyd
+from modipyd import LOGGER
 
 
 def monitor(filepath):
@@ -51,7 +52,7 @@ def run():
             for modified in monitor(filepath):
                 print "Modified:\t", modified
     except KeyboardInterrupt:
-        pass
+        LOGGER.debug('KeyboardInterrupt', exc_info=True)
 
 
 if __name__ == '__main__':

@@ -37,6 +37,13 @@ class TestCase(unittest.TestCase):
     assertNotNone = failIfNone
 
 
+class TestModipyd(TestCase):
+    """Tests modipyd module"""
+
+    def test_logger(self):
+        self.assertNotNone(modipyd.LOGGER)
+
+
 class TestModipydCollectFiles(TestCase):
     """Tests modipyd functionalities"""
 

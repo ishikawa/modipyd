@@ -45,14 +45,24 @@ def monitor(filepath):
                 finally:
                     mtimes[filename] = mtime
 
-def run():
+
+# ----------------------------------------------------------------
+# Main
+# ----------------------------------------------------------------
+def main(files):
+    if isinstance(files, basestring):
+        raise TypeError("You must pass filepath list, but was string")
+
     try:
-        for filepath in sys.argv[1:]:
+        for filepath in files:
             #filepath = os.path.abspath(os.path.join(os.getcwd(), path))
             for modified in monitor(filepath):
                 print "Modified:\t", modified
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
+
+def run():
+    main(sys.argv[1:] or [os.getcwd()])
 
 
 if __name__ == '__main__':

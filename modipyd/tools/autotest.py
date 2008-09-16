@@ -26,9 +26,17 @@ def monitor(filepath):
     scripts = []
     for filename in modipyd.collect_files(filepath):
         if filename.endswith('.py'):
-            print "Monitoring:\t", filename
-            scripts.append(filename)
-            mtimes[filename] = os.path.getmtime(filename)
+            try:
+                mtime = os.path.getmtime(filename)
+            except os.error:
+                LOGGER.warn(
+                    "The file at %s does not exist"
+                    " or is inaccessible, ignore." % filename)
+            else:
+                print "Monitoring:\t", filename
+                scripts.append(filename)
+                mtimes[filename] = mtime
+
 
     # uniqfy
     scripts = list(set(scripts))
@@ -55,6 +63,7 @@ def main(filepath):
     try:
         for modified in monitor(filepath):
             print "Modified:\t", modified
+            #os.system("python ./tests/runtests.py")
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
 

@@ -42,7 +42,11 @@ LOGGER = __configure_logger(logging.INFO)
 # Public APIs
 # ----------------------------------------------------------------
 def collect_files(filepath_or_list):
-    """``collect_files()`` generates the file names in a directory tree."""
+    """
+    ``collect_files()`` generates the file names in a directory tree.
+    Note: ``collect_files()`` will not visit symbolic links to
+    subdirectories.
+    """
     for filepath in wrap_sequence(filepath_or_list):
         if not os.path.exists(filepath):
             raise IOError(ENOENT, "No such file or directory", filepath)

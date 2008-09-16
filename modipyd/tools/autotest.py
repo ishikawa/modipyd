@@ -25,7 +25,6 @@ def monitor(filepath):
     mtimes = {}
     scripts = []
     for filename in modipyd.collect_files(filepath):
-        print filename
         if filename.endswith('.py'):
             try:
                 mtime = os.path.getmtime(filename)
@@ -34,7 +33,6 @@ def monitor(filepath):
                     "The file at %s does not exist"
                     " or is inaccessible, ignore." % filename)
             else:
-                print "Monitoring:\t", filename
                 scripts.append(filename)
                 mtimes[filename] = mtime
 

@@ -18,7 +18,15 @@ So I named it modipyd (modified + python).
 import os
 from errno import ENOENT
 
+
 def collect_files(filepath):
+    """``collect_files()`` generates the file names in a directory tree."""
     if not os.path.exists(filepath):
         raise IOError(ENOENT, "No such file or directory", filepath)
-    return []
+    elif not os.path.isdir(filepath):
+        yield filepath
+    else:
+        # pylint: disable-msg=W0612
+        for dirpath, dirnames, filenames in os.walk(filepath):
+            for filename in filenames:
+                yield os.path.join(dirpath, filename)

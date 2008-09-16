@@ -17,19 +17,13 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 import os
 import sys
 import time
+import modipyd
 
-def collect(filepath):
-    if not os.path.isdir(filepath):
-        yield filepath
-    else:
-        for dirpath, dirnames, filenames in os.walk(filepath):
-            for filename in filenames:
-                yield os.path.join(dirpath, filename)
 
 def monitor(filepath):
     mtimes = {}
     scripts = []
-    for filename in collect(filepath):
+    for filename in modipyd.collect_files(filepath):
         if filename.endswith('.py'):
             print "Monitoring:\t", filename
             scripts.append(filename)

@@ -43,6 +43,12 @@ class TestModipyd(TestCase):
     def test_logger(self):
         self.assertNotNone(modipyd.LOGGER)
 
+    def test_wrap_sequence(self):
+        self.assertEqual([], modipyd.wrap_sequence([]))
+        self.assertEqual([1, 2, 3], modipyd.wrap_sequence([1, 2, 3]))
+        self.assertEqual((1,), modipyd.wrap_sequence(1))
+        self.assertEqual([1], modipyd.wrap_sequence(1, list))
+
 
 class TestModipydCollectFiles(TestCase):
     """Tests modipyd functionalities"""

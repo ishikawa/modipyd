@@ -30,6 +30,8 @@ def monitor(filepath):
             scripts.append(filename)
             mtimes[filename] = os.path.getmtime(filename)
 
+    # uniqfy
+    scripts = list(set(scripts))
     while scripts:
         time.sleep(1)
         for filename in scripts:
@@ -49,20 +51,15 @@ def monitor(filepath):
 # ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
-def main(files):
-    if isinstance(files, basestring):
-        raise TypeError("You must pass filepath list, but was string")
-
+def main(filepath):
     try:
-        for filepath in files:
-            #filepath = os.path.abspath(os.path.join(os.getcwd(), path))
-            for modified in monitor(filepath):
-                print "Modified:\t", modified
+        for modified in monitor(filepath):
+            print "Modified:\t", modified
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
 
 def run():
-    main(sys.argv[1:] or [os.getcwd()])
+    main(sys.argv[1:] or os.getcwd())
 
 
 if __name__ == '__main__':

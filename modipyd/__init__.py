@@ -41,14 +41,27 @@ LOGGER = __configure_logger(logging.INFO)
 # ----------------------------------------------------------------
 # Public APIs
 # ----------------------------------------------------------------
-def collect_files(filepath):
+def collect_files(filepath_or_list):
     """``collect_files()`` generates the file names in a directory tree."""
-    if not os.path.exists(filepath):
-        raise IOError(ENOENT, "No such file or directory", filepath)
-    elif not os.path.isdir(filepath):
-        yield filepath
+    for filepath in wrap_sequence(filepath_or_list):
+        if not os.path.exists(filepath):
+            raise IOError(ENOENT, "No such file or directory", filepath)
+        elif not os.path.isdir(filepath):
+            yield filepath
+        else:
+            # pylint: disable-msg=W0612
+            for dirpath, dirnames, filenames in os.walk(filepath):
+                for filename in filenames:
+                    yield os.path.join(dirpath, filename)
+
+def wrap_sequence(obj, sequence_type=tuple):
+    """
+    Return a tuple whose item is obj.
+    If obj is already a list or tuple, it is returned unchanged.
+    """
+    if isinstance(obj, (list, tuple)):
+        return obj
     else:
-        # pylint: disable-msg=W0612
-        for dirpath, dirnames, filenames in os.walk(filepath):
-            for filename in filenames:
-                yield os.path.join(dirpath, filename)
+        return sequence_type((obj,))
+
+    

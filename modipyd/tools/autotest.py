@@ -25,6 +25,7 @@ def monitor(filepath):
     mtimes = {}
     scripts = []
     for filename in modipyd.collect_files(filepath):
+        print filename
         if filename.endswith('.py'):
             try:
                 mtime = os.path.getmtime(filename)
@@ -36,7 +37,6 @@ def monitor(filepath):
                 print "Monitoring:\t", filename
                 scripts.append(filename)
                 mtimes[filename] = mtime
-
 
     # uniqfy
     scripts = list(set(scripts))

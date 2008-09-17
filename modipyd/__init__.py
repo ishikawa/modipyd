@@ -35,7 +35,7 @@ def __configure_logger(level):
     return logger
 
 # Logger object for project
-LOGGER = __configure_logger(logging.INFO)
+LOGGER = __configure_logger(logging.WARN)
 
 
 # ----------------------------------------------------------------

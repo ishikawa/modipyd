@@ -21,37 +21,55 @@ import modipyd
 from modipyd import LOGGER
 
 
+class PythonScript(object):
+    """Python source code file"""
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.mtime = os.path.getmtime(filename)
+
+    def update(self):
+        """Return True if updated"""
+        try:
+            mtime = os.path.getmtime(self.filename)
+            return mtime > self.mtime
+        finally:
+            self.mtime = mtime
+
+    def __hash__(self):
+        return hash(self.filename)
+
+    def __eq__(self, other):
+        return (isinstance(other, type(self)) and
+            self.filename == other.filename)
+
+
 def monitor(filepath):
-    mtimes = {}
     scripts = []
     for filename in modipyd.collect_files(filepath):
         if filename.endswith('.py'):
             try:
-                mtime = os.path.getmtime(filename)
+                modfile = PythonScript(filename)
+                LOGGER.info("Monitoring %s" % filename)
             except os.error:
                 LOGGER.warn(
                     "The file at %s does not exist"
                     " or is inaccessible, ignore." % filename)
             else:
-                scripts.append(filename)
-                mtimes[filename] = mtime
+                scripts.append(modfile)
 
     # uniqfy
     scripts = list(set(scripts))
     while scripts:
         time.sleep(1)
-        for filename in scripts:
-            if not os.path.exists(filename):
-                # remove entry
-                del scripts[filename]
-                del mtimes[filename]
-            else:
-                mtime = os.path.getmtime(filename)
-                try:
-                    if mtime > mtimes[filename]:
-                        yield filename
-                finally:
-                    mtimes[filename] = mtime
+        # For in-place deletion (avoids copying the list),
+        # Don't delete anything earlier in the list than
+        # the current element through.
+        for i, script in enumerate(reversed(scripts)):
+            if not os.path.exists(script.filename):
+                del script[-i]
+            elif script.update():
+                yield script.filename
 
 
 # ----------------------------------------------------------------
@@ -60,7 +78,7 @@ def monitor(filepath):
 def main(filepath):
     try:
         for modified in monitor(filepath):
-            print "Modified:\t", modified
+            LOGGER.info("Modified %s" % modified)
             #os.system("python ./tests/runtests.py")
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)

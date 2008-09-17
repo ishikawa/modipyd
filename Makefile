@@ -10,5 +10,5 @@ test:
 	python tests/runtests.py
 
 lint:
-	pylint --rcfile .pylintrc --disable-msg=I0011,C0111 modipyd
-	pylint --rcfile .pylintrc --disable-msg=I0011,C0111,C0103,R0904 tests/runtests.py
+	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=I0011,C0111 modipyd
+	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=I0011,C0111,C0103,R0904 tests/runtests.py

@@ -22,6 +22,7 @@ from optparse import OptionParser
 
 import modipyd
 from modipyd import LOGGER
+from modipyd.pyscript import PyScript
 
 
 # ----------------------------------------------------------------
@@ -35,48 +36,12 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 # ----------------------------------------------------------------
 # API, Functions, Classes...
 # ----------------------------------------------------------------
-class PythonScript(object):
-    """Python source code file"""
-
-    def __init__(self, filename):
-        if not os.path.isabs(filename):
-            raise RuntimeError("filename must be absolute path: %s" % filename)
-
-        self.filename = filename
-        # Instance variable ``mtime`` will be updated by ``update()``
-        self.mtime = None
-        self.update()
-        assert self.mtime is not None
-
-    def update(self):
-        """Return ``True`` if updated"""
-        return self.update_mtime()
-
-    def update_mtime(self):
-        """Update modification time and return ``True`` if modified"""
-        try:
-            mtime = os.path.getmtime(self.filename)
-            return self.mtime is None or mtime > self.mtime
-        finally:
-            self.mtime = mtime
-
-    def __hash__(self):
-        return hash(self.filename)
-
-    def __eq__(self, other):
-        return (isinstance(other, type(self)) and
-            self.filename == other.filename)
-
-    def __str__(self):
-        return self.filename
-
-
 def monitor(filepath):
     scripts = []
     for filename in modipyd.collect_files(filepath):
         if filename.endswith('.py'):
             try:
-                modfile = PythonScript(filename)
+                modfile = PyScript(filename)
                 LOGGER.info("Monitoring %s" % filename)
             except os.error:
                 LOGGER.warn(

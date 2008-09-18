@@ -40,13 +40,16 @@ class PythonScript(object):
 
     def __init__(self, filename):
         self.filename = filename
-        self.mtime = os.path.getmtime(filename)
+        # Instance variable ``mtime`` will be updated by ``update()``
+        self.mtime = None
+        self.update()
+        assert self.mtime is not None
 
     def update(self):
         """Return True if updated"""
         try:
             mtime = os.path.getmtime(self.filename)
-            return mtime > self.mtime
+            return self.mtime is None or mtime > self.mtime
         finally:
             self.mtime = mtime
 

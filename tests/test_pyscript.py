@@ -37,7 +37,7 @@ class TestPyScript(unittest_helper.TestCase):
 
         script = PyScript(pycpath)
         self.assertNotNone(script)
-        self.assertEqual(filepath, script.filename)
+        self.assertEqual(pycpath, script.filename)
 
 if __name__ == '__main__':
     unittest.main()

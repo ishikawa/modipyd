@@ -8,10 +8,10 @@ import os
 import sys
 import unittest
 import imp
-from os.path import join, normpath, dirname
+from os.path import join, dirname
 
 sys.path.insert(0, join(dirname(__file__), '..'))
-from modipyd import make_modulename
+from modipyd.utils import make_modulename
 
 
 tests = unittest.TestSuite()

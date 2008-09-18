@@ -15,14 +15,25 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 
 """
 import os
-import sys
 import time
-import optparse
+import logging
+from optparse import OptionParser
 
 import modipyd
 from modipyd import LOGGER
 
 
+# ----------------------------------------------------------------
+# Version
+# ----------------------------------------------------------------
+MAJOR_VERSION = 0
+MINOR_VERSION = 1
+VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
+
+
+# ----------------------------------------------------------------
+# API, Functions, Classes...
+# ----------------------------------------------------------------
 class PythonScript(object):
     """Python source code file"""
 
@@ -73,7 +84,6 @@ def monitor(filepath):
             elif script.update():
                 yield script.filename
 
-
 # ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
@@ -84,6 +94,13 @@ def main(options, filepath):
     with '.py' suffix. They are also inserted into ``sys.path`` so that
     program can import monitoring modules.
     """
+    # options handling
+    if options.verbose:
+        LOGGER.setLevel(logging.INFO)
+    if options.debug:
+        LOGGER.setLevel(logging.DEBUG)
+
+    # start monitoring
     try:
         for modified in monitor(filepath):
             LOGGER.info("Modified %s" % modified)
@@ -92,7 +109,21 @@ def main(options, filepath):
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
 
 def run():
-    main({}, sys.argv[1:] or os.getcwd())
+    """Standalone program interface"""
+    parser = OptionParser(
+        usage="usage: %prog [options] [files or directories]",
+        version=("%prog " + VERSION_STRING))
+
+    parser.add_option("-v", "--verbose",
+        action="store_true", dest="verbose", default=False,
+        help="Make the operation more talkative")
+    parser.add_option("--debug",
+        action="store_true", dest="debug", default=False,
+        help="Make the operation more talkative (debug mode)")
+
+    (options, args) = parser.parse_args()
+    #main(options, args or os.getcwd())
+    main(options, args or '.')
 
 
 if __name__ == '__main__':

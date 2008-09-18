@@ -67,5 +67,3 @@ def wrap_sequence(obj, sequence_type=tuple):
         return obj
     else:
         return sequence_type((obj,))
-
-    

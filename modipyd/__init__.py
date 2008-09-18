@@ -16,27 +16,25 @@ So I named it modipyd (modified + python).
 """
 
 import os
-import logging
-import re
-from errno import ENOENT
 
 
 # ----------------------------------------------------------------
 # Logger
 # ----------------------------------------------------------------
-def __configure_logger(level):
+def __configure_logger():
     """Configure project-wide logger"""
+    import logging
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(
         '%(asctime)s [%(levelname)s] %(message)s '
         '(File "%(pathname)s", line %(lineno)d, in %(funcName)s)'))
     logger = logging.getLogger(__name__)
     logger.addHandler(handler)
-    logger.setLevel(level)
+    logger.setLevel(logging.WARN)
     return logger
 
 # Logger object for project
-LOGGER = __configure_logger(logging.WARN)
+LOGGER = __configure_logger()
 
 
 # ----------------------------------------------------------------
@@ -48,8 +46,10 @@ def collect_files(filepath_or_list):
     Note: ``collect_files()`` will not visit symbolic links to
     subdirectories.
     """
+    from modipyd.utils import wrap_sequence
     for filepath in wrap_sequence(filepath_or_list):
         if not os.path.exists(filepath):
+            from errno import ENOENT
             raise IOError(ENOENT, "No such file or directory", filepath)
         elif not os.path.isdir(filepath):
             yield filepath
@@ -58,21 +58,3 @@ def collect_files(filepath_or_list):
             for dirpath, dirnames, filenames in os.walk(filepath):
                 for filename in filenames:
                     yield os.path.join(dirpath, filename)
-
-def wrap_sequence(obj, sequence_type=tuple):
-    """
-    Return a tuple whose item is obj.
-    If obj is already a list or tuple, it is returned unchanged.
-    """
-    if isinstance(obj, (list, tuple)):
-        return obj
-    else:
-        return sequence_type((obj,))
-
-def make_modulename(filepath):
-    """Convert string (e.g. filepath) so that it can be suitable for module name"""
-    # - Remove file extention
-    # - Replace identifier character with safe character
-    # - Make start with "_"
-    path, ext = os.path.splitext(filepath)
-    return '_' + re.sub(r'[^a-zA-Z0-9_]', '_', path)

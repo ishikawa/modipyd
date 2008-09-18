@@ -11,6 +11,13 @@ from unittest_helper import FILES_DIR
 import modipyd
 
 
+class TestModipyd(unittest_helper.TestCase):
+    """Tests modipyd module"""
+
+    def test_logger(self):
+        self.assertNotNone(modipyd.LOGGER)
+
+
 class TestModipydCollectFiles(unittest_helper.TestCase):
     """Tests modipyd functionalities"""
 

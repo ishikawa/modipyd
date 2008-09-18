@@ -17,14 +17,22 @@ class PyScript(object):
             raise RuntimeError("filename must be absolute path: %s" % filename)
 
         self.filename = filename
-        # Instance variable ``mtime`` will be updated by ``update()``
-        self.mtime = None
+        # Instance variables will be initialized by ``update()``
+        self.mtime = self.module = None
         self.update()
         assert self.mtime is not None
 
     def update(self):
         """Return ``True`` if updated"""
-        return self.update_mtime()
+        if not self.update_mtime():
+            return False
+
+        from imp import load_source
+        from modipyd.utils import make_modulename
+        self.module = load_source(make_modulename(self.filename), self.filename)
+        #import unittest
+        #print unittest.defaultTestLoader.loadTestsFromModule(self.module)
+        return True
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""

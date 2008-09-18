@@ -10,7 +10,7 @@ import unittest
 import imp
 from os.path import join, dirname
 
-sys.path.insert(0, join(dirname(__file__), '..'))
+import unittest_helper
 from modipyd.utils import make_modulename
 
 

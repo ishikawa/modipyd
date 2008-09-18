@@ -4,7 +4,7 @@ import unittest
 
 from os.path import join, normpath, dirname
 sys.path.insert(0, join(dirname(__file__), '..'))
-
+print sys.path
 
 # ----------------------------------------------------------------
 # Settings

@@ -15,6 +15,8 @@ class PyScript(object):
     def __init__(self, filename):
         if not os.path.isabs(filename):
             raise RuntimeError("filename must be absolute path: %s" % filename)
+        if not os.path.exists(filename):
+            raise RuntimeError("No such file or directory: %s" % filename)
 
         self.filename = filename
         # Instance variables will be initialized by ``update()``
@@ -24,16 +26,25 @@ class PyScript(object):
 
     def update(self):
         """Return ``True`` if updated"""
-        if not self.update_mtime():
+        if self.update_mtime():
+            self.reload_module()
+            return True
+        else:
             return False
 
-        from imp import load_source
+    def reload_module(self):
+        import imp
         from modipyd.utils import make_modulename
-        self.module = load_source(make_modulename(self.filename), self.filename)
-        return True
+
+        modname = make_modulename(self.filename)
+        if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
+            self.module = imp.load_compiled(modname, self.filename)
+        else:
+            self.module = imp.load_source(modname, self.filename)
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""
+        mtime = None
         try:
             mtime = os.path.getmtime(self.filename)
             return self.mtime is None or mtime > self.mtime

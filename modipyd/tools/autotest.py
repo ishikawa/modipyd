@@ -18,6 +18,7 @@ import os
 import sys
 import time
 import logging
+import unittest
 from optparse import OptionParser
 
 import modipyd
@@ -73,6 +74,23 @@ def monitor(scripts):
 # ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
+def collect_unittest(scripts):
+    """
+    Search ``unittest.TestCase`` classes in scripts,
+    return ``unittest.TestSuite`` instance.
+    """
+    suite = unittest.TestSuite()
+    loader = unittest.defaultTestLoader
+    for script in scripts:
+        tests = loader.loadTestsFromModule(script.module)
+        suite.addTest(tests)
+    return suite
+
+def run_unittest(scripts):
+    suite = collect_unittest(scripts)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 def main(options, filepath):
     """
     Monitoring modules on the search path ``path``. If ``path`` is
@@ -108,7 +126,7 @@ def main(options, filepath):
         scripts = collect_pyscript(filepath)
         for modified in monitor(scripts):
             LOGGER.info("Modified %s" % modified)
-            #os.system("python ./tests/runtests.py")
+            run_unittest(scripts)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)

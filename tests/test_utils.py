@@ -39,6 +39,7 @@ class TestMakeModulename(unittest_helper.TestCase):
     def test_different_modulename(self):
         self.assert_different_modulename("", "A")
         self.assert_different_modulename("/path/to/test.py", "/path/to/test")
+        self.assert_different_modulename("/path/to/test@!?.py", "/path/to/test@!!.py")
 
 
 if __name__ == '__main__':

@@ -23,6 +23,7 @@ from optparse import OptionParser
 import modipyd
 from modipyd import LOGGER
 from modipyd.pyscript import PyScript
+from modipyd import utils
 
 
 # ----------------------------------------------------------------
@@ -82,7 +83,7 @@ def main(options, filepath):
     # start monitoring
     try:
         # Make filepath iterable.
-        filepath = modipyd.wrap_sequence(filepath)
+        filepath = utils.wrap_sequence(filepath)
         assert not isinstance(filepath, basestring)
 
         # absolute path convertion

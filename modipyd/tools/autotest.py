@@ -39,6 +39,9 @@ class PythonScript(object):
     """Python source code file"""
 
     def __init__(self, filename):
+        if not os.path.isabs(filename):
+            raise RuntimeError("filename must be absolute path: %s" % filename)
+
         self.filename = filename
         # Instance variable ``mtime`` will be updated by ``update()``
         self.mtime = None
@@ -117,11 +120,15 @@ def main(options, filepath):
         filepath = modipyd.wrap_sequence(filepath)
         assert not isinstance(filepath, basestring)
 
+        # absolute path convertion
+        filepath = [os.path.abspath(f) for f in filepath]
+
         # Insert directories path into the head of ``sys.path``
         # so that ``monitor()`` can import found modules.
         # Notes: For the proper order of specified filepaths,
         # inserts path in reverse order.
         for f in reversed(filepath):
+            assert os.path.isabs(f)
             if os.path.isdir(f):
                 sys.path.insert(0, f)
                 LOGGER.info("sys.path: %s" % f)
@@ -146,8 +153,7 @@ def run():
         help="Make the operation more talkative (debug mode)")
 
     (options, args) = parser.parse_args()
-    #main(options, args or os.getcwd())
-    main(options, args or '.')
+    main(options, args or os.getcwd())
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
 import sys
 from os.path import dirname, join, normpath
 
-sys.path.insert(0, normpath(join(dirname(__file__), '../')))
-from modipyd.tools import autotest
-
-autotest.run()
+if __name__ == '__main__':
+    sys.path.insert(0, normpath(join(dirname(__file__), '..')))
+    from modipyd.tools import autotest
+    autotest.run()

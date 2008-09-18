@@ -46,7 +46,11 @@ class PythonScript(object):
         assert self.mtime is not None
 
     def update(self):
-        """Return True if updated"""
+        """Return ``True`` if updated"""
+        return self.update_mtime()
+
+    def update_mtime(self):
+        """Update modification time and return ``True`` if modified"""
         try:
             mtime = os.path.getmtime(self.filename)
             return self.mtime is None or mtime > self.mtime

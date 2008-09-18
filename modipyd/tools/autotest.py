@@ -64,6 +64,9 @@ class PythonScript(object):
         return (isinstance(other, type(self)) and
             self.filename == other.filename)
 
+    def __str__(self):
+        return self.filename
+
 
 def monitor(filepath):
     scripts = []
@@ -90,7 +93,7 @@ def monitor(filepath):
             if not os.path.exists(script.filename):
                 del script[-i]
             elif script.update():
-                yield script.filename
+                yield script
 
 # ----------------------------------------------------------------
 # Main

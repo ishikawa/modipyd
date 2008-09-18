@@ -125,6 +125,7 @@ def main(options, filepath):
         scripts = collect_pyscript(filepath)
         for modified in monitor(scripts):
             LOGGER.info("Modified %s" % modified)
+            print sys.modules
             run_unittest(scripts)
 
     except KeyboardInterrupt:

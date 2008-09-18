@@ -5,7 +5,6 @@ Regression tests for modipyd
 """
 
 import os
-import sys
 import unittest
 import imp
 from os.path import join, dirname

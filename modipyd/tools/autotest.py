@@ -17,6 +17,8 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 import os
 import sys
 import time
+import optparse
+
 import modipyd
 from modipyd import LOGGER
 
@@ -75,7 +77,13 @@ def monitor(filepath):
 # ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
-def main(filepath):
+def main(options, filepath):
+    """
+    Monitoring modules on the search path ``path``. If ``path`` is
+    a list of directory names, each directory is searched for files
+    with '.py' suffix. They are also inserted into ``sys.path`` so that
+    program can import monitoring modules.
+    """
     try:
         for modified in monitor(filepath):
             LOGGER.info("Modified %s" % modified)
@@ -84,7 +92,7 @@ def main(filepath):
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
 
 def run():
-    main(sys.argv[1:] or os.getcwd())
+    main({}, sys.argv[1:] or os.getcwd())
 
 
 if __name__ == '__main__':

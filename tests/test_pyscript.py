@@ -29,6 +29,9 @@ class TestPyScript(unittest_helper.TestCase):
         pypath = os.path.splitext(filepath)[0] + ".py"
         pycpath = pypath + "c"
 
+        assert pypath.endswith(".py")
+        assert pycpath.endswith(".pyc")
+
         if not os.path.exists(pycpath):
             import py_compile
             print "Compile", pycpath

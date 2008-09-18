@@ -15,6 +15,7 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 
 """
 import os
+import sys
 import time
 import logging
 from optparse import OptionParser
@@ -102,6 +103,19 @@ def main(options, filepath):
 
     # start monitoring
     try:
+        # Make filepath iterable.
+        filepath = modipyd.wrap_sequence(filepath)
+        assert not isinstance(filepath, basestring)
+
+        # Insert directories path into the head of ``sys.path``
+        # so that ``monitor()`` can import found modules.
+        # Notes: For the proper order of specified filepaths,
+        # inserts path in reverse order.
+        for f in reversed(filepath):
+            if os.path.isdir(f):
+                sys.path.insert(0, f)
+                LOGGER.info("sys.path: %s" % f)
+
         for modified in monitor(filepath):
             LOGGER.info("Modified %s" % modified)
             #os.system("python ./tests/runtests.py")

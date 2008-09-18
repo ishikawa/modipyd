@@ -30,8 +30,6 @@ class PyScript(object):
         from imp import load_source
         from modipyd.utils import make_modulename
         self.module = load_source(make_modulename(self.filename), self.filename)
-        #import unittest
-        #print unittest.defaultTestLoader.loadTestsFromModule(self.module)
         return True
 
     def update_mtime(self):

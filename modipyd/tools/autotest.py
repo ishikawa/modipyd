@@ -37,13 +37,13 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 # ----------------------------------------------------------------
 # API, Functions, Classes...
 # ----------------------------------------------------------------
-def monitor(filepath):
+def collect_pyscript(filepath):
     scripts = []
     for filename in modipyd.collect_files(filepath):
         if filename.endswith('.py'):
             try:
                 modfile = PyScript(filename)
-                LOGGER.info("Monitoring %s" % filename)
+                LOGGER.info("Found: %s" % filename)
             except os.error:
                 LOGGER.warn(
                     "The file at %s does not exist"
@@ -52,7 +52,12 @@ def monitor(filepath):
                 scripts.append(modfile)
 
     # uniqfy
-    scripts = list(set(scripts))
+    return list(set(scripts))
+
+
+def monitor(scripts):
+    """WARNING: This method can modify ``scripts`` list."""
+    assert isinstance(scripts, list)
     while scripts:
         time.sleep(1)
         # For in-place deletion (avoids copying the list),
@@ -63,6 +68,7 @@ def monitor(filepath):
                 del script[-i]
             elif script.update():
                 yield script
+
 
 # ----------------------------------------------------------------
 # Main
@@ -99,9 +105,11 @@ def main(options, filepath):
                 sys.path.insert(0, f)
                 LOGGER.info("sys.path: %s" % f)
 
-        for modified in monitor(filepath):
+        scripts = collect_pyscript(filepath)
+        for modified in monitor(scripts):
             LOGGER.info("Modified %s" % modified)
             #os.system("python ./tests/runtests.py")
+
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
 

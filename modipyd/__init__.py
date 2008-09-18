@@ -17,6 +17,7 @@ So I named it modipyd (modified + python).
 
 import os
 import logging
+import re
 from errno import ENOENT
 
 
@@ -67,3 +68,11 @@ def wrap_sequence(obj, sequence_type=tuple):
         return obj
     else:
         return sequence_type((obj,))
+
+def make_modulename(filepath):
+    """Convert string (e.g. filepath) so that it can be suitable for module name"""
+    # - Remove file extention
+    # - Replace identifier character with safe character
+    # - Make start with "_"
+    path, ext = os.path.splitext(filepath)
+    return '_' + re.sub(r'[^a-zA-Z0-9_]', '_', path)

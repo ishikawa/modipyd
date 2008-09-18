@@ -22,7 +22,6 @@ class TestPyScript(unittest_helper.TestCase):
         script = PyScript(filepath)
         self.assertNotNone(script)
         self.assertEqual(filepath, script.filename)
-        self.assertNotNone(script.mtime)
 
     def test_bytecode_file(self):
         """Tests compiled byte-code file"""

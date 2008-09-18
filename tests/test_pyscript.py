@@ -10,6 +10,12 @@ from modipyd.pyscript import PyScript
 
 class TestPyScript(unittest_helper.TestCase):
 
+    def assert_pyscript(self, script, filepath):
+        self.assertNotNone(script)
+        self.assertEqual(filepath, script.filename)
+        self.assertNotNone(script.mtime)
+        self.assertEqual(os.path.getmtime(filepath), script.mtime)
+
     def test_abspath(self):
         self.assertRaises(RuntimeError, PyScript, 'runtests.py')
 
@@ -19,9 +25,7 @@ class TestPyScript(unittest_helper.TestCase):
 
     def test_init(self):
         filepath = abspath(join(dirname(__file__), 'runtests.py'))
-        script = PyScript(filepath)
-        self.assertNotNone(script)
-        self.assertEqual(filepath, script.filename)
+        self.assert_pyscript(PyScript(filepath), filepath)
 
     def test_bytecode_file(self):
         """Tests compiled byte-code file"""
@@ -38,9 +42,7 @@ class TestPyScript(unittest_helper.TestCase):
             py_compile.compile(pypath, pycpath)
             self.assert_(os.path.exists(pycpath))
 
-        script = PyScript(pycpath)
-        self.assertNotNone(script)
-        self.assertEqual(pycpath, script.filename)
+        self.assert_pyscript(PyScript(pycpath), pycpath)
 
 if __name__ == '__main__':
     unittest.main()

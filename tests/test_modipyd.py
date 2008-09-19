@@ -1,24 +1,22 @@
 #!/usr/bin/env python
 
 import os
-import sys
 import unittest
 from errno import ENOENT
-from os.path import join, normpath, dirname
+from os.path import join, normpath
 
-import unittest_helper
-from unittest_helper import FILES_DIR
 import modipyd
+from tests import TestCase, FILES_DIR
 
 
-class TestModipyd(unittest_helper.TestCase):
+class TestModipyd(TestCase):
     """Tests modipyd module"""
 
     def test_logger(self):
         self.assertNotNone(modipyd.LOGGER)
 
 
-class TestModipydCollectFiles(unittest_helper.TestCase):
+class TestModipydCollectFiles(TestCase):
     """Tests modipyd functionalities"""
 
     def test_files_dir_exists(self):

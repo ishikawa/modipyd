@@ -4,11 +4,11 @@ import os
 from os.path import abspath, join, dirname
 import unittest
 
-import unittest_helper
 from modipyd.pyscript import PyScript
+from tests import TestCase
 
 
-class TestPyScript(unittest_helper.TestCase):
+class TestPyScript(TestCase):
 
     def assert_pyscript(self, script, filepath):
         self.assertNotNone(script)
@@ -24,7 +24,7 @@ class TestPyScript(unittest_helper.TestCase):
         self.assertRaises(RuntimeError, PyScript, filepath)
 
     def test_init(self):
-        filepath = abspath(join(dirname(__file__), 'runtests.py'))
+        filepath = abspath(join(dirname(__file__), 'test_pyscript.py'))
         self.assert_pyscript(PyScript(filepath), filepath)
 
     def test_bytecode_file(self):

@@ -2,12 +2,12 @@
 
 import re
 import unittest
-import unittest_helper
-import modipyd
+
 from modipyd import utils
+from tests import TestCase
 
 
-class TestModipydUtils(unittest_helper.TestCase):
+class TestModipydUtils(TestCase):
 
     def test_wrap_sequence(self):
         self.assertEqual([], utils.wrap_sequence([]))
@@ -16,7 +16,7 @@ class TestModipydUtils(unittest_helper.TestCase):
         self.assertEqual([1], utils.wrap_sequence(1, list))
 
 
-class TestMakeModulename(unittest_helper.TestCase):
+class TestMakeModulename(TestCase):
 
     MODULE_NAME_RE = re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*$')
 
@@ -39,7 +39,8 @@ class TestMakeModulename(unittest_helper.TestCase):
     def test_different_modulename(self):
         self.assert_different_modulename("", "A")
         self.assert_different_modulename("/path/to/test.py", "/path/to/test")
-        self.assert_different_modulename("/path/to/test@!?.py", "/path/to/test@!!.py")
+        self.assert_different_modulename(
+            "/path/to/test@!?.py", "/path/to/test@!!.py")
 
 
 if __name__ == '__main__':

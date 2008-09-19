@@ -1,15 +1,21 @@
+"""
+Regression tests for modipyd
+
+    :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
+    :license: MIT (See ``LICENSE`` file for more details)
+
+"""
+
 import sys
 import unittest
-
 from os.path import join, dirname
-sys.path.insert(0, join(dirname(__file__), '..'))
-
 
 # ----------------------------------------------------------------
 # Settings
 # ----------------------------------------------------------------
 # The directory contains test files.
 FILES_DIR = join(dirname(__file__), 'files')
+
 
 class TestCase(unittest.TestCase):
     """Custom TestCase class"""

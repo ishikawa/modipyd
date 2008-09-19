@@ -2,9 +2,11 @@
 
 import re
 import unittest
+import os
+from os.path import join
 
 from modipyd import utils
-from tests import TestCase
+from tests import TestCase, FILES_DIR
 
 
 class TestModipydUtils(TestCase):
@@ -14,6 +16,19 @@ class TestModipydUtils(TestCase):
         self.assertEqual([1, 2, 3], utils.wrap_sequence([1, 2, 3]))
         self.assertEqual((1,), utils.wrap_sequence(1))
         self.assertEqual([1], utils.wrap_sequence(1, list))
+
+    def test_is_python_module_file(self):
+        filepath = join(FILES_DIR, '000/001')
+        script = join(FILES_DIR, 'python/a.py')
+
+        assert os.path.exists(filepath)
+        assert os.path.exists(script)
+
+        self.assert_(utils.is_python_module_file(script),
+            "Expected python file: %s" % script)
+        self.assert_(not utils.is_python_module_file(filepath),
+            "Expected not python file: %s" % filepath)
+        self.assert_(not utils.is_python_module_file("not_found_file"))
 
 
 class TestMakeModulename(TestCase):

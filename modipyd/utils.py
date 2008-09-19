@@ -31,7 +31,7 @@ def is_python_module_file(filepath):
     """
     try:
         st = os.stat(filepath)
-    except os.error:
+    except (TypeError, os.error):
         return False
     else:
         return (stat.S_ISREG(st.st_mode) and
@@ -44,6 +44,9 @@ def detect_modulename(filepath, search_path=None):
     the search path ``search_path``. If *path* is omitted or ``None``,
     ``sys.path`` is used.
     """
+    if not is_python_module_file(filepath):
+        raise RuntimeError("Not a python script: %s" % filepath)
+
     dirpath, modname = os.path.split(filepath)
     if not modname:
         raise RuntimeError("filepath must not be directory")

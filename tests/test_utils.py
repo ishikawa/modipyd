@@ -24,11 +24,21 @@ class TestModipydUtils(TestCase):
         assert os.path.exists(filepath)
         assert os.path.exists(script)
 
+        self.assert_(not utils.is_python_module_file(None))
+        self.assert_(not utils.is_python_module_file(""))
+
         self.assert_(utils.is_python_module_file(script),
             "Expected python file: %s" % script)
         self.assert_(not utils.is_python_module_file(filepath),
             "Expected not python file: %s" % filepath)
         self.assert_(not utils.is_python_module_file("not_found_file"))
+
+
+class TestDetectModulename(TestCase):
+
+    def test_empty(self):
+        self.assertRaises(RuntimeError, utils.detect_modulename, None)
+        self.assertRaises(RuntimeError, utils.detect_modulename, "")
 
 
 class TestMakeModulename(TestCase):

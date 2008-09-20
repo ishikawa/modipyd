@@ -43,8 +43,8 @@ def collect_pyscript(filepath):
         if filename.endswith('.py'):
             try:
                 modfile = PyScript(filename)
-                #print modfile.module
-                LOGGER.info("Found: %s" % filename)
+                LOGGER.info("Found: %s" % modfile)
+                LOGGER.info("Module Loaded: %s" % modfile.module)
             except os.error:
                 LOGGER.warn(
                     "The file at %s does not exist"
@@ -128,7 +128,7 @@ def main(options, filepath):
         scripts = collect_pyscript(filepath)
         for modified in monitor(scripts):
             LOGGER.info("Modified %s" % modified)
-            print sys.modules
+            #print sys.modules
             run_unittest(scripts)
 
     except KeyboardInterrupt:

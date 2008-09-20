@@ -7,6 +7,7 @@ The ``PyScript`` class is Python script file abstraction.
 """
 
 import os
+import sys
 
 
 class PyScript(object):
@@ -27,20 +28,24 @@ class PyScript(object):
     def update(self):
         """Return ``True`` if updated"""
         if self.update_mtime():
-            self.reload_module()
+            self.load_module()
             return True
         else:
             return False
 
-    def reload_module(self):
-        import imp
+    def load_module(self, reload_module=False):
         from modipyd.utils import find_modulename
-
         modname = find_modulename(self.filename)
-        if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
-            self.module = imp.load_compiled(modname, self.filename)
-        else:
-            self.module = imp.load_source(modname, self.filename)
+        
+        if modname in sys.modules:
+            self.module = sys.modules[modname]
+
+        if reload_module or not self.module:
+            import imp
+            if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
+                self.module = imp.load_compiled(modname, self.filename)
+            else:
+                self.module = imp.load_source(modname, self.filename)
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""

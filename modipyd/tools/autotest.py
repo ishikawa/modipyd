@@ -129,7 +129,12 @@ def main(options, filepath):
         for modified in monitor(scripts):
             LOGGER.info("Modified %s" % modified)
             #print sys.modules
-            run_unittest(scripts)
+            if os.fork() == 0:
+                LOGGER.debug("Forking child process (%d)" % os.getpid())
+                modified.load_module(reload_module=True)
+                run_unittest(scripts)
+                LOGGER.debug("Terminate child process (%d)" % os.getpid())
+                os._exit(os.EX_OK)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)

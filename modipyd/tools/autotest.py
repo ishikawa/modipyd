@@ -117,11 +117,13 @@ def main(options, filepath):
         # so that ``monitor()`` can import found modules.
         # Notes: For the proper order of specified filepaths,
         # inserts path in reverse order.
+        """
         for f in reversed(filepath):
             assert os.path.isabs(f)
             if os.path.isdir(f):
                 sys.path.insert(0, f)
                 LOGGER.info("sys.path: %s" % f)
+        """
 
         scripts = collect_pyscript(filepath)
         for modified in monitor(scripts):

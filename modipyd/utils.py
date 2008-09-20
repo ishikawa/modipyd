@@ -38,39 +38,50 @@ def is_python_module_file(filepath):
             PYTHON_SCRIPT_FILENAME_RE.match(filepath))
 
 
-def detect_modulename(filepath, search_path=None):
+def detect_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on
-    the search path ``search_path``. If *path* is omitted or ``None``,
+    the search path ``search_paths``. If *path* is omitted or ``None``,
     ``sys.path`` is used.
+    
+    Notes: This function only returns first found module name.
     """
     if not is_python_module_file(filepath):
         raise RuntimeError("Not a python script: %s" % filepath)
 
+    # filepath must be absolute.
+    filepath = os.path.abspath(filepath)
     dirpath, modname = os.path.split(filepath)
-    if not modname:
-        raise RuntimeError("filepath must not be directory")
+    assert modname
 
     # ignore extention (e.g. '.py', '.pyc')
     modname, _ = os.path.splitext(modname)
-    if modname == '__init__':
-        # package itself
-        dirpath, modname = os.path.split(dirpath)
+    assert _
 
-    # Now, dirpath should be in sys.path so that
+    # Now, dirpath should be in search path so that
     # interpreter finds this module.
-    import sys
-    assert dirpath
+    if search_paths is None:
+        import sys
+        search_paths = sys.path
 
-    if search_path is None:
-        search_path = sys.path
+    def detect(name, dirpath, search_paths):
+        assert name and os.path.isabs(dirpath)
+        for path in search_paths:
 
-    for path in search_path:
-        if dirpath.startswith(path):
+            path = os.path.abspath(path)
+            if not dirpath.startswith(path):
+                continue
+
             while dirpath != path:
                 dirpath, parent = os.path.split(dirpath)
-                modname = "%s.%s" % (parent, modname)
-            return modname
+                name = "%s.%s" % (parent, name)
+            else:
+                if name.endswith(".__init__"):
+                    name = name[:-9]
+            yield name
+
+    for detected in detect(modname, dirpath, search_paths):
+        return detected
     return None
 
 

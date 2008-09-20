@@ -3,7 +3,8 @@
 import re
 import unittest
 import os
-from os.path import join
+import sys
+from os.path import join, dirname
 
 from modipyd import utils
 from tests import TestCase, FILES_DIR
@@ -39,6 +40,54 @@ class TestDetectModulename(TestCase):
     def test_empty(self):
         self.assertRaises(RuntimeError, utils.detect_modulename, None)
         self.assertRaises(RuntimeError, utils.detect_modulename, "")
+
+    def assert_detect_modulename_in_dir(self,
+                            expected_name, filepath, directory):
+        name = utils.detect_modulename(filepath, [directory])
+        self.assertEqual(expected_name,
+            name,
+            "Expected module name is '%s', but was '%s' (%s in %s)" %
+            (expected_name, name, filepath, directory))
+
+        # '/'
+        directory += '/'
+        name = utils.detect_modulename(filepath, [directory])
+        self.assertEqual(expected_name,
+            name,
+            "Expected module name is '%s', but was '%s' (%s in %s)" %
+            (expected_name, name, filepath, directory))
+
+    def test_python_package(self):
+        python_dir = join(FILES_DIR, 'python')
+        script = join(python_dir, '__init__.py')
+        self.assert_detect_modulename_in_dir("python",
+            script, dirname(python_dir))
+
+    def test_python_script(self):
+        python_dir = join(FILES_DIR, 'python')
+        script = join(python_dir, 'a.py')
+        self.assert_detect_modulename_in_dir("a", script, python_dir)
+        self.assert_detect_modulename_in_dir("python.a",
+            script, dirname(python_dir))
+
+    def test_sys_path(self):
+        top = join(dirname(__file__), "..")
+        search_path = sys.path[:]
+        search_path.insert(0, top)
+
+        self.assertEqual("modipyd", 
+            utils.detect_modulename(
+                join(top, "modipyd/__init__.py"),
+                search_path))
+        self.assertEqual("modipyd.utils", 
+            utils.detect_modulename(
+                join(top, "modipyd/utils.py"),
+                search_path))
+        self.assertEqual("modipyd.tools", 
+            utils.detect_modulename(
+                join(top, "modipyd/tools/__init__.py"),
+                search_path))
+
 
 
 class TestMakeModulename(TestCase):

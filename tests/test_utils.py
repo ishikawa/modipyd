@@ -88,6 +88,16 @@ class TestDetectModulename(TestCase):
                 join(top, "modipyd/tools/__init__.py"),
                 search_path))
 
+    def test_common_prefix_path(self):
+        python_dir = join(FILES_DIR, 'python')
+        python2_dir = join(FILES_DIR, 'python2')
+        search_path = [python_dir, python2_dir]
+
+        script = join(python2_dir, '__init__.py')
+        self.assertEqual("b",
+            utils.detect_modulename(
+                join(python2_dir, "b.py"),
+                search_path))
 
 
 class TestMakeModulename(TestCase):

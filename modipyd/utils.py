@@ -64,16 +64,32 @@ def detect_modulename(filepath, search_paths=None):
         import sys
         search_paths = sys.path
 
+    def is_parent_or_same(test_dir, filepath):
+        assert test_dir and filepath
+        assert os.path.isabs(test_dir) and os.path.isabs(filepath)
+        
+        # 1. /path/to/parent - /path/to/parent
+        # 2. /path/to/parent/ - /path/to/parent/file
+        # 3. /path/to/parent - /path/to/parent/file
+        return (filepath.startswith(test_dir) and (
+            len(filepath) == len(test_dir) or
+            test_dir[-1] == '/' or
+            filepath[len(test_dir)] == '/'))
+
     def detect(name, dirpath, search_paths):
-        assert name and os.path.isabs(dirpath)
+        assert name and dirpath
+        assert os.path.isabs(dirpath)
+        assert dirpath[-1] != '/'
+
         for path in search_paths:
 
             path = os.path.abspath(path)
-            if not dirpath.startswith(path):
+            if not is_parent_or_same(path, dirpath):
                 continue
 
             while dirpath != path:
                 dirpath, parent = os.path.split(dirpath)
+                assert parent, "parent is empty, leads infinite loop!"
                 name = "%s.%s" % (parent, name)
             else:
                 if name.endswith(".__init__"):

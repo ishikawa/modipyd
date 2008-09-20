@@ -46,7 +46,7 @@ def find_modulename(filepath, search_paths=None):
 
     Notes: This function only returns first found module name.
     """
-    from os.path import abspath, isabs, samestat
+    from os.path import abspath, samestat
     if not is_python_module_file(filepath):
         raise RuntimeError("Not a python script: %s" % filepath)
 

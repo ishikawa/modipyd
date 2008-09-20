@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import re
 import unittest
 import os
 import sys
@@ -106,7 +105,6 @@ class TestDetectModulename(TestCase):
         python2_dir = join(FILES_DIR, 'python2')
         search_path = [python_dir, python2_dir]
 
-        script = join(python2_dir, '__init__.py')
         self.assertEqual("b",
             utils.find_modulename(
                 join(python2_dir, "b.py"),

@@ -7,7 +7,7 @@ Regression tests for modipyd
 import os
 import unittest
 import imp
-from os.path import join, dirname, basename, splitext
+from os.path import join, dirname
 from modipyd.utils import find_modulename
 
 tests = unittest.TestSuite()

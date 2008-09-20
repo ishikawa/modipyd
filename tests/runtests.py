@@ -8,7 +8,7 @@ import os
 import unittest
 import imp
 from os.path import join, dirname, basename, splitext
-from modipyd.utils import detect_modulename
+from modipyd.utils import find_modulename
 
 tests = unittest.TestSuite()
 
@@ -18,7 +18,8 @@ for dirpath, dirnames, filenames in os.walk(dirname(__file__)):
             continue
 
         filepath = join(dirpath, name)
-        modulename = detect_modulename(filepath)
+        modulename = find_modulename(filepath)
+        #print modulename, filepath
         module = imp.load_source(modulename, filepath)
         suite = unittest.defaultTestLoader.loadTestsFromModule(module)
         tests.addTest(suite)

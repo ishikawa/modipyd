@@ -38,21 +38,22 @@ def is_python_module_file(filepath):
             PYTHON_SCRIPT_FILENAME_RE.match(filepath))
 
 
-def detect_modulename(filepath, search_paths=None):
+def find_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on
     the search path ``search_paths``. If *path* is omitted or ``None``,
     ``sys.path`` is used.
-    
+
     Notes: This function only returns first found module name.
     """
+    from os.path import abspath, isabs, samestat
     if not is_python_module_file(filepath):
         raise RuntimeError("Not a python script: %s" % filepath)
 
     # filepath must be absolute.
     filepath = os.path.abspath(filepath)
     dirpath, modname = os.path.split(filepath)
-    assert modname
+    assert os.path.isabs(dirpath) and modname
 
     # ignore extention (e.g. '.py', '.pyc')
     modname, _ = os.path.splitext(modname)
@@ -64,40 +65,27 @@ def detect_modulename(filepath, search_paths=None):
         import sys
         search_paths = sys.path
 
-    def is_parent_or_same(test_dir, filepath):
-        assert test_dir and filepath
-        assert os.path.isabs(test_dir) and os.path.isabs(filepath)
-        
-        # 1. /path/to/parent - /path/to/parent
-        # 2. /path/to/parent/ - /path/to/parent/file
-        # 3. /path/to/parent - /path/to/parent/file
-        return (filepath.startswith(test_dir) and (
-            len(filepath) == len(test_dir) or
-            test_dir[-1] == '/' or
-            filepath[len(test_dir)] == '/'))
+    def _find_modulename(name, dirpath, search_path):
+        # search_path must be string
+        assert isinstance(search_path, basestring)
+        if not os.path.isdir(search_path):
+            return None
 
-    def detect(name, dirpath, search_paths):
-        assert name and dirpath
-        assert os.path.isabs(dirpath)
-        assert dirpath[-1] != '/'
+        st = os.stat(search_path)
+        while not samestat(st, os.stat(dirpath)):
+            if dirpath == '/':
+                return None # not found in search_path
+            dirpath, parent = os.path.split(dirpath)
+            name = "%s.%s" % (parent, name)
+        else:
+            if name.endswith(".__init__"):
+                name = name[:-9]
+        return name
 
-        for path in search_paths:
-
-            path = os.path.abspath(path)
-            if not is_parent_or_same(path, dirpath):
-                continue
-
-            while dirpath != path:
-                dirpath, parent = os.path.split(dirpath)
-                assert parent, "parent is empty, leads infinite loop!"
-                name = "%s.%s" % (parent, name)
-            else:
-                if name.endswith(".__init__"):
-                    name = name[:-9]
-            yield name
-
-    for detected in detect(modname, dirpath, search_paths):
-        return detected
+    for syspath in (abspath(f) for f in search_paths):
+        name = _find_modulename(modname, dirpath, syspath)
+        if name:
+            return name
     return None
 
 

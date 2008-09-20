@@ -38,12 +38,12 @@ class TestModipydUtils(TestCase):
 class TestDetectModulename(TestCase):
 
     def test_empty(self):
-        self.assertRaises(RuntimeError, utils.detect_modulename, None)
-        self.assertRaises(RuntimeError, utils.detect_modulename, "")
+        self.assertRaises(RuntimeError, utils.find_modulename, None)
+        self.assertRaises(RuntimeError, utils.find_modulename, "")
 
-    def assert_detect_modulename_in_dir(self,
+    def assert_find_modulename_in_dir(self,
                             expected_name, filepath, directory):
-        name = utils.detect_modulename(filepath, [directory])
+        name = utils.find_modulename(filepath, [directory])
         self.assertEqual(expected_name,
             name,
             "Expected module name is '%s', but was '%s' (%s in %s)" %
@@ -51,7 +51,7 @@ class TestDetectModulename(TestCase):
 
         # '/'
         directory += '/'
-        name = utils.detect_modulename(filepath, [directory])
+        name = utils.find_modulename(filepath, [directory])
         self.assertEqual(expected_name,
             name,
             "Expected module name is '%s', but was '%s' (%s in %s)" %
@@ -60,14 +60,14 @@ class TestDetectModulename(TestCase):
     def test_python_package(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, '__init__.py')
-        self.assert_detect_modulename_in_dir("python",
+        self.assert_find_modulename_in_dir("python",
             script, dirname(python_dir))
 
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
-        self.assert_detect_modulename_in_dir("a", script, python_dir)
-        self.assert_detect_modulename_in_dir("python.a",
+        self.assert_find_modulename_in_dir("a", script, python_dir)
+        self.assert_find_modulename_in_dir("python.a",
             script, dirname(python_dir))
 
     def test_sys_path(self):
@@ -76,15 +76,15 @@ class TestDetectModulename(TestCase):
         search_path.insert(0, top)
 
         self.assertEqual("modipyd", 
-            utils.detect_modulename(
+            utils.find_modulename(
                 join(top, "modipyd/__init__.py"),
                 search_path))
         self.assertEqual("modipyd.utils", 
-            utils.detect_modulename(
+            utils.find_modulename(
                 join(top, "modipyd/utils.py"),
                 search_path))
         self.assertEqual("modipyd.tools", 
-            utils.detect_modulename(
+            utils.find_modulename(
                 join(top, "modipyd/tools/__init__.py"),
                 search_path))
 
@@ -95,7 +95,7 @@ class TestDetectModulename(TestCase):
 
         script = join(python2_dir, '__init__.py')
         self.assertEqual("b",
-            utils.detect_modulename(
+            utils.find_modulename(
                 join(python2_dir, "b.py"),
                 search_path))
 

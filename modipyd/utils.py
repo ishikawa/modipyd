@@ -37,6 +37,13 @@ def is_python_module_file(filepath):
         return (stat.S_ISREG(st.st_mode) and
             PYTHON_SCRIPT_FILENAME_RE.match(filepath))
 
+def is_python_package(dirpath):
+    from os.path import isdir, isfile, join
+    if not isdir(dirpath):
+        return False
+    return (isfile(join(dirpath, '__init__.py')) or
+            isfile(join(dirpath, '__init__.pyc')) or
+            isfile(join(dirpath, '__init__.pyo')))
 
 def find_modulename(filepath, search_paths=None):
     """
@@ -71,8 +78,11 @@ def find_modulename(filepath, search_paths=None):
         if not os.path.isdir(search_path):
             return None
 
+        qp = is_python_package(dirpath)
         st = os.stat(search_path)
         while not samestat(st, os.stat(dirpath)):
+            if not qp:
+                return None # No parent package
             if dirpath == '/':
                 return None # not found in search_path
             dirpath, parent = os.path.split(dirpath)
@@ -86,4 +96,4 @@ def find_modulename(filepath, search_paths=None):
         name = _find_modulename(modname, dirpath, syspath)
         if name:
             return name
-    return None
+    raise ImportError("No module name found: %s" % filepath)

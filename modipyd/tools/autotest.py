@@ -49,6 +49,8 @@ def collect_pyscript(filepath):
                 LOGGER.warn(
                     "The file at %s does not exist"
                     " or is inaccessible, ignore." % filename)
+            except ImportError:
+                LOGGER.info("Couldn't import file at %s, ignore" % filename)
             else:
                 scripts.append(modfile)
 

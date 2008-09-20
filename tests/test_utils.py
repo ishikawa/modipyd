@@ -56,13 +56,31 @@ class TestDetectModulename(TestCase):
             "Expected module name is '%s', but was '%s' (%s in %s)" %
             (expected_name, name, filepath, directory))
 
-    def test_python_package(self):
+    def test_package_init_module(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, '__init__.py')
         self.assert_find_modulename_in_dir("python",
             script, dirname(python_dir))
 
-    def test_python_package_contents(self):
+    def test_package(self):
+        self.assert_find_modulename_in_dir('python.a',
+            join(FILES_DIR, 'python/a.py'), FILES_DIR)
+        self.assert_find_modulename_in_dir('python2.b',
+            join(FILES_DIR, 'python2/b.py'), FILES_DIR)
+
+        # not a package
+        name = utils.find_modulename(
+            join(FILES_DIR, 'python3/c.py'),
+            [join(FILES_DIR, 'python3')])
+        self.assertEqual('c', name)
+
+        self.assertRaises(
+            ImportError,
+            utils.find_modulename,
+            join(FILES_DIR, 'python3/c.py'),
+            [FILES_DIR])
+
+    def test_search_in_package(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
 
@@ -81,6 +99,11 @@ class TestDetectModulename(TestCase):
         self.assert_find_modulename_in_dir("a", script, python_dir)
         self.assert_find_modulename_in_dir("python.a",
             script, dirname(python_dir))
+
+    def test_not_in_search_path(self):
+        python_dir = join(FILES_DIR, 'python')
+        script = join(python_dir, 'a.py')
+        self.assertRaises(ImportError, utils.find_modulename, script, [])
 
     def test_sys_path(self):
         top = join(dirname(__file__), "..")

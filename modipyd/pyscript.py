@@ -35,17 +35,20 @@ class PyScript(object):
 
     def load_module(self, reload_module=False):
         from modipyd.utils import find_modulename
-        modname = find_modulename(self.filename)
-        
-        if modname in sys.modules:
-            self.module = sys.modules[modname]
+        try:
+            modname = find_modulename(self.filename)
+            
+            if modname in sys.modules:
+                self.module = sys.modules[modname]
 
-        if reload_module or not self.module:
-            import imp
-            if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
-                self.module = imp.load_compiled(modname, self.filename)
-            else:
-                self.module = imp.load_source(modname, self.filename)
+            if reload_module or not self.module:
+                import imp
+                if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
+                    self.module = imp.load_compiled(modname, self.filename)
+                else:
+                    self.module = imp.load_source(modname, self.filename)
+        except ImportError, e:
+            raise
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""

@@ -87,25 +87,3 @@ def find_modulename(filepath, search_paths=None):
         if name:
             return name
     return None
-
-
-def make_modulename(filepath):
-    """
-    Convert filepath so that it can be suitable
-    for module name
-    """
-    # - Extract filename (without file extention)
-    # - Make start with "_"
-    # - Append sha1 hexdigest value
-    # - Replace identifier character with safe character
-    filename, _ = os.path.splitext(os.path.basename(filepath))
-    try:
-        import hashlib
-        digest = hashlib.sha1(filepath).hexdigest()
-    except ImportError:
-        # < Python 2.5
-        import sha
-        digest = sha.new(filepath).hexdigest()
-
-    modulename = "_".join(['', filename, digest])
-    return re.sub(r'[^a-zA-Z0-9_]', '_', modulename)

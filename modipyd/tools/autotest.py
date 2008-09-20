@@ -99,7 +99,7 @@ def spawn_unittest_runner(scripts):
         args = ['"%s"' % arg for arg in args]
 
     LOGGER.debug("Spawn test runner process")
-    return os.spawnv(os.P_WAIT, sys.executable, args)
+    return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
 
 def main(options, filepath):
     """

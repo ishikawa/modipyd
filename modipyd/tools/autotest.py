@@ -91,6 +91,16 @@ def run_unittest(scripts):
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
+def spawn_unittest_runner(scripts):
+    args = [sys.executable] + sys.argv
+    args.append("--run-tests")
+
+    if sys.platform == "win32":
+        args = ['"%s"' % arg for arg in args]
+
+    LOGGER.debug("Spawn test runner process")
+    return os.spawnv(os.P_WAIT, sys.executable, args)
+
 def main(options, filepath):
     """
     Monitoring modules on the search path ``path``. If ``path`` is
@@ -126,15 +136,15 @@ def main(options, filepath):
         """
 
         scripts = collect_pyscript(filepath)
-        for modified in monitor(scripts):
-            LOGGER.info("Modified %s" % modified)
-            #print sys.modules
-            if os.fork() == 0:
-                LOGGER.debug("Forking child process (%d)" % os.getpid())
-                modified.load_module(reload_module=True)
-                run_unittest(scripts)
-                LOGGER.debug("Terminate child process (%d)" % os.getpid())
-                os._exit(os.EX_OK)
+
+        # test runner mode
+        if options.run_tests:
+            LOGGER.info("Test Runner Mode: %d" % os.getpid())
+            run_unittest(scripts)
+        else:
+            for modified in monitor(scripts):
+                LOGGER.info("Modified %s" % modified)
+                spawn_unittest_runner(scripts)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
@@ -151,6 +161,10 @@ def run():
     parser.add_option("--debug",
         action="store_true", dest="debug", default=False,
         help="Make the operation more talkative (debug mode)")
+
+    parser.add_option("--run-tests",
+        action="store_true", dest="run_tests", default=False,
+        help="Test runner mode")
 
     (options, args) = parser.parse_args()
     main(options, args or os.getcwd())

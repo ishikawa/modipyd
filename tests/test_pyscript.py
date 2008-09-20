@@ -38,7 +38,7 @@ class TestPyScript(TestCase):
 
         if not os.path.exists(pycpath):
             import py_compile
-            print "Compile", pycpath
+            #print "Compile", pycpath
             py_compile.compile(pypath, pycpath)
             self.assert_(os.path.exists(pycpath))
 

@@ -34,9 +34,9 @@ class PyScript(object):
 
     def reload_module(self):
         import imp
-        from modipyd.utils import make_modulename
+        from modipyd.utils import find_modulename
 
-        modname = make_modulename(self.filename)
+        modname = find_modulename(self.filename)
         if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
             self.module = imp.load_compiled(modname, self.filename)
         else:

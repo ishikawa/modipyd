@@ -63,6 +63,19 @@ class TestDetectModulename(TestCase):
         self.assert_find_modulename_in_dir("python",
             script, dirname(python_dir))
 
+    def test_python_package_contents(self):
+        python_dir = join(FILES_DIR, 'python')
+        script = join(python_dir, 'a.py')
+
+        name = utils.find_modulename(script, [dirname(python_dir)])
+        self.assertEqual("python.a", name)
+        name = utils.find_modulename(script, [python_dir])
+        self.assertEqual("a", name)
+        name = utils.find_modulename(script, [dirname(python_dir), python_dir])
+        self.assertEqual("python.a", name)
+        #name = utils.find_modulename(script, [python_dir, dirname(python_dir)])
+        #self.assertEqual("python.a", name)
+
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')

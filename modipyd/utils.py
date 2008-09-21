@@ -96,7 +96,11 @@ def python_module_exists(dirpath, modulename):
     Return ``True`` if *dirpath* refers to an existing directory that
     contains Python module named *modulename*.
     """
-    pass
+    from os.path import isdir, isfile, join
+    return (isdir(dirpath) and
+                (isfile(join(dirpath, '%s.py' % modulename)) or
+                 isfile(join(dirpath, '%s.pyc' % modulename)) or
+                 isfile(join(dirpath, '%s.pyo' % modulename))))
 
 
 # Python script filename pattern

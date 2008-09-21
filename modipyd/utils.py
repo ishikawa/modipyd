@@ -21,6 +21,59 @@ def wrap_sequence(obj, sequence_type=tuple):
         return sequence_type((obj,))
 
 
+# ----------------------------------------------------------------
+# Path utilities
+# ----------------------------------------------------------------
+def python_module_file(filepath):
+    """
+    Return ``True`` if path is an existing Python source
+    file (*.py*). This follows symbolic links.
+    """
+    return (python_source_file(filepath) or
+            python_compiled_file(filepath))
+
+def python_source_file(filepath):
+    """
+    Return ``True`` if path is an existing Python source
+    file (*.py*). This follows symbolic links.
+    """
+    try:
+        st = os.stat(filepath)
+    except (TypeError, os.error):
+        return False
+    else:
+        return (stat.S_ISREG(st.st_mode) and
+                filepath.endswith('.py'))
+
+def python_compiled_file(filepath):
+    """
+    Return ``True`` if path is an existing Python compiled
+    bytecode file (*.pyc* or *.pyo*). This follows symbolic links.
+    """
+    try:
+        st = os.stat(filepath)
+    except (TypeError, os.error):
+        return False
+    else:
+        return (stat.S_ISREG(st.st_mode) and
+                   (filepath.endswith('.pyc') or
+                    filepath.endswith('.pyo')))
+
+def python_package(dirpath):
+    """
+    Return ``True`` if *dirpath* is an existing directory that is
+    Python package directory (contains ``__init__.py[co]``).
+    """
+    pass
+
+def python_module_exists(dirpath, modulename):
+    """
+    Return ``True`` if *dirpath* refers to an existing directory that
+    contains Python module named *modulename*.
+    """
+    pass
+
+
 # Python script filename pattern
 PYTHON_SCRIPT_FILENAME_RE = re.compile(r'^.*\.py[co]?$')
 
@@ -45,6 +98,9 @@ def is_python_package(dirpath):
             isfile(join(dirpath, '__init__.pyc')) or
             isfile(join(dirpath, '__init__.pyo')))
 
+# ----------------------------------------------------------------
+# find_modulename
+# ----------------------------------------------------------------
 def find_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on

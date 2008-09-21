@@ -3,7 +3,7 @@
 import unittest
 import os
 import sys
-from os.path import join, dirname
+from os.path import join, dirname, exists
 
 from modipyd import utils
 from tests import TestCase, FILES_DIR
@@ -21,8 +21,8 @@ class TestModipydUtils(TestCase):
         filepath = join(FILES_DIR, '000/001')
         script = join(FILES_DIR, 'python/a.py')
 
-        assert os.path.exists(filepath)
-        assert os.path.exists(script)
+        assert exists(filepath)
+        assert exists(script)
 
         self.assert_(not utils.is_python_module_file(None))
         self.assert_(not utils.is_python_module_file(""))
@@ -32,6 +32,29 @@ class TestModipydUtils(TestCase):
         self.assert_(not utils.is_python_module_file(filepath),
             "Expected not python file: %s" % filepath)
         self.assert_(not utils.is_python_module_file("not_found_file"))
+
+
+class TestModipyPathUtils(TestCase):
+
+    def setUp(self):
+        self.notpypath = join(FILES_DIR, '000', '001')
+        self.pypath  = join(FILES_DIR, 'python', 'a.py')
+        self.pycpath = join(FILES_DIR, 'python', 'a.pyc')
+        self.pyopath = join(FILES_DIR, 'python', 'a.pyo')
+
+        assert exists(self.pypath)
+        if not exists(self.pycpath) or not exists(self.pyopath):
+            import py_compile
+            py_compile.compile(self.pypath, self.pycpath)
+            py_compile.compile(self.pypath, self.pyopath)
+        assert exists(self.pycpath)
+        assert exists(self.pyopath)
+
+    def test_python_module_file(self):
+        self.assert_(utils.python_module_file(self.pypath))
+        self.assert_(utils.python_module_file(self.pycpath))
+        self.assert_(utils.python_module_file(self.pyopath))
+        self.assert_(not utils.python_module_file(self.notpypath))
 
 
 class TestDetectModulename(TestCase):

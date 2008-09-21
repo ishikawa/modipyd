@@ -8,6 +8,14 @@ How this software works:
 
 So I named it **modipyd** _(modified + python)_.
 
+This project contains **autotest** which is a useful tool for Test-Driven Development.
+The **autotest** program continually runs tests based on files you've changed.
+
+
+h3. Requirements
+
+* Python 2.4 or higher
+
 
 h3. Developer Notes
 

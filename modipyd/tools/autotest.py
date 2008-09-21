@@ -135,14 +135,14 @@ def on_module_modified(modified, scripts):
     # Inspect modified script dependancies
     try:
         modname = find_modulename(modified.filename)
-        dependant_names = set(iterate_dependancies(modname))
+        dependent_names = set(iterate_dependancies(modname))
     except ImportError:
         LOGGER.warn(
             "Couldn't import file at %s, ignore" % script.filename,
             exc_info=True)
     else:
         # dependent modules + modified module itself
-        dependent_scripts = [mappings[name] for name in dependant_names]
+        dependent_scripts = [mappings[name] for name in dependent_names]
         dependent_scripts.append(modified)
 
     modified.load_module(True)

@@ -111,7 +111,7 @@ class TestDetectModulename(TestCase):
             join(FILES_DIR, 'python3/c.py'),
             [FILES_DIR])
 
-    def test_search_in_package(self):
+    def test_search_package(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
 
@@ -121,8 +121,28 @@ class TestDetectModulename(TestCase):
         self.assertEqual("a", name)
         name = utils.find_modulename(script, [dirname(python_dir), python_dir])
         self.assertEqual("python.a", name)
-        #name = utils.find_modulename(script, [python_dir, dirname(python_dir)])
-        #self.assertEqual("python.a", name)
+
+    def test_search_package_priority(self):
+        """
+        Consider:
+
+            src/packageA/__init__.py
+                        /a.py
+
+        and *sys.path* is:
+
+            ['src/packageA', 'src']
+
+        a.py is in src/packageA, so module name 'a' is matched.
+        But better module name is 'packageA.a' because a.py is
+        created under the package 'packageA'.
+        """
+        search_path = [join(FILES_DIR, 'python'), FILES_DIR]
+        script = join(FILES_DIR, 'python', 'a.py')
+
+        name = utils.find_modulename(script, search_path)
+        #self.assertEqual('python.a', name)
+
 
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')

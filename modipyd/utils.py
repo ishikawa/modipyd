@@ -139,10 +139,11 @@ def find_modulename(filepath, search_paths=None):
         if not os.path.isdir(search_path):
             return None
 
-        qp = python_package(dirpath)
+        pp = python_package(dirpath)
         st = os.stat(search_path)
+
         while not samestat(st, os.stat(dirpath)):
-            if not qp:
+            if not pp:
                 return None # No parent package
             if dirpath == '/':
                 return None # not found in search_path
@@ -150,7 +151,13 @@ def find_modulename(filepath, search_paths=None):
             name = "%s.%s" % (parent, name)
         else:
             if name.endswith(".__init__"):
+                assert pp
                 name = name[:-9]
+            elif pp and '.' not in name:
+                # script is created under a package,
+                # but its module name is not a package.
+                #print "!!!", name
+                pass
         return name
 
     for syspath in (abspath(f) for f in search_paths):

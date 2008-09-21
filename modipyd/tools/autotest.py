@@ -85,13 +85,68 @@ def collect_unittest(scripts):
     loader = unittest.defaultTestLoader
     for script in scripts:
         tests = loader.loadTestsFromModule(script.module)
-        suite.addTest(tests)
+        if tests.countTestCases():
+            suite.addTest(tests)
+            LOGGER.info("Running test: %s" % script.module.__name__)
     return suite
 
 def run_unittest(scripts):
     suite = collect_unittest(scripts)
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+    if suite.countTestCases():
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
+def on_module_modified(modified, scripts):
+    import pprint
+    import modulefinder
+    from modipyd.utils import find_modulename, import_module
+
+    mappings = {}
+    dependancies = {}
+
+    # Mapping module name -> script
+    for script in scripts:
+        try:
+            modname = find_modulename(script.filename)
+        except ImportError:
+            LOGGER.warn(
+                "Couldn't import file at %s, ignore" % script.filename,
+                exc_info=True)
+        else:
+            mappings[modname] = script
+
+    # Construct dependancy graph
+    for name, script in mappings.iteritems():
+        finder = modulefinder.ModuleFinder()
+        finder.run_script(script.filename)
+        for module_name, module in finder.modules.iteritems():
+            if module_name == name or not module.__file__:
+                continue
+            if module_name in mappings:
+                dependancies.setdefault(module_name, set()).add(name)
+
+    def iterate_dependancies(module_name):
+        if module_name in dependancies:
+            for n in dependancies[module_name]:
+                yield n
+                for m in iterate_dependancies(n):
+                    yield m
+
+    # Inspect modified script dependancies
+    try:
+        modname = find_modulename(modified.filename)
+        dependant_names = set(iterate_dependancies(modname))
+    except ImportError:
+        LOGGER.warn(
+            "Couldn't import file at %s, ignore" % script.filename,
+            exc_info=True)
+    else:
+        dependent_scripts = [mappings[name] for name in dependant_names]
+
+    modified.load_module(True)
+    run_unittest(dependent_scripts)
+#    spawn_unittest_runner()
+
 
 def spawn_unittest_runner():
     args = [sys.executable] + sys.argv
@@ -102,6 +157,7 @@ def spawn_unittest_runner():
 
     LOGGER.debug("Spawn test runner process")
     return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
+
 
 def main(options, filepath):
     """
@@ -133,7 +189,7 @@ def main(options, filepath):
         else:
             for modified in monitor(scripts):
                 LOGGER.info("Modified %s" % modified)
-                spawn_unittest_runner()
+                on_module_modified(modified, scripts)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)

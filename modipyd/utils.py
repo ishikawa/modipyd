@@ -118,14 +118,16 @@ def find_modulename(filepath, search_paths=None):
     if not python_module_file(filepath):
         raise RuntimeError("Not a python script: %s" % filepath)
 
-    # filepath must be absolute.
-    filepath = os.path.abspath(filepath)
-    dirpath, modname = os.path.split(filepath)
-    assert os.path.isabs(dirpath) and modname
+    def splitmodname(filepath):
+        # filepath must be absolute.
+        filepath = os.path.abspath(filepath)
+        dirpath, modname = os.path.split(filepath)
+        assert os.path.isabs(dirpath) and modname
 
-    # ignore extention (e.g. '.py', '.pyc')
-    modname, _ = os.path.splitext(modname)
-    assert _
+        # ignore extention (e.g. '.py', '.pyc')
+        modname, _ = os.path.splitext(modname)
+        assert _
+        return dirpath, modname
 
     # Now, dirpath should be in search path so that
     # interpreter finds this module.
@@ -133,35 +135,44 @@ def find_modulename(filepath, search_paths=None):
         import sys
         search_paths = sys.path
 
-    def _find_modulename(name, dirpath, search_path):
-        # search_path must be string
-        assert isinstance(search_path, basestring)
-        if not os.path.isdir(search_path):
-            return None
-
-        pp = python_package(dirpath)
-        st = os.stat(search_path)
-
-        while not samestat(st, os.stat(dirpath)):
-            if not pp:
-                return None # No parent package
-            if dirpath == '/':
-                return None # not found in search_path
-            dirpath, parent = os.path.split(dirpath)
-            name = "%s.%s" % (parent, name)
-        else:
-            if name.endswith(".__init__"):
-                assert pp
-                name = name[:-9]
-            elif pp and '.' not in name:
-                # script is created under a package,
-                # but its module name is not a package.
-                #print "!!!", name
-                pass
-        return name
-
+    # Searching...
+    dirpath, modname = splitmodname(filepath)
     for syspath in (abspath(f) for f in search_paths):
-        name = _find_modulename(modname, dirpath, syspath)
-        if name:
-            return name
+
+        assert isinstance(syspath, basestring)
+        if not os.path.isdir(syspath):
+            # Only search in directory (ignore .zip, .egg, ...)
+            continue
+
+        st = os.stat(syspath)
+        package = python_package(dirpath)
+
+        if not package:
+            # if module is not in package directory,
+            # *dirpath* and *syspath* must be same directory
+            if samestat(st, os.stat(dirpath)):
+                return modname
+        else:
+            d, name = dirpath, modname
+
+            while not samestat(st, os.stat(d)):
+                if d == '/':
+                    # not found in search path
+                    name = None
+                    break
+                d, parent = os.path.split(d)
+                name = "%s.%s" % (parent, name)
+            else:
+                initmod = ".__init__"
+                if name.endswith(initmod):
+                    name = name[:-len(initmod)]
+                elif '.' not in name:
+                    # script is created under a package,
+                    # but its module name is not a package.
+                    #print "!!!", name
+                    pass
+
+            if name:
+                return name
+
     raise ImportError("No module name found: %s" % filepath)

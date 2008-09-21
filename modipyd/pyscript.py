@@ -34,20 +34,14 @@ class PyScript(object):
             return False
 
     def load_module(self, reload_module=False):
-        from modipyd.utils import find_modulename
+        from modipyd.utils import find_modulename, import_module
         try:
             modname = find_modulename(self.filename)
             
-            if modname in sys.modules:
-                self.module = sys.modules[modname]
-
-            if reload_module or not self.module:
-                import imp
-                from modipyd.utils import python_compiled_file
-                if python_compiled_file(self.filename):
-                    self.module = imp.load_compiled(modname, self.filename)
-                else:
-                    self.module = imp.load_source(modname, self.filename)
+            self.module = import_module(modname)
+            assert self.module
+            if reload_module:
+                reload(self.module)
         except ImportError:
             raise
 

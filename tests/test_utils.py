@@ -141,8 +141,7 @@ class TestDetectModulename(TestCase):
         script = join(FILES_DIR, 'python', 'a.py')
 
         name = utils.find_modulename(script, search_path)
-        #self.assertEqual('python.a', name)
-
+        self.assertEqual('python.a', name)
 
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')

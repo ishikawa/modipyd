@@ -6,6 +6,7 @@ Utilities
 
 """
 import os
+import sys
 import stat
 
 
@@ -104,8 +105,17 @@ def python_module_exists(dirpath, modulename):
 
 
 # ----------------------------------------------------------------
-# find_modulename
+# Working with modules
 # ----------------------------------------------------------------
+def import_module(modulename):
+    """
+    Return loaded module if module is already loaded in
+    ``sys.modules``, otherwise load module and return it.
+    """
+    if modulename not in sys.modules:
+        __import__(modulename)
+    return sys.modules[modulename]
+
 def find_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on
@@ -132,10 +142,10 @@ def find_modulename(filepath, search_paths=None):
     # Now, dirpath should be in search path so that
     # interpreter finds this module.
     if search_paths is None:
-        import sys
         search_paths = sys.path
 
     # Searching...
+    skipped_name = None
     dirpath, modname = splitmodname(filepath)
     for syspath in (abspath(f) for f in search_paths):
 
@@ -148,31 +158,47 @@ def find_modulename(filepath, search_paths=None):
         package = python_package(dirpath)
 
         if not package:
-            # if module is not in package directory,
-            # *dirpath* and *syspath* must be same directory
             if samestat(st, os.stat(dirpath)):
+                # if module is not in package directory,
+                # *dirpath* and *syspath* must be same directory
                 return modname
         else:
             d, name = dirpath, modname
-
             while not samestat(st, os.stat(d)):
                 if d == '/':
                     # not found in search path
-                    name = None
                     break
                 d, parent = os.path.split(d)
-                name = "%s.%s" % (parent, name)
+                name = '.'.join((parent, name))
             else:
-                initmod = ".__init__"
-                if name.endswith(initmod):
-                    name = name[:-len(initmod)]
+                if name.endswith(".__init__"):
+                    # Remove tail '.__init__'
+                    name = name[:-9]
                 elif '.' not in name:
                     # script is created under a package,
                     # but its module name is not a package.
-                    #print "!!!", name
-                    pass
-
-            if name:
+                    #
+                    # For example, consider:
+                    #
+                    #   src/packageA/__init__.py
+                    #               /a.py
+                    #
+                    # and *sys.path* is:
+                    #
+                    #   ['src/packageA', 'src']
+                    #
+                    # a.py is in src/packageA, so module name 'a' is
+                    # matched. But better module name is 'packageA.a'
+                    # because a.py is created under the package
+                    # 'packageA'.
+                    #
+                    # Store result name, and continues with
+                    # the next iteration of the **for** loop.
+                    skipped_name = name
+                    continue
                 return name
 
-    raise ImportError("No module name found: %s" % filepath)
+    if skipped_name is not None:
+        return skipped_name
+    else:
+        raise ImportError("No module name found: %s" % filepath)

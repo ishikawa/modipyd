@@ -6,9 +6,8 @@ Regression tests for modipyd
 
 import os
 import unittest
-import imp
 from os.path import join, dirname
-from modipyd.utils import find_modulename
+from modipyd.utils import find_modulename, import_module
 
 tests = unittest.TestSuite()
 
@@ -19,8 +18,7 @@ for dirpath, dirnames, filenames in os.walk(dirname(__file__)):
 
         filepath = join(dirpath, name)
         modulename = find_modulename(filepath)
-        #print modulename, filepath
-        module = imp.load_source(modulename, filepath)
+        module = import_module(modulename)
         suite = unittest.defaultTestLoader.loadTestsFromModule(module)
         tests.addTest(suite)
 

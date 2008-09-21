@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import unittest
-import os
 import sys
 from os.path import join, dirname, exists
 

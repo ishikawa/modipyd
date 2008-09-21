@@ -27,7 +27,7 @@ def __configure_logger():
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(
         '%(asctime)s [%(levelname)s] %(message)s '
-        '(File "%(pathname)s", line %(lineno)d, in %(funcName)s)'))
+        '(File "%(pathname)s", line %(lineno)d)'))
     logger = logging.getLogger(__name__)
     logger.addHandler(handler)
     # If a line below is uncommented, LOGGER's level is accidentally

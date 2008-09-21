@@ -140,12 +140,16 @@ def on_module_modified(modified, scripts):
             exc_info=True)
     else:
         # dependent modules + modified module itself
+        #
+        # This dependent order is **important**, because a dependent
+        # module might refer target module's symbols (variable, class, ... etc).
+        #
         dependent_scripts = [mappings[it] for it in dependent_names]
-        dependent_scripts.append(modified)
-
-    modified.load_module(True)
-    run_unittest(dependent_scripts)
-#    spawn_unittest_runner()
+        dependent_scripts.insert(0, modified)
+        for script in dependent_scripts:
+            LOGGER.info("Reload Module: %s" % script.module)
+            script.load_module(True)
+        run_unittest(dependent_scripts)
 
 
 def spawn_unittest_runner():

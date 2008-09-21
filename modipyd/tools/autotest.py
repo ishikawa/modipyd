@@ -43,7 +43,6 @@ def collect_pyscript(filepath):
         if filename.endswith('.py'):
             try:
                 modfile = PyScript(filename)
-                LOGGER.info("Found: %s" % modfile)
                 LOGGER.info("Module Loaded: %s" % modfile.module)
             except os.error:
                 LOGGER.warn(

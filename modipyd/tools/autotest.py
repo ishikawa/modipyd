@@ -176,6 +176,11 @@ def main(options, filepath):
     if options.debug:
         LOGGER.setLevel(logging.DEBUG)
 
+    # So many projects contain its modules and packages
+    # at top level directory, modipyd inserts current directory
+    # in ``sys.path`` module search path variable for convenience.
+    sys.path.insert(0, os.getcwd())
+
     # start monitoring
     try:
         # Make filepath iterable.

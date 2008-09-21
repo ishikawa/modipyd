@@ -93,7 +93,7 @@ def run_unittest(scripts):
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-def spawn_unittest_runner(scripts):
+def spawn_unittest_runner():
     args = [sys.executable] + sys.argv
     args.append("--run-tests")
 
@@ -124,19 +124,6 @@ def main(options, filepath):
 
         # absolute path convertion
         filepath = [os.path.abspath(f) for f in filepath]
-
-        # Insert directories path into the head of ``sys.path``
-        # so that ``monitor()`` can import found modules.
-        # Notes: For the proper order of specified filepaths,
-        # inserts path in reverse order.
-        """
-        for f in reversed(filepath):
-            assert os.path.isabs(f)
-            if os.path.isdir(f):
-                sys.path.insert(0, f)
-                LOGGER.info("sys.path: %s" % f)
-        """
-
         scripts = collect_pyscript(filepath)
 
         # test runner mode
@@ -146,7 +133,7 @@ def main(options, filepath):
         else:
             for modified in monitor(scripts):
                 LOGGER.info("Modified %s" % modified)
-                spawn_unittest_runner(scripts)
+                spawn_unittest_runner()
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)

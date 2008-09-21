@@ -141,7 +141,9 @@ def on_module_modified(modified, scripts):
             "Couldn't import file at %s, ignore" % script.filename,
             exc_info=True)
     else:
+        # dependent modules + modified module itself
         dependent_scripts = [mappings[name] for name in dependant_names]
+        dependent_scripts.append(modified)
 
     modified.load_module(True)
     run_unittest(dependent_scripts)

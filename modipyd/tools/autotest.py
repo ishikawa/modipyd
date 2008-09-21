@@ -97,9 +97,8 @@ def run_unittest(scripts):
         runner.run(suite)
 
 def on_module_modified(modified, scripts):
-    import pprint
     import modulefinder
-    from modipyd.utils import find_modulename, import_module
+    from modipyd.utils import find_modulename
 
     mappings = {}
     dependancies = {}
@@ -142,7 +141,7 @@ def on_module_modified(modified, scripts):
             exc_info=True)
     else:
         # dependent modules + modified module itself
-        dependent_scripts = [mappings[name] for name in dependent_names]
+        dependent_scripts = [mappings[it] for it in dependent_names]
         dependent_scripts.append(modified)
 
     modified.load_module(True)

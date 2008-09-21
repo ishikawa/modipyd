@@ -37,26 +37,3 @@ def __configure_logger():
 
 # Logger object for project
 LOGGER = __configure_logger()
-
-
-# ----------------------------------------------------------------
-# Public APIs
-# ----------------------------------------------------------------
-def collect_files(filepath_or_list):
-    """
-    ``collect_files()`` generates the file names in a directory tree.
-    Note: ``collect_files()`` will not visit symbolic links to
-    subdirectories.
-    """
-    from modipyd.utils import wrap_sequence
-    for filepath in wrap_sequence(filepath_or_list):
-        if not os.path.exists(filepath):
-            from errno import ENOENT
-            raise IOError(ENOENT, "No such file or directory", filepath)
-        elif not os.path.isdir(filepath):
-            yield filepath
-        else:
-            # pylint: disable-msg=W0612
-            for dirpath, dirnames, filenames in os.walk(filepath):
-                for filename in filenames:
-                    yield os.path.join(dirpath, filename)

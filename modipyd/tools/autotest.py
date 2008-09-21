@@ -21,7 +21,7 @@ import logging
 import unittest
 from optparse import OptionParser
 
-from modipyd import LOGGER, collect_files
+from modipyd import LOGGER
 from modipyd.pyscript import PyScript
 from modipyd import utils
 
@@ -39,7 +39,7 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 # ----------------------------------------------------------------
 def collect_pyscript(filepath):
     scripts = []
-    for filename in collect_files(filepath):
+    for filename in utils.collect_files(filepath):
         if filename.endswith('.py'):
             try:
                 modfile = PyScript(filename)

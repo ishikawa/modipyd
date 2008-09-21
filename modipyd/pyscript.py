@@ -7,7 +7,6 @@ The ``PyScript`` class is Python script file abstraction.
 """
 
 import os
-import sys
 
 
 class PyScript(object):

@@ -16,32 +16,6 @@ class TestModipydUtils(TestCase):
         self.assertEqual((1,), utils.wrap_sequence(1))
         self.assertEqual([1], utils.wrap_sequence(1, list))
 
-    def test_is_python_module_file(self):
-        filepath = join(FILES_DIR, '000/001')
-        script = join(FILES_DIR, 'python/a.py')
-
-        assert exists(filepath)
-        assert exists(script)
-
-        self.assert_(not utils.is_python_module_file(None))
-        self.assert_(not utils.is_python_module_file(""))
-
-        self.assert_(utils.is_python_module_file(script),
-            "Expected python file: %s" % script)
-        self.assert_(not utils.is_python_module_file(filepath),
-            "Expected not python file: %s" % filepath)
-        self.assert_(not utils.is_python_module_file("not_found_file"))
-
-    def test_python_module_exists(self):
-        python_dir = join(FILES_DIR, 'python')
-        self.assert_(utils.python_module_exists(python_dir, 'a'))
-        self.assert_(utils.python_module_exists(python_dir, '__init__'))
-        self.assert_(not utils.python_module_exists(python_dir, 'unknown'))
-
-    def test_python_package(self):
-        self.assert_(utils.python_package(join(FILES_DIR, 'python')))
-        self.assert_(not utils.python_package(FILES_DIR))
-
 
 class TestModipyPathUtils(TestCase):
 
@@ -63,6 +37,32 @@ class TestModipyPathUtils(TestCase):
         self.assert_(utils.python_module_file(self.pycpath))
         self.assert_(utils.python_module_file(self.pyopath))
         self.assert_(not utils.python_module_file(self.notpypath))
+
+    def test_python_module_file2(self):
+        filepath = join(FILES_DIR, '000/001')
+        script = join(FILES_DIR, 'python/a.py')
+
+        assert exists(filepath)
+        assert exists(script)
+
+        self.assert_(not utils.python_module_file(None))
+        self.assert_(not utils.python_module_file(""))
+
+        self.assert_(utils.python_module_file(script),
+            "Expected python file: %s" % script)
+        self.assert_(not utils.python_module_file(filepath),
+            "Expected not python file: %s" % filepath)
+        self.assert_(not utils.python_module_file("not_found_file"))
+
+    def test_python_module_exists(self):
+        python_dir = join(FILES_DIR, 'python')
+        self.assert_(utils.python_module_exists(python_dir, 'a'))
+        self.assert_(utils.python_module_exists(python_dir, '__init__'))
+        self.assert_(not utils.python_module_exists(python_dir, 'unknown'))
+
+    def test_python_package(self):
+        self.assert_(utils.python_package(join(FILES_DIR, 'python')))
+        self.assert_(not utils.python_package(FILES_DIR))
 
 
 class TestDetectModulename(TestCase):

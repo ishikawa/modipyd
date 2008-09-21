@@ -6,7 +6,6 @@ Utilities
 
 """
 import os
-import re
 import stat
 
 
@@ -104,30 +103,6 @@ def python_module_exists(dirpath, modulename):
                  isfile(join(dirpath, '%s.pyo' % modulename))))
 
 
-# Python script filename pattern
-PYTHON_SCRIPT_FILENAME_RE = re.compile(r'^.*\.py[co]?$')
-
-def is_python_module_file(filepath):
-    """
-    Return ``True`` if *filepath* is Python script/bytecode
-    (".py", ".pyc", ".pyo").
-    """
-    try:
-        st = os.stat(filepath)
-    except (TypeError, os.error):
-        return False
-    else:
-        return (stat.S_ISREG(st.st_mode) and
-            PYTHON_SCRIPT_FILENAME_RE.match(filepath))
-
-def is_python_package(dirpath):
-    from os.path import isdir, isfile, join
-    if not isdir(dirpath):
-        return False
-    return (isfile(join(dirpath, '__init__.py')) or
-            isfile(join(dirpath, '__init__.pyc')) or
-            isfile(join(dirpath, '__init__.pyo')))
-
 # ----------------------------------------------------------------
 # find_modulename
 # ----------------------------------------------------------------
@@ -140,7 +115,7 @@ def find_modulename(filepath, search_paths=None):
     Notes: This function only returns first found module name.
     """
     from os.path import abspath, samestat
-    if not is_python_module_file(filepath):
+    if not python_module_file(filepath):
         raise RuntimeError("Not a python script: %s" % filepath)
 
     # filepath must be absolute.
@@ -164,7 +139,7 @@ def find_modulename(filepath, search_paths=None):
         if not os.path.isdir(search_path):
             return None
 
-        qp = is_python_package(dirpath)
+        qp = python_package(dirpath)
         st = os.stat(search_path)
         while not samestat(st, os.stat(dirpath)):
             if not qp:

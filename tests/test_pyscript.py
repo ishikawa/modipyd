@@ -38,7 +38,7 @@ class TestPyScript(TestCase):
 
         if not os.path.exists(pycpath):
             import modipyd.utils
-            utils.compile(pypath)
+            modipyd.utils.compile_python_source(pypath)
             assert os.path.exists(pycpath)
 
         self.assert_pyscript(PyScript(pycpath), pycpath)

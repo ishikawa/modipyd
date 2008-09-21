@@ -44,8 +44,8 @@ class TestModipyPathUtils(TestCase):
 
         assert exists(self.pypath)
         if not exists(self.pycpath) or not exists(self.pyopath):
-            utils.compile(self.pypath)
-            utils.compile(self.pypath, optimization=True)
+            utils.compile_python_source(self.pypath)
+            utils.compile_python_source(self.pypath, optimization=True)
         assert exists(self.pycpath)
         assert exists(self.pyopath)
 

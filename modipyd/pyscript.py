@@ -43,11 +43,12 @@ class PyScript(object):
 
             if reload_module or not self.module:
                 import imp
-                if self.filename.endswith(".pyc") or self.filename.endswith(".pyo"):
+                from modipyd.utils import python_compiled_file
+                if python_compiled_file(self.filename):
                     self.module = imp.load_compiled(modname, self.filename)
                 else:
                     self.module = imp.load_source(modname, self.filename)
-        except ImportError, e:
+        except ImportError:
             raise
 
     def update_mtime(self):

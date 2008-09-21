@@ -20,11 +20,13 @@ def wrap_sequence(obj, sequence_type=tuple):
     else:
         return sequence_type((obj,))
 
-def compile(filepath, optimization=False):
+def compile_python_source(filepath, optimization=False):
     """
-    Compile a source file to byte-code and write out the byte-code cache file.
-    The source code is loaded from the file name *filepath*. The byte-code is
-    cached in the normal manner (*filepath* + 'c' or 'o' if optimization is enabled).
+    Compile a source file to byte-code and write out
+    the byte-code cache file. The source code is loaded
+    from the file name *filepath*. The byte-code is cached
+    in the normal manner (*filepath* + 'c' or 'o' if
+    optimization is enabled).
     """
     from os import spawnv
     from sys import executable, platform
@@ -32,7 +34,12 @@ def compile(filepath, optimization=False):
     args = [executable]
     if optimization:
         args.append('-O')
-    args += ['-m', 'py_compile', filepath]
+    args += ['-m', 'py_compile']
+
+    if isinstance(filepath, (tuple, list)):
+        args.extend(filepath)
+    else:
+        args.append(filepath)
 
     if platform == "win32":
         args = ['"%s"' % arg for arg in args]

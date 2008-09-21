@@ -30,7 +30,9 @@ def __configure_logger():
         '(File "%(pathname)s", line %(lineno)d, in %(funcName)s)'))
     logger = logging.getLogger(__name__)
     logger.addHandler(handler)
-    logger.setLevel(logging.WARN)
+    # If a line below is uncommented, LOGGER's level is accidentally
+    # changed when this module is reloaded
+    #logger.setLevel(logging.WARN)
     return logger
 
 # Logger object for project

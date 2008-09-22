@@ -160,8 +160,8 @@ def import_module(modulename):
         __import__(modulename)
     return sys.modules[modulename]
 
-## ``find_modulename`` is major bottleneck of performance :-(
-def find_modulename(filepath, search_paths=None):
+## ``resolve_modulename`` is major bottleneck of performance :-(
+def resolve_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on
     the search path ``search_paths``. If *path* is omitted or ``None``,

@@ -34,9 +34,9 @@ class PyScript(object):
             return False
 
     def load_module(self, reload_module=False):
-        from modipyd.utils import find_modulename, import_module
+        from modipyd.utils import resolve_modulename, import_module
         try:
-            modname = find_modulename(self.filename)
+            modname = resolve_modulename(self.filename)
             
             self.module = import_module(modname)
             assert self.module

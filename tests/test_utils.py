@@ -128,12 +128,12 @@ class TestModipyPathUtils(TestCase):
 class TestDetectModulename(TestCase):
 
     def test_empty(self):
-        self.assertRaises(RuntimeError, utils.find_modulename, None)
-        self.assertRaises(RuntimeError, utils.find_modulename, "")
+        self.assertRaises(RuntimeError, utils.resolve_modulename, None)
+        self.assertRaises(RuntimeError, utils.resolve_modulename, "")
 
-    def assert_find_modulename_in_dir(self,
+    def assert_resolve_modulename_in_dir(self,
                             expected_name, filepath, directory):
-        name = utils.find_modulename(filepath, [directory])
+        name = utils.resolve_modulename(filepath, [directory])
         self.assertEqual(expected_name,
             name,
             "Expected module name is '%s', but was '%s' (%s in %s)" %
@@ -141,7 +141,7 @@ class TestDetectModulename(TestCase):
 
         # '/'
         directory += '/'
-        name = utils.find_modulename(filepath, [directory])
+        name = utils.resolve_modulename(filepath, [directory])
         self.assertEqual(expected_name,
             name,
             "Expected module name is '%s', but was '%s' (%s in %s)" %
@@ -150,24 +150,24 @@ class TestDetectModulename(TestCase):
     def test_package_init_module(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, '__init__.py')
-        self.assert_find_modulename_in_dir("python",
+        self.assert_resolve_modulename_in_dir("python",
             script, dirname(python_dir))
 
     def test_package(self):
-        self.assert_find_modulename_in_dir('python.a',
+        self.assert_resolve_modulename_in_dir('python.a',
             join(FILES_DIR, 'python/a.py'), FILES_DIR)
-        self.assert_find_modulename_in_dir('python2.b',
+        self.assert_resolve_modulename_in_dir('python2.b',
             join(FILES_DIR, 'python2/b.py'), FILES_DIR)
 
         # not a package
-        name = utils.find_modulename(
+        name = utils.resolve_modulename(
             join(FILES_DIR, 'python3/c.py'),
             [join(FILES_DIR, 'python3')])
         self.assertEqual('c', name)
 
         self.assertRaises(
             ImportError,
-            utils.find_modulename,
+            utils.resolve_modulename,
             join(FILES_DIR, 'python3/c.py'),
             [FILES_DIR])
 
@@ -175,11 +175,11 @@ class TestDetectModulename(TestCase):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
 
-        name = utils.find_modulename(script, [dirname(python_dir)])
+        name = utils.resolve_modulename(script, [dirname(python_dir)])
         self.assertEqual("python.a", name)
-        name = utils.find_modulename(script, [python_dir])
+        name = utils.resolve_modulename(script, [python_dir])
         self.assertEqual("a", name)
-        name = utils.find_modulename(script, [dirname(python_dir), python_dir])
+        name = utils.resolve_modulename(script, [dirname(python_dir), python_dir])
         self.assertEqual("python.a", name)
 
     def test_search_package_priority(self):
@@ -200,26 +200,26 @@ class TestDetectModulename(TestCase):
         search_path = [join(FILES_DIR, 'python'), FILES_DIR]
         script = join(FILES_DIR, 'python', 'a.py')
 
-        name = utils.find_modulename(script, search_path)
+        name = utils.resolve_modulename(script, search_path)
         self.assertEqual('python.a', name)
 
     def test_package_in_not_package(self):
         search_path = [join(dirname(__file__), '..')]
         script = join(FILES_DIR, 'python', 'a.py')
         self.assertRaises(ImportError,
-            utils.find_modulename, script, search_path)
+            utils.resolve_modulename, script, search_path)
 
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
-        self.assert_find_modulename_in_dir("a", script, python_dir)
-        self.assert_find_modulename_in_dir("python.a",
+        self.assert_resolve_modulename_in_dir("a", script, python_dir)
+        self.assert_resolve_modulename_in_dir("python.a",
             script, dirname(python_dir))
 
     def test_not_in_search_path(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
-        self.assertRaises(ImportError, utils.find_modulename, script, [])
+        self.assertRaises(ImportError, utils.resolve_modulename, script, [])
 
     def test_sys_path(self):
         top = join(dirname(__file__), "..")
@@ -227,15 +227,15 @@ class TestDetectModulename(TestCase):
         search_path.insert(0, top)
 
         self.assertEqual("modipyd", 
-            utils.find_modulename(
+            utils.resolve_modulename(
                 join(top, "modipyd/__init__.py"),
                 search_path))
         self.assertEqual("modipyd.utils", 
-            utils.find_modulename(
+            utils.resolve_modulename(
                 join(top, "modipyd/utils.py"),
                 search_path))
         self.assertEqual("modipyd.tools", 
-            utils.find_modulename(
+            utils.resolve_modulename(
                 join(top, "modipyd/tools/__init__.py"),
                 search_path))
 
@@ -245,7 +245,7 @@ class TestDetectModulename(TestCase):
         search_path = [python_dir, python2_dir]
 
         self.assertEqual("b",
-            utils.find_modulename(
+            utils.resolve_modulename(
                 join(python2_dir, "b.py"),
                 search_path))
 

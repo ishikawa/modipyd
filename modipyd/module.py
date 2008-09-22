@@ -132,7 +132,7 @@ def collect_python_module(filepath_or_list, search_path=None):
 
         # module name
         try:
-            modname = utils.find_modulename(sourcepath, search_path)
+            modname = utils.resolve_modulename(sourcepath, search_path)
         except ImportError:
             LOGGER.info("Couldn't import file at %s, ignore" % sourcepath)
         else:

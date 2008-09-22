@@ -6,6 +6,7 @@ Utilities
 
 """
 import os
+import re
 import sys
 import stat
 
@@ -49,13 +50,18 @@ def compile_python_source(filepath, optimization=False):
 # ----------------------------------------------------------------
 # File browser
 # ----------------------------------------------------------------
-def collect_files(filepath_or_list):
+def collect_files(filepath_or_list, ignore_pattern=r'\..+$'):
     """
     ``collect_files()`` generates the file names in a directory tree.
     Note: ``collect_files()`` will not visit symbolic links to
     subdirectories.
     """
+    pattern = re.compile(ignore_pattern or r'^$')
+
     for filepath in wrap_sequence(filepath_or_list):
+        if pattern.match(os.path.basename(filepath)):
+            continue
+
         if not os.path.exists(filepath):
             from errno import ENOENT
             raise IOError(ENOENT, "No such file or directory", filepath)
@@ -64,8 +70,18 @@ def collect_files(filepath_or_list):
         else:
             # pylint: disable-msg=W0612
             for dirpath, dirnames, filenames in os.walk(filepath):
+                # For in-place deletion (avoids copying the list),
+                # Don't delete anything earlier in the list than
+                # the current element through.
+                print dirnames
+                for i, dirname in enumerate(reversed(dirnames)):
+                    if pattern.match(dirname):
+                        print "D", dirname
+                        del dirnames[-(i+1)]
+                print dirnames
                 for filename in filenames:
-                    yield os.path.join(dirpath, filename)
+                    if not pattern.match(filename):
+                        yield os.path.join(dirpath, filename)
 
 
 # ----------------------------------------------------------------

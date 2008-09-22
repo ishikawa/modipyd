@@ -67,7 +67,7 @@ def monitor(scripts):
         # the current element through.
         for i, script in enumerate(reversed(scripts)):
             if not os.path.exists(script.filename):
-                del script[-i]
+                del script[-(i+1)]
             elif script.update():
                 yield script
 

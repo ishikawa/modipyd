@@ -175,11 +175,14 @@ class TestDetectModulename(TestCase):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
 
-        name = utils.resolve_modulename(script, [dirname(python_dir)])
+        name = utils.resolve_modulename(
+            script, [dirname(python_dir)])
         self.assertEqual("python.a", name)
-        name = utils.resolve_modulename(script, [python_dir])
+        name = utils.resolve_modulename(
+            script, [python_dir])
         self.assertEqual("a", name)
-        name = utils.resolve_modulename(script, [dirname(python_dir), python_dir])
+        name = utils.resolve_modulename(
+            script, [dirname(python_dir), python_dir])
         self.assertEqual("python.a", name)
 
     def test_search_package_priority(self):

@@ -6,10 +6,7 @@ Python module representation.
 
 """
 
-import os
-import sys
 import dis
-
 from modipyd import utils, LOGGER
 
 

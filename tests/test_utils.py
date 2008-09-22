@@ -191,6 +191,12 @@ class TestDetectModulename(TestCase):
         name = utils.find_modulename(script, search_path)
         self.assertEqual('python.a', name)
 
+    def test_package_in_not_package(self):
+        search_path = [join(dirname(__file__), '..')]
+        script = join(FILES_DIR, 'python', 'a.py')
+        self.assertRaises(ImportError,
+            utils.find_modulename, script, search_path)
+
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')

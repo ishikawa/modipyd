@@ -10,6 +10,42 @@ import os
 import sys
 import dis
 
+
+# ----------------------------------------------------------------
+# Loading, Compiling source code
+# ----------------------------------------------------------------
+def load_compiled(filepath):
+    import marshal
+    import imp
+    fp = open(filepath, 'rb')
+    try:
+        try:
+            if fp.read(4) != imp.get_magic():
+                raise ImportError, "Bad magic number in %s" % filepath
+            fp.read(4)
+            return marshal.load(fp)
+        except StandardError:
+            # ignore, try to compile .py
+            from modipyd import LOGGER
+            LOGGER.warn(
+                "Can't load compiled .pyc file: %s" % filepath,
+                exc_info=True)
+    finally:
+        fp.close()
+
+def compile_source(filepath):
+    # line endings must be represented by a single newline character ('\n'),
+    # and the input must be terminated by at least one newline character.
+    fp = open(filepath, 'U')
+    try:
+        return compile(fp.read() + '\n', filepath, 'exec')
+    finally:
+        fp.close()
+
+
+# ----------------------------------------------------------------
+# Bytecode analysis
+# ----------------------------------------------------------------
 LOAD_CONST = dis.opname.index('LOAD_CONST')
 IMPORT_NAME = dis.opname.index('IMPORT_NAME')
 STORE_NAME = dis.opname.index('STORE_NAME')
@@ -42,22 +78,9 @@ def scan_code(co, module):
             scan_code(c, module)
 
 
-class Module(object):
-    """Python module representation"""
-
-    def __init__(self, modulename, filepath, code):
-        super(Module, self).__init__()
-        self.name = modulename
-        self.filepath = filepath
-        self.code = code
-
-        self.imports = []
-        scan_code(self.code, self)
-
-    def __str__(self):
-        return "<module '%s' (%s)>" % (self.name, self.filepath)
-
-
+# ----------------------------------------------------------------
+# Python Module Finder
+# ----------------------------------------------------------------
 # Bit masks for collect_python_module_files
 PYTHON_SOURCE_MASK    = 1
 PYTHON_COMPILED_MASK  = 2
@@ -86,33 +109,6 @@ def _collect_python_module_files(filepath_or_list):
         if bitmask > 0:
             yield path, bitmask
 
-def load_compiled(filepath):
-    import marshal
-    import imp
-    fp = open(filepath, 'rb')
-    try:
-        try:
-            if fp.read(4) != imp.get_magic():
-                raise ImportError, "Bad magic number in %s" % filepath
-            fp.read(4)
-            return marshal.load(fp)
-        except StandardError:
-            # ignore, try to compile .py
-            from modipyd import LOGGER
-            LOGGER.warn(
-                "Can't load compiled .pyc file: %s" % filepath,
-                exc_info=True)
-    finally:
-        fp.close()
-
-def compile_source(filepath):
-    # line endings must be represented by a single newline character ('\n'),
-    # and the input must be terminated by at least one newline character.
-    fp = open(filepath, 'U')
-    try:
-        return compile(fp.read() + '\n', filepath, 'exec')
-    finally:
-        fp.close()
 
 def collect_python_module(filepath_or_list):
     from modipyd import utils
@@ -143,6 +139,25 @@ def collect_python_module(filepath_or_list):
             continue
         else:
             yield Module(modname, sourcepath, code)
+
+
+# ----------------------------------------------------------------
+# Module class
+# ----------------------------------------------------------------
+class Module(object):
+    """Python module representation"""
+
+    def __init__(self, modulename, filepath, code):
+        super(Module, self).__init__()
+        self.name = modulename
+        self.filepath = filepath
+        self.code = code
+
+        self.imports = []
+        scan_code(self.code, self)
+
+    def __str__(self):
+        return "<module '%s' (%s)>" % (self.name, self.filepath)
 
 
 if __name__ == '__main__':

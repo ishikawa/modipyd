@@ -110,12 +110,12 @@ def _collect_python_module_files(filepath_or_list):
             yield path, bitmask
 
 
-def collect_python_module(filepath_or_list):
+def collect_python_module(filepath_or_list, search_path=None):
     from modipyd import utils
     for path, typebits in _collect_python_module_files(filepath_or_list):
-        code = None
 
         # ,pyc, .pyo
+        code = None
         if typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
 
             if typebits & PYTHON_OPTIMIZED_MASK:
@@ -134,7 +134,7 @@ def collect_python_module(filepath_or_list):
 
         # module name
         try:
-            modname = utils.find_modulename(sourcepath)
+            modname = utils.find_modulename(sourcepath, search_path)
         except ImportError:
             continue
         else:
@@ -161,9 +161,11 @@ class Module(object):
 
 
 if __name__ == '__main__':
+    import sys
     sys.path.insert(0, os.getcwd())
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-    for m in collect_python_module('.'):
+    args = sys.argv[1:]
+    for m in collect_python_module(args or '.'):
         print m
         print m.imports

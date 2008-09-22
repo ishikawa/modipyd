@@ -8,7 +8,7 @@ from tests import TestCase, FILES_DIR
 class TestModipydModule(TestCase):
 
     def test_init(self):
-        module = modipyd.module.Module('', '')
+        module = modipyd.module.Module('', '', None)
         self.assertNotNone(module)
 
 

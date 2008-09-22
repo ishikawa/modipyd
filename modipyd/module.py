@@ -161,8 +161,7 @@ class Module(object):
 
     def __eq__(self, other):
         return (self is other or
-                    (other is not None and
-                     isinstance(other, type(self)) and
+                    (isinstance(other, type(self)) and
                      self.name == other.name))
 
     def __hash__(self):

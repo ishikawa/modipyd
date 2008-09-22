@@ -6,7 +6,6 @@ Utilities
 
 """
 import os
-import re
 import sys
 import stat
 
@@ -161,7 +160,7 @@ def import_module(modulename):
         __import__(modulename)
     return sys.modules[modulename]
 
-# TODO: ``find_modulename`` is major bottleneck of performance :-(
+## ``find_modulename`` is major bottleneck of performance :-(
 def find_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on

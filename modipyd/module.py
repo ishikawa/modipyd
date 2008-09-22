@@ -10,6 +10,8 @@ import os
 import sys
 import dis
 
+from modipyd import utils, LOGGER
+
 
 # ----------------------------------------------------------------
 # Loading, Compiling source code
@@ -26,7 +28,6 @@ def load_compiled(filepath):
             return marshal.load(fp)
         except StandardError:
             # ignore, try to compile .py
-            from modipyd import LOGGER
             LOGGER.warn(
                 "Can't load compiled .pyc file: %s" % filepath,
                 exc_info=True)
@@ -89,7 +90,6 @@ PYTHON_OPTIMIZED_MASK = 4
 def _collect_python_module_files(filepath_or_list):
     """Generates (filepath without extention, bitmask)"""
     from os.path import splitext
-    from modipyd import utils
 
     modules = {}
     for filepath in utils.collect_files(filepath_or_list, ['.?*', 'CVS']):
@@ -111,7 +111,6 @@ def _collect_python_module_files(filepath_or_list):
 
 
 def collect_python_module(filepath_or_list, search_path=None):
-    from modipyd import utils
     for path, typebits in _collect_python_module_files(filepath_or_list):
 
         # ,pyc, .pyo
@@ -136,7 +135,7 @@ def collect_python_module(filepath_or_list, search_path=None):
         try:
             modname = utils.find_modulename(sourcepath, search_path)
         except ImportError:
-            continue
+            LOGGER.info("Couldn't import file at %s, ignore" % sourcepath)
         else:
             yield Module(modname, sourcepath, code)
 
@@ -166,14 +165,3 @@ class Module(object):
 
     def __hash__(self):
         return hash(self.name)
-
-
-if __name__ == '__main__':
-    import sys
-    sys.path.insert(0, os.getcwd())
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
-    args = sys.argv[1:]
-    for m in collect_python_module(args or '.'):
-        print m
-        print m.imports

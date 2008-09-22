@@ -64,6 +64,18 @@ class TestModipydCollectFiles(TestCase):
             f = normpath(join(directory, f))
             self.assert_(f in files)
 
+    def test_ignore_pattern(self):
+        directory = join(FILES_DIR, '000')
+        files = list(utils.collect_files(directory, ['004']))
+        self.assertNotNone(files)
+        self.assertEqual(3, len(files))
+
+        files[:] = [normpath(f) for f in files]
+        self.assert_(directory not in files)
+        for f in ['001', '002', '003']:
+            f = normpath(join(directory, f))
+            self.assert_(f in files)
+
 
 class TestModipyPathUtils(TestCase):
 

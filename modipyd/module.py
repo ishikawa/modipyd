@@ -112,22 +112,21 @@ def _collect_python_module_files(filepath_or_list):
 
 def collect_python_module(filepath_or_list, search_path=None):
     for path, typebits in _collect_python_module_files(filepath_or_list):
-
-        # ,pyc, .pyo
+        # Since changing .py file is not reflected by .pyc, .pyo quickly,
+        # the plain .py file takes first prioriry.
         code = None
-        if typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
 
+        if typebits & PYTHON_SOURCE_MASK:
+            # .py
+            sourcepath = path + '.py'
+            code = compile_source(sourcepath)
+        elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
+            # .pyc, .pyo
             if typebits & PYTHON_OPTIMIZED_MASK:
                 sourcepath = path + '.pyo'
             else:
                 sourcepath = path + '.pyc'
             code = load_compiled(sourcepath)
-
-        # .py
-        if not code and typebits & PYTHON_SOURCE_MASK:
-            sourcepath = path + '.py'
-            code = compile_source(sourcepath)
-
         if not code:
             continue
 

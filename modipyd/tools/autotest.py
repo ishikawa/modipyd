@@ -21,9 +21,9 @@ import logging
 import unittest
 from optparse import OptionParser
 
-from modipyd import LOGGER
+from modipyd import utils, LOGGER
 from modipyd.pyscript import PyScript
-from modipyd import utils
+from modipyd.module import Module, collect_python_module
 
 
 # ----------------------------------------------------------------
@@ -57,19 +57,20 @@ def collect_pyscript(filepath):
     return list(set(scripts))
 
 
-def monitor(scripts):
+def monitor(modules):
     """WARNING: This method can modify ``scripts`` list."""
-    assert isinstance(scripts, list)
-    while scripts:
+    assert isinstance(modules, list)
+    for m in modules:
+        print m
+
+    while modules:
         time.sleep(1)
         # For in-place deletion (avoids copying the list),
         # Don't delete anything earlier in the list than
         # the current element through.
-        for i, script in enumerate(reversed(scripts)):
-            if not os.path.exists(script.filename):
-                del script[-(i+1)]
-            elif script.update():
-                yield script
+        for i, m in enumerate(reversed(modules)):
+            if not os.path.exists(m.filepath):
+                del modules[-(i+1)]
 
 
 # ----------------------------------------------------------------
@@ -152,17 +153,6 @@ def on_module_modified(modified, scripts):
         run_unittest(dependent_scripts)
 
 
-def spawn_unittest_runner():
-    args = [sys.executable] + sys.argv
-    args.append("--run-tests")
-
-    if sys.platform == "win32":
-        args = ['"%s"' % arg for arg in args]
-
-    LOGGER.debug("Spawn test runner process")
-    return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
-
-
 def main(options, filepath):
     """
     Monitoring modules on the search path ``path``. If ``path`` is
@@ -183,22 +173,14 @@ def main(options, filepath):
 
     # start monitoring
     try:
-        # Make filepath iterable.
+        # Make filepath list.
         filepath = utils.wrap_sequence(filepath)
         assert not isinstance(filepath, basestring)
+        modules = list(collect_python_module(filepath))
 
-        # absolute path convertion
-        filepath = [os.path.abspath(f) for f in filepath]
-        scripts = collect_pyscript(filepath)
-
-        # test runner mode
-        if options.run_tests:
-            LOGGER.info("Test Runner Mode: %d" % os.getpid())
-            run_unittest(scripts)
-        else:
-            for modified in monitor(scripts):
-                LOGGER.info("Modified %s" % modified)
-                on_module_modified(modified, scripts)
+        for modified in monitor(modules):
+            LOGGER.info("Modified %s" % modified)
+            on_module_modified(modified, scripts)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
@@ -215,10 +197,6 @@ def run():
     parser.add_option("--debug",
         action="store_true", dest="debug", default=False,
         help="Make the operation more talkative (debug mode)")
-
-    parser.add_option("--run-tests",
-        action="store_true", dest="run_tests", default=False,
-        help="Test runner mode")
 
     (options, args) = parser.parse_args()
     main(options, args or os.getcwd())

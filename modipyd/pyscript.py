@@ -13,6 +13,7 @@ class PyScript(object):
     """Python source code file"""
 
     def __init__(self, filename):
+        super(PyScript, self).__init__()
         if not os.path.isabs(filename):
             raise RuntimeError("filename must be absolute path: %s" % filename)
         if not os.path.exists(filename):

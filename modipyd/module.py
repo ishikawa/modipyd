@@ -159,6 +159,15 @@ class Module(object):
     def __str__(self):
         return "<module '%s' (%s)>" % (self.name, self.filepath)
 
+    def __eq__(self, other):
+        return (self is other or
+                    (other is not None and
+                     isinstance(other, type(self)) and
+                     self.name == other.name))
+
+    def __hash__(self):
+        return hash(self.name)
+
 
 if __name__ == '__main__':
     import sys

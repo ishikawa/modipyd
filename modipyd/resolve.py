@@ -8,6 +8,8 @@ This module provides ``ModuleNameResolver`` class
 
 import os
 import sys
+from os.path import isdir, abspath, samestat
+from modipyd.utils import python_module_file, python_package
 
 
 class ModuleNameResolver(object):
@@ -19,15 +21,17 @@ class ModuleNameResolver(object):
         if *search_paths* is omitted or ``None``, ``sys.path`` is used.
         ``sys.path`` is used.
         """
-        # search_paths would be modified, copy it.
-        self.search_paths = (search_paths or sys.path)[:]
+        # Cofigure module search path (copy it)
+        syspaths = (search_paths or sys.path)
+        self.search_paths = [abspath(d) for d in syspaths if isdir(d)]
+        for d in self.search_paths:
+            assert isinstance(d, basestring)
+            assert isdir(d)
 
     def resolve(self, filepath):
         """
         Resolve the module name from *filepath* on search_paths.
         """
-        from os.path import abspath, samestat
-        from modipyd.utils import python_module_file, python_package
 
         if not python_module_file(filepath):
             raise RuntimeError("Not a python script: %s" % filepath)
@@ -46,12 +50,7 @@ class ModuleNameResolver(object):
         # Searching...
         skipped_name = None
         dirpath, modname = splitmodname(filepath)
-        for syspath in (abspath(f) for f in self.search_paths):
-
-            assert isinstance(syspath, basestring)
-            if not os.path.isdir(syspath):
-                # Only search in directory (ignore .zip, .egg, ...)
-                continue
+        for syspath in self.search_paths:
 
             st = os.stat(syspath)
             d, name = dirpath, modname

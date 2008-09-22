@@ -37,120 +37,114 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 # ----------------------------------------------------------------
 # API, Functions, Classes...
 # ----------------------------------------------------------------
-def collect_pyscript(filepath):
-    scripts = []
-    for filename in utils.collect_files(filepath):
-        if filename.endswith('.py'):
-            try:
-                modfile = PyScript(filename)
-                LOGGER.info("Module Loaded: %s" % modfile.module)
-            except os.error:
-                LOGGER.warn(
-                    "The file at %s does not exist"
-                    " or is inaccessible, ignore." % filename)
-            except ImportError:
-                LOGGER.info("Couldn't import file at %s, ignore" % filename)
-            else:
-                scripts.append(modfile)
+class ModuleMonitor(object):
 
-    # uniqfy
-    return list(set(scripts))
+    def __init__(self, module):
+        super(ModuleMonitor, self).__init__()
+        self.module = module
+        self.mtime = None
+        self.update_mtime()
+
+        self.dependencies = set()
+        self.reverse_dependencies = set()
+
+    @property
+    def name(self):
+        return self.module.name
+
+    @property
+    def filepath(self):
+        return self.module.filepath
+
+    def update(self):
+        return self.update_mtime()
+
+    def update_mtime(self):
+        """Update modification time and return ``True`` if modified"""
+        mtime = None
+        try:
+            mtime = os.path.getmtime(self.filepath)
+            return self.mtime is None or mtime > self.mtime
+        finally:
+            self.mtime = mtime
+
+    def add_dependency(self, module):
+        self.dependencies.add(module)
+        module.add_reverse_dependency(self)
+
+    def add_reverse_dependency(self, module):
+        self.reverse_dependencies.add(module)
+
+    def __str__(self):
+        return self.filepath
 
 
-def monitor(modules):
+def monitor(module_list):
     """WARNING: This method can modify ``scripts`` list."""
-    assert isinstance(modules, list)
-    for m in modules:
-        print m
+    assert isinstance(module_list, list)
+
+    modules = {}
+    for m in module_list:
+        modules[m.name] = ModuleMonitor(m)
+
+    #from pprint import pprint
+    #pprint(modules)
+
+    for modname, module in modules.iteritems():
+
+        # Analyze dependent modules
+        dependent_modules = []
+        for name, fromlist in module.module.imports:
+            dependent_modules.append(name)
+            for sym in fromlist:
+                quolified_name = '.'.join([name, sym])
+                dependent_modules.append(quolified_name)
+
+        for m in dependent_modules:
+            if m in modules:
+                module.add_dependency(modules[m])
 
     while modules:
         time.sleep(1)
-        # For in-place deletion (avoids copying the list),
-        # Don't delete anything earlier in the list than
-        # the current element through.
-        for i, m in enumerate(reversed(modules)):
-            if not os.path.exists(m.filepath):
-                del modules[-(i+1)]
+        for modname, module in modules.iteritems():
+            if module.update():
+                yield module
 
 
 # ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
-def collect_unittest(scripts):
-    """
-    Search ``unittest.TestCase`` classes in scripts,
-    return ``unittest.TestSuite`` instance.
-    """
-    suite = unittest.TestSuite()
-    loader = unittest.defaultTestLoader
-    for script in scripts:
-        tests = loader.loadTestsFromModule(script.module)
-        if tests.countTestCases():
-            suite.addTest(tests)
-            LOGGER.info("Running test: %s" % script.module.__name__)
-    return suite
-
-def run_unittest(scripts):
-    suite = collect_unittest(scripts)
+def run_unittest(suite):
     if suite.countTestCases():
         runner = unittest.TextTestRunner()
         runner.run(suite)
 
-def on_module_modified(modified, scripts):
-    import modulefinder
-    from modipyd.utils import find_modulename
+def walk_dependencies(module, dependencies):
+    yield module
+    for mod1 in dependencies:
+        for mod2 in walk_dependencies(mod1, mod1.reverse_dependencies):
+            yield mod2
 
-    mappings = {}
-    dependancies = {}
+def collect_affected_unittests(module):
+    suite = unittest.TestSuite()
+    loader = unittest.defaultTestLoader
 
-    # Mapping module name -> script
-    for script in scripts:
-        try:
-            modname = find_modulename(script.filename)
-        except ImportError:
-            LOGGER.warn(
-                "Couldn't import file at %s, ignore" % script.filename,
-                exc_info=True)
+    walked = set()
+    for mod in walk_dependencies(module, module.reverse_dependencies):
+        if mod.name in walked:
+            continue
         else:
-            mappings[modname] = script
+            walked.add(mod.name)
 
-    # Construct dependancy graph
-    for name, script in mappings.iteritems():
-        finder = modulefinder.ModuleFinder()
-        finder.run_script(script.filename)
-        for module_name, module in finder.modules.iteritems():
-            if module_name == name or not module.__file__:
-                continue
-            if module_name in mappings:
-                dependancies.setdefault(module_name, set()).add(name)
-
-    def iterate_dependancies(module_name):
-        if module_name in dependancies:
-            for n in dependancies[module_name]:
-                yield n
-                for m in iterate_dependancies(n):
-                    yield m
-
-    # Inspect modified script dependancies
-    try:
-        modname = find_modulename(modified.filename)
-        dependent_names = set(iterate_dependancies(modname))
-    except ImportError:
-        LOGGER.warn(
-            "Couldn't import file at %s, ignore" % script.filename,
-            exc_info=True)
-    else:
-        # dependent modules + modified module itself
-        #
-        # This dependent order is **important**, because a dependent
-        # module might refer target module's symbols (variable, class, ... etc).
-        #
-        dependent_scripts = [mappings[it] for it in dependent_names]
-        dependent_scripts.insert(0, modified)
-        for script in dependent_scripts:
-            LOGGER.info("Reload Module: %s" % script.module)
-            script.load_module(True)
-        run_unittest(dependent_scripts)
+        # TODO: Don't depends on filename pattern
+        LOGGER.info("  Affected: %s" % mod)
+        if os.path.basename(mod.filepath).startswith('test_'):
+            m = utils.import_module(mod.name)
+            tests = loader.loadTestsFromModule(m)
+            if tests.countTestCases():
+                suite.addTest(tests)
+                LOGGER.info("Running test: %s" % m.__name__)
+    return suite
 
 
 def main(options, filepath):
@@ -179,8 +173,15 @@ def main(options, filepath):
         modules = list(collect_python_module(filepath))
 
         for modified in monitor(modules):
+            from pprint import pformat
             LOGGER.info("Modified %s" % modified)
-            on_module_modified(modified, scripts)
+            LOGGER.info("  Dependencies: %s" % 
+                pformat(list(str(x) for x in modified.dependencies)))
+            LOGGER.info("  Reverse Dependencies: %s" % 
+                pformat(list(str(x) for x in modified.reverse_dependencies)))
+
+            suite = collect_affected_unittests(modified)
+            run_unittest(suite)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
@@ -199,7 +200,7 @@ def run():
         help="Make the operation more talkative (debug mode)")
 
     (options, args) = parser.parse_args()
-    main(options, args or os.getcwd())
+    main(options, args or '.')
 
 
 if __name__ == '__main__':

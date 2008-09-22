@@ -77,7 +77,7 @@ def collect_python_module_files(root):
     from os.path import splitext
 
     modules = {}
-    for filepath in utils.collect_files(root):
+    for filepath in utils.collect_files(root, r'(?:\..+|CVS)$'):
         path, ext = splitext(filepath)
 
         # For performance gain, use bitmask value

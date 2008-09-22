@@ -73,12 +73,9 @@ def collect_files(filepath_or_list, ignore_pattern=r'\..+$'):
                 # For in-place deletion (avoids copying the list),
                 # Don't delete anything earlier in the list than
                 # the current element through.
-                print dirnames
                 for i, dirname in enumerate(reversed(dirnames)):
                     if pattern.match(dirname):
-                        print "D", dirname
                         del dirnames[-(i+1)]
-                print dirnames
                 for filename in filenames:
                     if not pattern.match(filename):
                         yield os.path.join(dirpath, filename)

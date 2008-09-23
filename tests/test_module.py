@@ -4,7 +4,7 @@ import unittest
 from os.path import join
 from modipyd.module import ModuleCode, compile_source, \
                            collect_module_code, \
-                           read_python_module
+                           read_module_code
 from tests import TestCase, FILES_DIR
 
 
@@ -32,7 +32,7 @@ class TestModipydModuleCode(TestCase):
 
     def test_python_module(self):
         filepath = join(FILES_DIR, 'python', 'a.py')
-        module = read_python_module(filepath, [FILES_DIR])
+        module = read_module_code(filepath, [FILES_DIR])
 
         self.assertNotNone(module)
         self.assertEqual('python.a', module.name)

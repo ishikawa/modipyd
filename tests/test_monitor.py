@@ -4,7 +4,7 @@ import unittest
 from os.path import join
 from modipyd.monitor import ModuleDescriptor, build_module_descriptors
 from modipyd.module import collect_module_code, \
-                           read_python_module
+                           read_module_code
 from tests import TestCase, FILES_DIR
 
 
@@ -12,7 +12,7 @@ class TestModipydMonitor(TestCase):
 
     def test_init(self):
         filepath = join(FILES_DIR, 'python', 'a.py')
-        module = read_python_module(filepath, [FILES_DIR])
+        module = read_module_code(filepath, [FILES_DIR])
 
         self.assertNotNone(module)
         monitor = ModuleDescriptor(module)

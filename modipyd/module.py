@@ -144,7 +144,7 @@ def collect_module_code(filepath_or_list, search_path=None):
         else:
             yield ModuleCode(modname, sourcepath, code)
 
-def read_python_module(filepath, search_path=None):
+def read_module_code(filepath, search_path=None):
     if not isinstance(filepath, basestring):
         raise TypeError("The filepath argument "
             "must be instance of basestring, but was "

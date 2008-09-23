@@ -3,7 +3,8 @@
 import unittest
 from os.path import join
 from modipyd.module import Module, compile_source, \
-                           collect_python_module
+                           collect_python_module, \
+                           read_python_module
 from tests import TestCase, FILES_DIR
 
 
@@ -28,6 +29,14 @@ class TestModipydModule(TestCase):
         names = [m.name for m in modules]
         self.assert_('python.a' in names)
         self.assert_('python' in names)
+
+    def test_python_module(self):
+        filepath = join(FILES_DIR, 'python', 'a.py')
+        module = read_python_module(filepath, [FILES_DIR])
+
+        self.assertNotNone(module)
+        self.assertEqual('python.a', module.name)
+        self.assertEqual(filepath, module.filepath)
 
     def test_module_equality(self):
         modules = list(collect_python_module(

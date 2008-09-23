@@ -135,6 +135,22 @@ def collect_python_module(filepath_or_list, search_path=None):
         else:
             yield Module(modname, sourcepath, code)
 
+def read_python_module(filepath, search_path=None):
+    if not isinstance(filepath, basestring):
+        raise TypeError("The filepath argument "
+            "must be instance of basestring, but was "
+            "instance of %s" % type(filepath))
+
+    g = collect_python_module(filepath, search_path)
+    module = g.next()
+    try:
+        g.next()
+    except StopIteration:
+        pass
+    else:
+        raise RuntimeError("Multiple module instance at %s" % filepath)
+    return module
+
 
 # ----------------------------------------------------------------
 # Module class

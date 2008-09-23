@@ -2,7 +2,7 @@
 
 import unittest
 from os.path import join
-from modipyd.monitor import ModuleMonitor, build_modules
+from modipyd.monitor import ModuleDescriptor, build_module_descriptors
 from modipyd.module import collect_python_module, \
                            read_python_module
 from tests import TestCase, FILES_DIR
@@ -15,7 +15,7 @@ class TestModipydMonitor(TestCase):
         module = read_python_module(filepath, [FILES_DIR])
 
         self.assertNotNone(module)
-        monitor = ModuleMonitor(module)
+        monitor = ModuleDescriptor(module)
 
         self.assertEqual('python.a', monitor.name)
         self.assertEqual(filepath, monitor.filepath)
@@ -25,7 +25,7 @@ class TestModipydMonitor(TestCase):
         modules = list(collect_python_module(
             join(FILES_DIR, 'cycles'),
             [FILES_DIR]))
-        modules = build_modules(modules)
+        modules = build_module_descriptors(modules)
 
         # file existence check
         names = set(modules.keys())

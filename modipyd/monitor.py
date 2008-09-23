@@ -19,21 +19,21 @@ from modipyd.module import collect_python_module
 def monitor(filepath_or_list):
     paths = utils.wrap_sequence(filepath_or_list)
     assert not isinstance(paths, basestring)
-    modules = list(collect_python_module(paths))
-    for modified in monitor_modules(modules):
+    module_codes = list(collect_python_module(paths))
+    for modified in monitor_module_codes(module_codes):
         yield modified
 
-def build_modules(module_codes):
+def build_module_descriptors(module_codes):
 
-    def analyze_dependent_names(module):
-        for name, fromlist in module.module.imports:
+    def analyze_dependent_names(descriptor):
+        for name, fromlist in descriptor.module_code.imports:
             # 'import MODULE'
             if not fromlist:
                 yield name
             # 'from MODULE import SYMBOLS'
             for sym in fromlist:
                 quolified_name = '.'.join([name, sym])
-                if quolified_name in modules:
+                if quolified_name in descriptors:
                     # The quolified name referes a submodule
                     yield quolified_name
                 else:
@@ -41,36 +41,38 @@ def build_modules(module_codes):
                     # of the module, so it depends imporintg module.
                     yield name
 
-    # Construct ``ModuleMonitor`` mappings
-    modules = dict([
-        (code.name, ModuleMonitor(code))
+    # Construct ``ModuleDescriptor`` mappings
+    descriptors = dict([
+        (code.name, ModuleDescriptor(code))
         for code in module_codes])
 
     # Dependency Analysis
-    for module in modules.itervalues():
-        for name in analyze_dependent_names(module):
-            if name in modules:
-                module.add_dependency(modules[name])
-    return modules
+    for descriptor in descriptors.itervalues():
+        for name in analyze_dependent_names(descriptor):
+            if name in descriptors:
+                descriptor.add_dependency(descriptors[name])
+    return descriptors
 
-def monitor_modules(module_codes):
+def monitor_module_codes(module_codes):
     """Monitoring ``modipyd.module.Module``s"""
-    modules = build_modules(module_codes)
+    descriptors = build_module_descriptors(module_codes)
 
     # Logging
     if LOGGER.isEnabledFor(logging.INFO):
-        desc = "\n".join([m.describe(indent=4) for m in modules.itervalues()])
+        desc = "\n".join([
+            desc.describe(indent=4)
+            for desc in descriptors.itervalues()])
         LOGGER.info("Monitoring:\n%s" % desc)
 
-    while modules:
+    while descriptors:
         time.sleep(1)
-        for module in modules.itervalues():
-            if module.update():
-                yield module
+        for desc in descriptors.itervalues():
+            if desc.update():
+                yield desc
 
 
 # ----------------------------------------------------------------
-# ModuleMonitor
+# ModuleDescriptor
 # ----------------------------------------------------------------
 class OrderedSet(object):
 
@@ -115,11 +117,11 @@ class OrderedSet(object):
         self.__set.clear()
 
 
-class ModuleMonitor(object):
+class ModuleDescriptor(object):
 
-    def __init__(self, module):
-        super(ModuleMonitor, self).__init__()
-        self.__module = module
+    def __init__(self, module_code):
+        super(ModuleDescriptor, self).__init__()
+        self.__module_code = module_code
         self.__mtime = None
         self.update_mtime()
 
@@ -127,19 +129,19 @@ class ModuleMonitor(object):
         self.__reverse_dependencies = OrderedSet()
 
     def __str__(self):
-        return str(self.module)
+        return str(self.module_code)
 
     def __eq__(self, other):
         return (self is other or
                     (isinstance(other, type(self)) and
-                     self.module == other.module))
+                     self.module_code == other.module_code))
 
     def __hash__(self):
-        return hash(self.module)
+        return hash(self.module_code)
 
     def describe(self, indent=1, width=80, depth=None):
         """
-        Return the formatted representation of ``ModuleMonitor``
+        Return the formatted representation of ``ModuleDescriptor``
         as a string. *indent*, *width* and *depth* will be passed to
         the ``PrettyPrinter`` constructor as formatting parameters.
         """
@@ -169,16 +171,16 @@ class ModuleMonitor(object):
         return tuple(self.__reverse_dependencies)
 
     @property
-    def module(self):
-        return self.__module
+    def module_code(self):
+        return self.__module_code
 
     @property
     def name(self):
-        return self.module.name
+        return self.module_code.name
 
     @property
     def filepath(self):
-        return self.module.filepath
+        return self.module_code.filepath
 
     def update(self):
         return self.update_mtime()
@@ -192,12 +194,12 @@ class ModuleMonitor(object):
         finally:
             self.__mtime = mtime
 
-    def add_dependency(self, module):
-        self.__dependencies.append(module)
-        module.add_reverse_dependency(self)
+    def add_dependency(self, descriptor):
+        self.__dependencies.append(descriptor)
+        descriptor.add_reverse_dependency(self)
 
-    def add_reverse_dependency(self, module):
-        self.__reverse_dependencies.append(module)
+    def add_reverse_dependency(self, descriptor):
+        self.__reverse_dependencies.append(descriptor)
 
     def walk(self):
         """Walking reverse dependency (includes self)"""

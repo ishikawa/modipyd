@@ -26,27 +26,30 @@ def monitor(filepath_or_list):
 def monitor_modules(module_list):
     """Monitoring ``modipyd.module.Module``s"""
 
-    # Construct ``ModuleMonitor``s
-    modules = {}
-    for module in module_list:
-        modules[module.name] = ModuleMonitor(module)
-
-    # Analyze module dependencies
-    for module in modules.itervalues():
-        dependent_names = []
+    def analyze_dependent_names(module):
         for name, fromlist in module.module.imports:
+            # 'import MODULE'
             if not fromlist:
-                dependent_names.append(name)
+                yield name
+            # 'from MODULE import SYMBOLS'
             for sym in fromlist:
                 quolified_name = '.'.join([name, sym])
                 if quolified_name in modules:
-                    dependent_names.append(quolified_name)
+                    # The quolified name referes a submodule
+                    yield quolified_name
                 else:
-                    # The fromlist includes contents of
-                    # module named `name`.
-                    dependent_names.append(name)
+                    # The quolified name referes a property
+                    # of the module, so it depends imporintg module.
+                    yield name
 
-        for name in dependent_names:
+    # Construct ``ModuleMonitor`` mappings
+    modules = dict([
+        (module.name, ModuleMonitor(module))
+        for module in module_list])
+
+    # Dependency Analysis
+    for module in modules.itervalues():
+        for name in analyze_dependent_names(module):
             if name in modules:
                 module.add_dependency(modules[name])
 

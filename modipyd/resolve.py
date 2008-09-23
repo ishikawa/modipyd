@@ -76,11 +76,9 @@ class ModuleNameResolver(object):
             # Because paths is normalized,
             # fast string comparison is sufficient
             while not d == syspath:
-                if not self.python_package(d):
-                    # encountered not a package
-                    break
-                if d == '/':
-                    # not found in search path
+                # Encountered not a package, or not found in
+                # the module search path
+                if not self.python_package(d) or d == '/':
                     break
                 d, parent = os.path.split(d)
                 names.insert(0, parent)

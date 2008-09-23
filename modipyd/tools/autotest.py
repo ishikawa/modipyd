@@ -40,24 +40,6 @@ def run_unittest(suite):
         runner = unittest.TextTestRunner()
         runner.run(suite)
 
-def walk_dependencies(module):
-    yield module
-
-    cycle = False
-    for mod1 in module.reverse_dependencies:
-        for mod2 in walk_dependencies(mod1):
-            if mod2 is module:
-                # cycle detected
-                
-                if cycle:
-                    LOGGER.info("Cycle break: %s" % module.name)
-                    break
-                else:
-                    LOGGER.info("Cycle detected: %s" % module.name)
-                    cycle = True
-                    break
-            yield mod2
-
 def collect_affected_unittests(module):
     from os.path import basename
 
@@ -65,7 +47,7 @@ def collect_affected_unittests(module):
     loader = unittest.defaultTestLoader
 
     collected = set()
-    for mod in walk_dependencies(module):
+    for mod in module.walk():
         LOGGER.info("-> Affected: %s" % mod.name)
 
         # TODO: Don't depends on filename pattern

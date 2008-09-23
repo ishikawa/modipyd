@@ -12,6 +12,21 @@ from os.path import isdir, abspath, samestat
 from modipyd.utils import python_module_file, python_package
 
 
+def split_module_name(filepath):
+    """
+    /path/to/module.py -> '/path/to/', 'module'
+    """
+    # filepath must be absolute.
+    filepath = os.path.abspath(filepath)
+    dirpath, modname = os.path.split(filepath)
+    assert os.path.isabs(dirpath) and modname
+
+    # ignore extention (e.g. '.py', '.pyc')
+    modname, _ = os.path.splitext(modname)
+    assert _
+    return dirpath, modname
+
+
 class ModuleNameResolver(object):
     """Module Name Resolver"""
 
@@ -36,20 +51,9 @@ class ModuleNameResolver(object):
         if not python_module_file(filepath):
             raise RuntimeError("Not a python script: %s" % filepath)
 
-        def splitmodname(filepath):
-            # filepath must be absolute.
-            filepath = os.path.abspath(filepath)
-            dirpath, modname = os.path.split(filepath)
-            assert os.path.isabs(dirpath) and modname
-
-            # ignore extention (e.g. '.py', '.pyc')
-            modname, _ = os.path.splitext(modname)
-            assert _
-            return dirpath, modname
-
         # Searching...
         skipped_name = None
-        dirpath, modname = splitmodname(filepath)
+        dirpath, modname = split_module_name(filepath)
         for syspath in self.search_paths:
 
             st = os.stat(syspath)

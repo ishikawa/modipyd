@@ -35,6 +35,14 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 # ----------------------------------------------------------------
 # Notification Observer
 # ----------------------------------------------------------------
+def scan_code(co, module):
+    import pprint
+
+    print "Scan", module.name
+    code = co.co_code
+    pprint.pprint(co.co_consts)
+
+
 def observe(module_descriptor):
 
     # Walking dependency graph in imported module to
@@ -47,7 +55,10 @@ def observe(module_descriptor):
         # bacause ``TestLoader`` imports (execute) module code.
         # If imported/executed module have a statement such as
         # ``sys.exit()``, ...program exit!
-        
+
+        modcode = module_descriptor.module_code
+        scan_code(modcode.code, modcode)
+
         # FIXME: But depending on filename is maybe a bad idea.
         filename = os.path.basename(descriptor.filepath)
         if filename.startswith('test_'):

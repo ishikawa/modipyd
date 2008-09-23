@@ -72,7 +72,7 @@ class ModuleNameResolver(object):
         dirpath, modname = _split_module_name(filepath)
         for syspath in self.search_paths:
 
-            d, name = dirpath, [modname]
+            d, names = dirpath, [modname]
             # Because paths is normalized,
             # fast string comparison is sufficient
             while not d == syspath:
@@ -83,38 +83,42 @@ class ModuleNameResolver(object):
                     # not found in search path
                     break
                 d, parent = os.path.split(d)
-                name.insert(0, parent)
+                names.insert(0, parent)
             else:
-                level = len(name)
-                assert level > 0
+                level = len(names)
+                assert level != 0, "module name is empty"
 
-                if self.python_package(dirpath) and level < 2:
-                    # script is created under a package,
-                    # but its module name is not a package.
-                    #
-                    # For example, consider:
-                    #
-                    #   src/packageA/__init__.py
-                    #               /a.py
-                    #
-                    # and *sys.path* is:
-                    #
-                    #   ['src/packageA', 'src']
-                    #
-                    # a.py is in src/packageA, so module name 'a' is
-                    # matched. But better module name is 'packageA.a'
-                    # because a.py is created under the package
-                    # 'packageA'.
-                    #
-                    # Store result name, and continues with
-                    # the next iteration of the **for** loop.
-                    skipped_name = name[0]
-                    continue
+                if level == 1:
+                    if self.python_package(dirpath) and level == 1:
+                        # script is created under a package,
+                        # but its module name is not a package style
+                        # (e.g. 'package.module').
+                        #
+                        # For example, consider:
+                        #
+                        #   src/packageA/__init__.py
+                        #               /a.py
+                        #
+                        # and *sys.path* is:
+                        #
+                        #   ['src/packageA', 'src']
+                        #
+                        # a.py is in src/packageA, so module name 'a' is
+                        # matched. But better module name is 'packageA.a'
+                        # because a.py is created under the package
+                        # 'packageA'.
+                        #
+                        # Store result name, and continues with
+                        # the next iteration of the **for** loop.
+                        skipped_name = names[0]
+                        continue
+                else:
+                    if names[-1] == '__init__':
+                        # The package initialization module.
+                        # Remove tail '__init__'
+                        del names[-1]
 
-                if level > 1 and name[-1] == '__init__':
-                    # Remove tail '__init__'
-                    del name[-1]
-                return '.'.join(name)
+                return '.'.join(names)
 
         if skipped_name is not None:
             return skipped_name

@@ -72,8 +72,8 @@ class ModuleMonitor(object):
 
     def __init__(self, module):
         super(ModuleMonitor, self).__init__()
-        self.module = module
-        self.mtime = None
+        self.__module = module
+        self.__mtime = None
         self.update_mtime()
 
         self.dependencies = set()
@@ -114,6 +114,10 @@ class ModuleMonitor(object):
         return "\n".join(messages)
 
     @property
+    def module(self):
+        return self.__module
+
+    @property
     def name(self):
         return self.module.name
 
@@ -129,9 +133,9 @@ class ModuleMonitor(object):
         mtime = None
         try:
             mtime = os.path.getmtime(self.filepath)
-            return self.mtime is None or mtime > self.mtime
+            return self.__mtime is None or mtime > self.__mtime
         finally:
-            self.mtime = mtime
+            self.__mtime = mtime
 
     def add_dependency(self, module):
         self.dependencies.add(module)

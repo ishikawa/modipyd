@@ -142,7 +142,7 @@ def collect_python_module(filepath_or_list, search_path=None):
         except ImportError:
             LOGGER.info("Couldn't import file at %s, ignore" % sourcepath)
         else:
-            yield Module(modname, sourcepath, code)
+            yield ModuleCode(modname, sourcepath, code)
 
 def read_python_module(filepath, search_path=None):
     if not isinstance(filepath, basestring):
@@ -164,11 +164,11 @@ def read_python_module(filepath, search_path=None):
 # ----------------------------------------------------------------
 # Module class
 # ----------------------------------------------------------------
-class Module(object):
+class ModuleCode(object):
     """Python module representation"""
 
     def __init__(self, modulename, filepath, code):
-        super(Module, self).__init__()
+        super(ModuleCode, self).__init__()
         self.name = modulename
         self.filepath = filepath
         self.code = code

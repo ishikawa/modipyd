@@ -2,20 +2,20 @@
 
 import unittest
 from os.path import join
-from modipyd.module import Module, compile_source, \
+from modipyd.module import ModuleCode, compile_source, \
                            collect_python_module, \
                            read_python_module
 from tests import TestCase, FILES_DIR
 
 
-class TestModipydModule(TestCase):
+class TestModipydModuleCode(TestCase):
 
     def test_init(self):
         py = join(FILES_DIR, 'python', 'a.py')
         code = compile_source(py)
         self.assertNotNone(code)
 
-        module = Module('a', py, code)
+        module = ModuleCode('a', py, code)
         self.assertNotNone(module)
         self.assertEqual(0, len(module.imports))
 

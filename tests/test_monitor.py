@@ -3,8 +3,7 @@
 import unittest
 from os.path import join
 from modipyd.monitor import ModuleMonitor, build_modules
-from modipyd.module import Module, compile_source, \
-                           collect_python_module, \
+from modipyd.module import collect_python_module, \
                            read_python_module
 from tests import TestCase, FILES_DIR
 

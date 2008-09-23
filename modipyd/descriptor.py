@@ -175,7 +175,10 @@ class ModuleDescriptor(object):
         self.__reverse_dependencies.append(descriptor)
 
     def walk(self):
-        """Walking reverse dependency (includes self)"""
+        """
+        Walking dependency graph in imported module to
+        module imports order (includes itself).
+        """
         yield self
         # Use Breadth First Search (BFS) algorithm
         L = [self]

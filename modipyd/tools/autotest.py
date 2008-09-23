@@ -33,33 +33,30 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 
 
 # ----------------------------------------------------------------
+# Notification Observer
+# ----------------------------------------------------------------
+def observe(module_descriptor):
+
+    # Walking dependency graph in imported module to
+    # module imports order.
+    for descriptor in module_descriptor.walk():
+
+        LOGGER.info("-> Affected: %s" % descriptor.name)
+
+        # We can't use ``unittest.TestLoader`` to loading tests,
+        # bacause ``TestLoader`` imports (execute) module code.
+        # If imported/executed module have a statement such as
+        # ``sys.exit()``, ...program exit!
+        
+        # FIXME: But depending on filename is maybe a bad idea.
+        filename = os.path.basename(descriptor.filepath)
+        if filename.startswith('test_'):
+            LOGGER.info("=> Loading:  %s" % descriptor.name)
+
+
+# ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
-def run_unittest(suite):
-    if suite.countTestCases():
-        runner = unittest.TextTestRunner()
-        runner.run(suite)
-
-def collect_affected_unittests(module_descriptor):
-    from os.path import basename
-
-    suite = unittest.TestSuite()
-    loader = unittest.defaultTestLoader
-
-    for desc in module_descriptor.walk():
-        LOGGER.info("-> Affected: %s" % desc.name)
-
-        # TODO: Don't depends on filename pattern
-        if basename(desc.filepath).startswith('test_'):
-            module = desc.import_module()
-            tests = loader.loadTestsFromModule(module)
-            if tests.countTestCases():
-                suite.addTest(tests)
-                LOGGER.info("Running test: %s" % module.__name__)
-
-    return suite
-
-
 def main(options, filepath):
     """
     Monitoring modules on the search path ``path``. If ``path`` is
@@ -84,8 +81,7 @@ def main(options, filepath):
         monitor = Monitor(filepath)
         for modified in monitor.start():
             LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
-            suite = collect_affected_unittests(modified)
-            run_unittest(suite)
+            observe(modified)
 
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)

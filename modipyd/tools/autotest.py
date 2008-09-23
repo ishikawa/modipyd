@@ -81,8 +81,20 @@ class ModuleMonitor(object):
 
 
 def monitor(module_list):
-    """WARNING: This method can modify ``scripts`` list."""
-    assert isinstance(module_list, list)
+
+    def _format_module_list(modules):
+        return pprint.pformat(
+            list(m.name for m in modules))
+
+    def _format_module_dict(modules):
+        messages = []
+        for name, m in modules.iteritems():
+             messages.append('%s: %s' % (name, m))
+             messages.append('  Dependencies: %s' % _format_module_list(
+                m.dependencies))
+             messages.append('  Reverse: %s' % _format_module_list(
+                m.reverse_dependencies))
+        return "\n".join(messages)
 
     # Construct ``ModuleMonitor``s
     modules = {}
@@ -104,16 +116,7 @@ def monitor(module_list):
 
     # Logging
     if LOGGER.isEnabledFor(logging.INFO):
-        def _format_modules(modules):
-            return pprint.pformat(
-                list(m.name for m in modules))
-
-        messages = []
-        for modname, module in modules.iteritems():
-             messages.append('%s: %s' % (modname, module))
-             messages.append('  Dependencies: %s' % _format_modules(module.dependencies))
-             messages.append('  Reverse: %s' % _format_modules(module.reverse_dependencies))
-        LOGGER.info("Monitoring:\n%s" % "\n".join(messages))
+        LOGGER.info("Monitoring:\n%s" % _format_module_dict(modules))
 
     while modules:
         time.sleep(1)

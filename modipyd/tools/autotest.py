@@ -101,7 +101,7 @@ def main(options, filepath):
     # start monitoring
     try:
         for modified in monitor.monitor(filepath):
-            LOGGER.info("Modified:\n%s" % modified.describe())
+            LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
             suite = collect_affected_unittests(modified)
             run_unittest(suite)
 

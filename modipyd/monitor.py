@@ -52,7 +52,7 @@ def monitor_modules(module_list):
 
     # Logging
     if LOGGER.isEnabledFor(logging.INFO):
-        desc = "\n".join([m.describe() for m in modules.itervalues()])
+        desc = "\n".join([m.describe(indent=4) for m in modules.itervalues()])
         LOGGER.info("Monitoring:\n%s" % desc)
 
     while modules:
@@ -65,11 +65,6 @@ def monitor_modules(module_list):
 # ----------------------------------------------------------------
 # ModuleMonitor
 # ----------------------------------------------------------------
-def _format_monitor_list(modules):
-    import pprint
-    return pprint.pformat(
-        list(m.name for m in modules))
-
 class ModuleMonitor(object):
 
     def __init__(self, module):
@@ -81,9 +76,19 @@ class ModuleMonitor(object):
         self.dependencies = set()
         self.reverse_dependencies = set()
 
-    def describe(self):
+    def describe(self, indent=1, width=80, depth=None):
+        """
+        Return the formatted representation of ``ModuleMonitor``
+        as a string. *indent*, *width* and *depth* will be passed to
+        the ``PrettyPrinter`` constructor as formatting parameters.
+        """
+        def _format_monitor_list(modules):
+            from pprint import pformat
+            return pformat(list(m.name for m in modules),
+                indent=indent, width=width, depth=depth)
+
         messages = []
-        messages.append('%s: %s' % (self.name, self))
+        messages.append('%s: %s' % (self.name, self.filepath))
         messages.append('  Dependencies: %s' % _format_monitor_list(
             self.dependencies))
         messages.append('  Reverse: %s' % _format_monitor_list(

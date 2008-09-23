@@ -19,6 +19,7 @@ import sys
 import time
 import logging
 import unittest
+import pprint
 from optparse import OptionParser
 
 from modipyd import utils, LOGGER
@@ -76,33 +77,43 @@ class ModuleMonitor(object):
         self.reverse_dependencies.add(module)
 
     def __str__(self):
-        return self.filepath
+        return str(self.module)
 
 
 def monitor(module_list):
     """WARNING: This method can modify ``scripts`` list."""
     assert isinstance(module_list, list)
 
+    # Construct ``ModuleMonitor``s
     modules = {}
     for m in module_list:
         modules[m.name] = ModuleMonitor(m)
 
-    #from pprint import pprint
-    #pprint(modules)
-
+    # Analyze module dependencies
     for modname, module in modules.iteritems():
-
-        # Analyze dependent modules
-        dependent_modules = []
+        dependent_names = []
         for name, fromlist in module.module.imports:
-            dependent_modules.append(name)
+            dependent_names.append(name)
             for sym in fromlist:
                 quolified_name = '.'.join([name, sym])
-                dependent_modules.append(quolified_name)
+                dependent_names.append(quolified_name)
 
-        for m in dependent_modules:
-            if m in modules:
-                module.add_dependency(modules[m])
+        for name in dependent_names:
+            if name in modules:
+                module.add_dependency(modules[name])
+
+    # Logging
+    if LOGGER.isEnabledFor(logging.INFO):
+        def _format_modules(modules):
+            return pprint.pformat(
+                list(m.name for m in modules))
+
+        messages = []
+        for modname, module in modules.iteritems():
+             messages.append('%s: %s' % (modname, module))
+             messages.append('  Dependencies: %s' % _format_modules(module.dependencies))
+             messages.append('  Reverse: %s' % _format_modules(module.reverse_dependencies))
+        LOGGER.info("Monitoring:\n%s" % "\n".join(messages))
 
     while modules:
         time.sleep(1)

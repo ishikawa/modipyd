@@ -9,7 +9,7 @@ from modipyd.module import collect_module_code, \
 from tests import TestCase, FILES_DIR
 
 
-class TestModipydMonitor(TestCase):
+class TestModuleDescriptor(TestCase):
 
     def test_init(self):
         filepath = join(FILES_DIR, 'python', 'a.py')
@@ -20,6 +20,9 @@ class TestModipydMonitor(TestCase):
 
         self.assertEqual('python.a', descriptor.name)
         self.assertEqual(filepath, descriptor.filepath)
+
+
+class TestModuleDescriptorDependency(TestCase):
 
     def test_dependency(self):
 

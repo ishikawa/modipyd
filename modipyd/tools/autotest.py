@@ -21,7 +21,7 @@ import unittest
 from optparse import OptionParser
 
 from modipyd import LOGGER
-from modipyd import utils, monitor
+from modipyd import monitor
 
 
 # ----------------------------------------------------------------

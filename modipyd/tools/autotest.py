@@ -21,7 +21,7 @@ import unittest
 from optparse import OptionParser
 
 from modipyd import LOGGER
-from modipyd import monitor
+from modipyd.monitor import Monitor
 
 
 # ----------------------------------------------------------------
@@ -80,7 +80,9 @@ def main(options, filepath):
 
     # start monitoring
     try:
-        for modified in monitor.monitor(filepath):
+
+        monitor = Monitor(filepath)
+        for modified in monitor.start():
             LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
             suite = collect_affected_unittests(modified)
             run_unittest(suite)

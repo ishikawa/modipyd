@@ -160,12 +160,15 @@ def import_module(modulename):
         __import__(modulename)
     return sys.modules[modulename]
 
-## ``resolve_modulename`` is major bottleneck of performance :-(
 def resolve_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on
-    the search path ``search_paths``. If *search_paths* is omitted or ``None``,
-    ``sys.path`` is used.
+    the search path ``search_paths``. If *search_paths*
+    is omitted or ``None``, ``sys.path`` is used.
+
+    Notice: This function is provided for convenience.
+    You should use ``modipyd.resolve.ModuleNameResolver``
+    class for better performance.
     """
     from modipyd.resolve import ModuleNameResolver
     return ModuleNameResolver(search_paths).resolve(filepath)

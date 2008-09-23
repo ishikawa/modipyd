@@ -1,5 +1,6 @@
 """
-This module provides ``ModuleNameResolver`` class
+This module provides an interface to the mechanisms
+used to resolve module name from mofule filepath.
 
     :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
     :license: MIT (See ``LICENSE`` file for more details)
@@ -13,11 +14,15 @@ from modipyd import utils
 
 
 def _normalize_path(filepath):
+    """Normalize path name"""
     #return os.path.realpath(abspath(expanduser(filepath)))
     return abspath(expanduser(filepath))
 
 class ModuleNameResolver(object):
-    """Module Name Resolver"""
+    """
+    This class provides an interface to the mechanisms
+    used to resolve module name from mofule filepath.
+    """
 
     def __init__(self, search_paths=None):
         """

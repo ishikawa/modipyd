@@ -14,6 +14,10 @@ from modipyd import utils, LOGGER
 # Loading, Compiling source code
 # ----------------------------------------------------------------
 def load_compiled(filepath):
+    """
+    Load and initialize a byte-compiled code file and return
+    its ``code`` object. Return ``None`` if loading is failed.
+    """
     import marshal
     import imp
     fp = open(filepath, 'rb')
@@ -32,6 +36,11 @@ def load_compiled(filepath):
         fp.close()
 
 def compile_source(filepath):
+    """
+    Compile the source file at *filepath* into a code object.
+    Code objects can be executed by an exec statement or
+    evaluated by a call to ``eval()``.
+    """
     # line endings must be represented by a single newline character ('\n'),
     # and the input must be terminated by at least one newline character.
     fp = open(filepath, 'U')

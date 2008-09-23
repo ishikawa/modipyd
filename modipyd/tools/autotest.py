@@ -40,24 +40,22 @@ def run_unittest(suite):
         runner = unittest.TextTestRunner()
         runner.run(suite)
 
-def collect_affected_unittests(module):
+def collect_affected_unittests(module_descriptor):
     from os.path import basename
 
     suite = unittest.TestSuite()
     loader = unittest.defaultTestLoader
 
-    collected = set()
-    for mod in module.walk():
-        LOGGER.info("-> Affected: %s" % mod.name)
+    for desc in module_descriptor.walk():
+        LOGGER.info("-> Affected: %s" % desc.name)
 
         # TODO: Don't depends on filename pattern
-        if mod.name not in collected and basename(mod.filepath).startswith('test_'):
-            m = utils.import_module(mod.name)
-            tests = loader.loadTestsFromModule(m)
+        if basename(desc.filepath).startswith('test_'):
+            module = desc.import_module()
+            tests = loader.loadTestsFromModule(module)
             if tests.countTestCases():
                 suite.addTest(tests)
-                LOGGER.info("Running test: %s" % m.__name__)
-            collected.add(mod.name)
+                LOGGER.info("Running test: %s" % module.__name__)
 
     return suite
 

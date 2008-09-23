@@ -51,6 +51,22 @@ class TestModuleDescriptorDependency(TestCase):
         self.assertEqual(1, len(a.reverse_dependencies))
         self.assertEqual(descriptors['cycles.b'], a.reverse_dependencies[0])
 
+    def test_cycles(self):
+        descriptors = self.descriptors
+        a = descriptors['cycles.a']
+
+        #print a.describe()
+        #print [str(x.name) for x in a.walk()]
+
+        dep = a.walk()
+        self.assertEqual(descriptors['cycles.a'], dep.next())
+        self.assertEqual(descriptors['cycles.b'], dep.next())
+        self.assertEqual(descriptors['cycles.c'], dep.next())
+        self.assertEqual(descriptors['cycles.f'], dep.next())
+        self.assertEqual(descriptors['cycles.d'], dep.next())
+        self.assertEqual(descriptors['cycles.e'], dep.next())
+        self.assertRaises(StopIteration, dep.next)
+
 
 if __name__ == '__main__':
     unittest.main()

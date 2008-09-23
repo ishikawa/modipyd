@@ -10,6 +10,7 @@ for managing annotations of module.
 
 import os
 from modipyd import LOGGER
+from modipyd import utils
 
 
 def build_module_descriptors(module_codes):
@@ -175,16 +176,26 @@ class ModuleDescriptor(object):
 
     def walk(self):
         """Walking reverse dependency (includes self)"""
-        cycle = False
         yield self
-        for m in self.__reverse_dependencies:
-            for mm in m.walk():
-                if mm is self:
-                    # cycle detected
-                    if cycle:
-                        LOGGER.info("Cycle break: %s" % self.name)
-                        break
-                    else:
-                        LOGGER.info("Cycle detected: %s" % self.name)
-                        cycle = True
-                yield mm
+        # Use Breadth First Search (BFS) algorithm
+        L = [self]
+        discovered = set(L)
+        while L:
+            u = L.pop()
+            for v in u.reverse_dependencies:
+                if v not in discovered:
+                    discovered.add(v)
+                    L.append(v)
+                    yield v
+
+    def import_module(self):
+        try:
+            return utils.import_module(self.name)
+        except ImportError:
+            LOGGER.warn("ImportError occurred while "
+                "importing module '%s'" % (self.name))
+            if (self.filepath.endswith('.pyc') or
+                    self.filepath.endswith('.pyo')):
+                LOGGER.warn("Suggestion: An orphan file? %s" % self.filepath)
+            raise
+        

@@ -22,13 +22,13 @@ class TestModipydMonitor(TestCase):
 
     def test_dependency(self):
 
-        modules = list(collect_module_code(
+        codes = list(collect_module_code(
             join(FILES_DIR, 'cycles'),
             [FILES_DIR]))
-        modules = build_module_descriptors(modules)
+        descriptors = build_module_descriptors(codes)
 
         # file existence check
-        names = set(modules.keys())
+        names = set(descriptors.keys())
         names.remove('cycles')
         names.remove('cycles.a')
         names.remove('cycles.b')
@@ -39,11 +39,11 @@ class TestModipydMonitor(TestCase):
         self.assertEqual(0, len(names))
 
         # dependency
-        a = modules['cycles.a']
+        a = descriptors['cycles.a']
         self.assertEqual(1, len(a.dependencies))
-        self.assertEqual(modules['cycles.d'], a.dependencies[0])
+        self.assertEqual(descriptors['cycles.d'], a.dependencies[0])
         self.assertEqual(1, len(a.reverse_dependencies))
-        self.assertEqual(modules['cycles.b'], a.reverse_dependencies[0])
+        self.assertEqual(descriptors['cycles.b'], a.reverse_dependencies[0])
 
 
 if __name__ == '__main__':

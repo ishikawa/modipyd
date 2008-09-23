@@ -8,24 +8,27 @@ This module provides ``ModuleNameResolver`` class
 
 import os
 import sys
-from os.path import isdir, abspath, samestat
+from os.path import isdir, abspath, expanduser, realpath, \
+                    split, splitext
 from modipyd.utils import python_module_file, python_package
 
 
-def split_module_name(filepath):
+def _normalize_path(filepath):
+    #return realpath(abspath(expanduser(filepath)))
+    return abspath(expanduser(filepath))
+
+def _split_module_name(filepath):
     """
     /path/to/module.py -> '/path/to/', 'module'
     """
     # filepath must be absolute.
-    filepath = os.path.abspath(filepath)
-    dirpath, modname = os.path.split(filepath)
+    dirpath, modname = split(filepath)
     assert os.path.isabs(dirpath) and modname
 
     # ignore extention (e.g. '.py', '.pyc')
     modname, _ = os.path.splitext(modname)
     assert _
     return dirpath, modname
-
 
 class ModuleNameResolver(object):
     """Module Name Resolver"""
@@ -38,7 +41,7 @@ class ModuleNameResolver(object):
         """
         # Cofigure module search path (copy it)
         syspaths = (search_paths or sys.path)
-        self.search_paths = [abspath(d) for d in syspaths if isdir(d)]
+        self.search_paths = [_normalize_path(d) for d in syspaths if isdir(d)]
         for d in self.search_paths:
             assert isinstance(d, basestring)
             assert isdir(d)
@@ -48,28 +51,35 @@ class ModuleNameResolver(object):
         Resolve the module name from *filepath* on search_paths.
         """
 
+        if not filepath:
+            raise RuntimeError("Empty string passed")
+
+        filepath = _normalize_path(filepath)
         if not python_module_file(filepath):
             raise RuntimeError("Not a python script: %s" % filepath)
 
         # Searching...
         skipped_name = None
-        dirpath, modname = split_module_name(filepath)
+        dirpath, modname = _split_module_name(filepath)
         for syspath in self.search_paths:
 
-            st = os.stat(syspath)
-            d, name = dirpath, modname
-
-            while not samestat(st, os.stat(d)):
+            d, name = dirpath, [modname]
+            # Because paths is normalized,
+            # fast string comparison is sufficient
+            while not d == syspath:
                 if not python_package(d):
                     # encountered not a package
                     break
                 if d == '/':
                     # not found in search path
                     break
-                d, parent = os.path.split(d)
-                name = '.'.join((parent, name))
+                d, parent = split(d)
+                name.insert(0, parent)
             else:
-                if python_package(dirpath) and '.' not in name:
+                level = len(name)
+                assert level > 0
+
+                if python_package(dirpath) and level < 2:
                     # script is created under a package,
                     # but its module name is not a package.
                     #
@@ -89,13 +99,13 @@ class ModuleNameResolver(object):
                     #
                     # Store result name, and continues with
                     # the next iteration of the **for** loop.
-                    skipped_name = name
+                    skipped_name = name[0]
                     continue
 
-                if name.endswith(".__init__"):
-                    # Remove tail '.__init__'
-                    name = name[:-9]
-                return name
+                if level > 1 and name[-1] == '__init__':
+                    # Remove tail '__init__'
+                    del name[-1]
+                return '.'.join(name)
 
         if skipped_name is not None:
             return skipped_name

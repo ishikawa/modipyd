@@ -2,7 +2,8 @@
 
 import unittest
 from os.path import join
-from modipyd.monitor import ModuleDescriptor, build_module_descriptors
+from modipyd.descriptor import ModuleDescriptor, \
+                               build_module_descriptors
 from modipyd.module import collect_module_code, \
                            read_module_code
 from tests import TestCase, FILES_DIR

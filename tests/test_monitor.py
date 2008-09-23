@@ -2,7 +2,7 @@
 
 import unittest
 from os.path import join
-from modipyd.monitor import ModuleMonitor
+from modipyd.monitor import ModuleMonitor, build_modules
 from modipyd.module import Module, compile_source, \
                            collect_python_module, \
                            read_python_module
@@ -20,6 +20,31 @@ class TestModipydMonitor(TestCase):
 
         self.assertEqual('python.a', monitor.name)
         self.assertEqual(filepath, monitor.filepath)
+
+    def test_dependency(self):
+
+        modules = list(collect_python_module(
+            join(FILES_DIR, 'cycles'),
+            [FILES_DIR]))
+        modules = build_modules(modules)
+
+        # file existence check
+        names = set(modules.keys())
+        names.remove('cycles')
+        names.remove('cycles.a')
+        names.remove('cycles.b')
+        names.remove('cycles.c')
+        names.remove('cycles.d')
+        names.remove('cycles.e')
+        names.remove('cycles.f')
+        self.assertEqual(0, len(names))
+
+        # dependency
+        a = modules['cycles.a']
+        self.assertEqual(1, len(a.dependencies))
+        self.assertEqual(modules['cycles.d'], a.dependencies[0])
+        self.assertEqual(1, len(a.reverse_dependencies))
+        self.assertEqual(modules['cycles.b'], a.reverse_dependencies[0])
 
 
 if __name__ == '__main__':

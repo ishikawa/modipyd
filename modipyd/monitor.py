@@ -23,8 +23,7 @@ def monitor(filepath_or_list):
     for modified in monitor_modules(modules):
         yield modified
 
-def monitor_modules(module_list):
-    """Monitoring ``modipyd.module.Module``s"""
+def build_modules(module_list):
 
     def analyze_dependent_names(module):
         for name, fromlist in module.module.imports:
@@ -52,6 +51,11 @@ def monitor_modules(module_list):
         for name in analyze_dependent_names(module):
             if name in modules:
                 module.add_dependency(modules[name])
+    return modules
+
+def monitor_modules(module_list):
+    """Monitoring ``modipyd.module.Module``s"""
+    modules = build_modules(module_list)
 
     # Logging
     if LOGGER.isEnabledFor(logging.INFO):
@@ -155,6 +159,14 @@ class ModuleMonitor(object):
         messages.append('  Reverse: %s' % _format_monitor_list(
             self.__reverse_dependencies))
         return "\n".join(messages)
+
+    @property
+    def dependencies(self):
+        return tuple(self.__dependencies)
+
+    @property
+    def reverse_dependencies(self):
+        return tuple(self.__reverse_dependencies)
 
     @property
     def module(self):

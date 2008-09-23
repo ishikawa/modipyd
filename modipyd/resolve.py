@@ -13,21 +13,8 @@ from modipyd import utils
 
 
 def _normalize_path(filepath):
-    #return realpath(abspath(expanduser(filepath)))
+    #return os.path.realpath(abspath(expanduser(filepath)))
     return abspath(expanduser(filepath))
-
-def _split_module_name(filepath):
-    """
-    /path/to/module.py -> '/path/to/', 'module'
-    """
-    # filepath must be absolute.
-    dirpath, modname = os.path.split(filepath)
-    assert os.path.isabs(dirpath) and modname
-
-    # ignore extention (e.g. '.py', '.pyc')
-    modname, _ = os.path.splitext(modname)
-    assert _
-    return dirpath, modname
 
 class ModuleNameResolver(object):
     """Module Name Resolver"""
@@ -68,26 +55,38 @@ class ModuleNameResolver(object):
             raise RuntimeError("Not a python script: %s" % filepath)
 
         # Searching...
+        #
+        # split path components
+        # ignore extention (e.g. '.py', '.pyc')
+        dirpath, modname = os.path.split(filepath)
+        modname, _ = os.path.splitext(modname)
+
         skipped_name = None
-        dirpath, modname = _split_module_name(filepath)
+        compiled_forms = [(dirpath, [modname])]
+
         for syspath in self.search_paths:
+            
+            i = 0
+            while not compiled_forms[i][0] == syspath:
+                # compile
+                i += 1
+                if i == len(compiled_forms):
+                    d, names = compiled_forms[i-1]
 
-            d, names = dirpath, [modname]
-            # Because paths is normalized,
-            # fast string comparison is sufficient
-            while not d == syspath:
-                # Encountered not a package, or not found in
-                # the module search path
-                if not self.python_package(d) or d == '/':
-                    break
-                d, parent = os.path.split(d)
-                names.insert(0, parent)
+                    # Encountered not a package, or not found in
+                    # the module search path
+                    if not self.python_package(d) or d == '/':
+                        break
+
+                    names = names[:] # copy
+                    d, parent = os.path.split(d)
+                    names.insert(0, parent)
+
+                    compiled_forms.append((d, names))
             else:
-                level = len(names)
-                assert level != 0, "module name is empty"
-
-                if level == 1:
-                    if self.python_package(dirpath) and level == 1:
+                d, names = compiled_forms[i]
+                if i == 0:
+                    if self.python_package(d):
                         # script is created under a package,
                         # but its module name is not a package style
                         # (e.g. 'package.module').

@@ -24,12 +24,14 @@ class TestModuleDescriptor(TestCase):
 
 class TestModuleDescriptorDependency(TestCase):
 
-    def test_dependency(self):
-
+    def setUp(self):
         codes = list(collect_module_code(
             join(FILES_DIR, 'cycles'),
             [FILES_DIR]))
-        descriptors = build_module_descriptors(codes)
+        self.descriptors = build_module_descriptors(codes)
+
+    def test_dependency(self):
+        descriptors = self.descriptors
 
         # file existence check
         names = set(descriptors.keys())

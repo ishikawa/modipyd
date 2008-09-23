@@ -8,9 +8,8 @@ This module provides ``ModuleNameResolver`` class
 
 import os
 import sys
-from os.path import isdir, abspath, expanduser, realpath, \
-                    split, splitext
-from modipyd.utils import python_module_file, python_package
+from os.path import isdir, abspath, expanduser
+from modipyd import utils
 
 
 def _normalize_path(filepath):
@@ -22,7 +21,7 @@ def _split_module_name(filepath):
     /path/to/module.py -> '/path/to/', 'module'
     """
     # filepath must be absolute.
-    dirpath, modname = split(filepath)
+    dirpath, modname = os.path.split(filepath)
     assert os.path.isabs(dirpath) and modname
 
     # ignore extention (e.g. '.py', '.pyc')
@@ -46,6 +45,16 @@ class ModuleNameResolver(object):
             assert isinstance(d, basestring)
             assert isdir(d)
 
+        # caches
+        self.cache_package = {}
+
+    def python_package(self, directory):
+        p = self.cache_package.get(directory)
+        if p is None:
+            p = utils.python_package(directory)
+            self.cache_package[directory] = p
+        return p
+
     def resolve(self, filepath):
         """
         Resolve the module name from *filepath* on search_paths.
@@ -55,7 +64,7 @@ class ModuleNameResolver(object):
             raise RuntimeError("Empty string passed")
 
         filepath = _normalize_path(filepath)
-        if not python_module_file(filepath):
+        if not utils.python_module_file(filepath):
             raise RuntimeError("Not a python script: %s" % filepath)
 
         # Searching...
@@ -67,19 +76,19 @@ class ModuleNameResolver(object):
             # Because paths is normalized,
             # fast string comparison is sufficient
             while not d == syspath:
-                if not python_package(d):
+                if not self.python_package(d):
                     # encountered not a package
                     break
                 if d == '/':
                     # not found in search path
                     break
-                d, parent = split(d)
+                d, parent = os.path.split(d)
                 name.insert(0, parent)
             else:
                 level = len(name)
                 assert level > 0
 
-                if python_package(dirpath) and level < 2:
+                if self.python_package(dirpath) and level < 2:
                     # script is created under a package,
                     # but its module name is not a package.
                     #

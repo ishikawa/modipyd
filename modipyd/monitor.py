@@ -30,12 +30,13 @@ class Monitor(object):
         super(Monitor, self).__init__()
         self.paths = utils.wrap_sequence(filepath_or_list)
         assert not isinstance(self.paths, basestring)
-        self.__descriptors = {}
+        self.descriptors = {}
+        self.monitoring = False
 
     def start(self):
         module_codes = list(collect_module_code(self.paths))
         descriptors = build_module_descriptors(module_codes)
-        self.__descriptors = descriptors
+        self.descriptors = descriptors
 
         # Logging
         if LOGGER.isEnabledFor(logging.INFO):
@@ -44,15 +45,15 @@ class Monitor(object):
                 for desc in descriptors.itervalues()])
             LOGGER.info("Monitoring:\n%s" % desc)
 
-        while descriptors:
-            time.sleep(1)
-            for desc in descriptors.itervalues():
-                if desc.update():
-                    yield desc
+        try:
+            self.monitoring = True
+            while descriptors and self.monitoring:
+                time.sleep(1)
+                for desc in descriptors.itervalues():
+                    if desc.update():
+                        yield desc
+        finally:
+            self.monitoring = False
 
     def stop(self):
-        pass
-
-    @property
-    def descriptors(self):
-        return self.__descriptors
+        self.monitoring = False

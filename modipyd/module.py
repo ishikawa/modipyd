@@ -88,12 +88,12 @@ def scan_code(co, module):
 # ----------------------------------------------------------------
 # Python Module Finder
 # ----------------------------------------------------------------
-# Bit masks for collect_python_module_files
+# Bit masks for collect_module_code_files
 PYTHON_SOURCE_MASK    = 1
 PYTHON_COMPILED_MASK  = 2
 PYTHON_OPTIMIZED_MASK = 4
 
-def _collect_python_module_files(filepath_or_list):
+def _collect_module_code_files(filepath_or_list):
     """Generates (filepath without extention, bitmask)"""
     from os.path import splitext
 
@@ -116,8 +116,8 @@ def _collect_python_module_files(filepath_or_list):
             yield path, bitmask
 
 
-def collect_python_module(filepath_or_list, search_path=None):
-    for path, typebits in _collect_python_module_files(filepath_or_list):
+def collect_module_code(filepath_or_list, search_path=None):
+    for path, typebits in _collect_module_code_files(filepath_or_list):
         # Since changing .py file is not reflected by .pyc, .pyo quickly,
         # the plain .py file takes first prioriry.
         code = None
@@ -150,7 +150,7 @@ def read_python_module(filepath, search_path=None):
             "must be instance of basestring, but was "
             "instance of %s" % type(filepath))
 
-    g = collect_python_module(filepath, search_path)
+    g = collect_module_code(filepath, search_path)
     module = g.next()
     try:
         g.next()

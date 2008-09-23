@@ -3,7 +3,7 @@
 import unittest
 from os.path import join
 from modipyd.module import ModuleCode, compile_source, \
-                           collect_python_module, \
+                           collect_module_code, \
                            read_python_module
 from tests import TestCase, FILES_DIR
 
@@ -19,8 +19,8 @@ class TestModipydModuleCode(TestCase):
         self.assertNotNone(module)
         self.assertEqual(0, len(module.imports))
 
-    def test_collect_python_module(self):
-        modules = list(collect_python_module(
+    def test_collect_module_code(self):
+        modules = list(collect_module_code(
             join(FILES_DIR, 'python'),
             [FILES_DIR]))
         self.assertNotNone(modules)
@@ -39,7 +39,7 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual(filepath, module.filepath)
 
     def test_module_equality(self):
-        modules = list(collect_python_module(
+        modules = list(collect_module_code(
             join(FILES_DIR, 'python'),
             [FILES_DIR]))
         self.assertEqual(2, len(modules))
@@ -52,7 +52,7 @@ class TestModipydModuleCode(TestCase):
         self.assert_(module1 is module1)
         self.assert_(module1 == module1)
 
-        modules2 = list(collect_python_module(
+        modules2 = list(collect_module_code(
             join(FILES_DIR, 'python'),
             [FILES_DIR]))
 

@@ -13,13 +13,13 @@ import logging
 import time
 from modipyd import LOGGER
 from modipyd import utils
-from modipyd.module import collect_python_module
+from modipyd.module import collect_module_code
 
 
 def monitor(filepath_or_list):
     paths = utils.wrap_sequence(filepath_or_list)
     assert not isinstance(paths, basestring)
-    module_codes = list(collect_python_module(paths))
+    module_codes = list(collect_module_code(paths))
     for modified in monitor_module_codes(module_codes):
         yield modified
 

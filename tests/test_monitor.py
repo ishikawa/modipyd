@@ -3,7 +3,7 @@
 import unittest
 from os.path import join
 from modipyd.monitor import ModuleDescriptor, build_module_descriptors
-from modipyd.module import collect_python_module, \
+from modipyd.module import collect_module_code, \
                            read_python_module
 from tests import TestCase, FILES_DIR
 
@@ -22,7 +22,7 @@ class TestModipydMonitor(TestCase):
 
     def test_dependency(self):
 
-        modules = list(collect_python_module(
+        modules = list(collect_module_code(
             join(FILES_DIR, 'cycles'),
             [FILES_DIR]))
         modules = build_module_descriptors(modules)

@@ -23,7 +23,7 @@ def monitor(filepath_or_list):
     for modified in monitor_modules(modules):
         yield modified
 
-def build_modules(module_list):
+def build_modules(module_codes):
 
     def analyze_dependent_names(module):
         for name, fromlist in module.module.imports:
@@ -43,8 +43,8 @@ def build_modules(module_list):
 
     # Construct ``ModuleMonitor`` mappings
     modules = dict([
-        (module.name, ModuleMonitor(module))
-        for module in module_list])
+        (code.name, ModuleMonitor(code))
+        for code in module_codes])
 
     # Dependency Analysis
     for module in modules.itervalues():
@@ -53,9 +53,9 @@ def build_modules(module_list):
                 module.add_dependency(modules[name])
     return modules
 
-def monitor_modules(module_list):
+def monitor_modules(module_codes):
     """Monitoring ``modipyd.module.Module``s"""
-    modules = build_modules(module_list)
+    modules = build_modules(module_codes)
 
     # Logging
     if LOGGER.isEnabledFor(logging.INFO):

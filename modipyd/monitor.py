@@ -149,10 +149,10 @@ class ModuleMonitor(object):
                 if mm is self:
                     # cycle detected
                     if cycle:
-                        LOGGER.info("Cycle break: %s" % module.name)
+                        LOGGER.info("Cycle break: %s" % self.name)
                         break
                     else:
-                        LOGGER.info("Cycle detected: %s" % module.name)
+                        LOGGER.info("Cycle detected: %s" % self.name)
                         cycle = True
                         break
                 yield mm

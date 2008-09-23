@@ -79,6 +79,17 @@ class ModuleMonitor(object):
         self.dependencies = set()
         self.reverse_dependencies = set()
 
+    def __str__(self):
+        return str(self.module)
+
+    def __eq__(self, other):
+        return (self is other or
+                    (isinstance(other, type(self)) and
+                     self.module == other.module))
+
+    def __hash__(self):
+        return hash(self.module)
+
     def describe(self, indent=1, width=80, depth=None):
         """
         Return the formatted representation of ``ModuleMonitor``
@@ -86,9 +97,13 @@ class ModuleMonitor(object):
         the ``PrettyPrinter`` constructor as formatting parameters.
         """
         def _format_monitor_list(modules):
+            import re
             from pprint import pformat
-            return pformat(list(m.name for m in modules),
+
+            s = pformat(list(m.name for m in modules),
                 indent=indent, width=width, depth=depth)
+            # bug?
+            return re.sub(r'\[( +)', "[\n\\1 ", s)
 
         messages = []
         messages.append('%s: %s' % (self.name, self.filepath))
@@ -125,7 +140,19 @@ class ModuleMonitor(object):
     def add_reverse_dependency(self, module):
         self.reverse_dependencies.add(module)
 
-    def __str__(self):
-        return str(self.module)
-
-
+    def walk(self):
+        """Walking reverse dependency (includes self)"""
+        cycle = False
+        yield self
+        for m in self.reverse_dependencies:
+            for mm in m.walk():
+                if mm is self:
+                    # cycle detected
+                    if cycle:
+                        LOGGER.info("Cycle break: %s" % module.name)
+                        break
+                    else:
+                        LOGGER.info("Cycle detected: %s" % module.name)
+                        cycle = True
+                        break
+                yield mm

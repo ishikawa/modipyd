@@ -133,19 +133,19 @@ def python_package(dirpath):
     Return ``True`` if *dirpath* is an existing directory that is
     Python package directory (contains ``__init__.py[co]``).
     """
-    from os.path import isdir
-    return isdir(dirpath) and python_module_exists(dirpath, '__init__')
+    # os.path.isdir() check is not needed
+    return python_module_exists(dirpath, '__init__')
 
 def python_module_exists(dirpath, modulename):
     """
     Return ``True`` if *dirpath* refers to an existing directory that
     contains Python module named *modulename*.
     """
-    from os.path import isdir, isfile, join
-    return (isdir(dirpath) and
-                (isfile(join(dirpath, '%s.py' % modulename)) or
+    # os.path.isdir() check is not needed
+    from os.path import isfile, join
+    return (isfile(join(dirpath, '%s.py' % modulename)) or
                  isfile(join(dirpath, '%s.pyc' % modulename)) or
-                 isfile(join(dirpath, '%s.pyo' % modulename))))
+                 isfile(join(dirpath, '%s.pyo' % modulename)))
 
 
 # ----------------------------------------------------------------

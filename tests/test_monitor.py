@@ -12,13 +12,13 @@ class TestModipydMonitor(TestCase):
 
     def test_init(self):
         filepath = join(FILES_DIR, 'python', 'a.py')
-        module = read_module_code(filepath, [FILES_DIR])
+        code = read_module_code(filepath, [FILES_DIR])
 
-        self.assertNotNone(module)
-        monitor = ModuleDescriptor(module)
+        self.assertNotNone(code)
+        descriptor = ModuleDescriptor(code)
 
-        self.assertEqual('python.a', monitor.name)
-        self.assertEqual(filepath, monitor.filepath)
+        self.assertEqual('python.a', descriptor.name)
+        self.assertEqual(filepath, descriptor.filepath)
 
     def test_dependency(self):
 

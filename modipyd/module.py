@@ -111,9 +111,7 @@ def _collect_module_code_files(filepath_or_list):
         elif ext == '.pyo':
             modules[path] |= PYTHON_OPTIMIZED_MASK
 
-    for path, bitmask in modules.iteritems():
-        if bitmask > 0:
-            yield path, bitmask
+    return (item for item in modules.iteritems() if item[1] > 0)
 
 
 def collect_module_code(filepath_or_list, search_path=None):
@@ -134,6 +132,7 @@ def collect_module_code(filepath_or_list, search_path=None):
                 sourcepath = path + '.pyc'
             code = load_compiled(sourcepath)
         if not code:
+            LOGGER.info("Couldn't load file at %s" % sourcepath)
             continue
 
         # module name

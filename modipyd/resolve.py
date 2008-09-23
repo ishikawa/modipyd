@@ -30,6 +30,8 @@ class ModuleNameResolver(object):
         if *search_paths* is omitted or ``None``, ``sys.path`` is used.
         ``sys.path`` is used.
         """
+        super(ModuleNameResolver, self).__init__()
+
         # Cofigure module search path (copy it)
         syspaths = (search_paths or sys.path)
         self.search_paths = [_normalize_path(d) for d in syspaths if isdir(d)]

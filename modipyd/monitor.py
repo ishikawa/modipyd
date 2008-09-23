@@ -68,6 +68,49 @@ def monitor_modules(module_list):
 # ----------------------------------------------------------------
 # ModuleMonitor
 # ----------------------------------------------------------------
+class OrderedSet(object):
+
+    def __init__(self, items=None):
+        super(OrderedSet, self).__init__()
+        self.__items = []
+        self.__set = set()
+        self.update(items or ())
+
+    def __len__(self):
+        return len(self.__items)
+
+    def __iter__(self):
+        return iter(self.__items)
+
+    def __contains__(self, item):
+        return item in self.__set
+
+    def __str__(self):
+        return str(self.__items)
+
+    def __repr__(self):
+        return repr(self.__items)
+
+    def update(self, items):
+        for i in items:
+            self.add(i)
+
+    def add(self, item):
+        if item not in self.__set:
+            self.__items.append(item)
+            self.__set.add(item)
+
+    append = add
+
+    def remove(self, item):
+        self.__items.remove(item)
+        self.__set.remove(item)
+
+    def clear(self):
+        self.__items[:] = []
+        self.__set.clear()
+
+
 class ModuleMonitor(object):
 
     def __init__(self, module):
@@ -76,8 +119,8 @@ class ModuleMonitor(object):
         self.__mtime = None
         self.update_mtime()
 
-        self.dependencies = set()
-        self.reverse_dependencies = set()
+        self.__dependencies = OrderedSet()
+        self.__reverse_dependencies = OrderedSet()
 
     def __str__(self):
         return str(self.module)
@@ -108,9 +151,9 @@ class ModuleMonitor(object):
         messages = []
         messages.append('%s: %s' % (self.name, self.filepath))
         messages.append('  Dependencies: %s' % _format_monitor_list(
-            self.dependencies))
+            self.__dependencies))
         messages.append('  Reverse: %s' % _format_monitor_list(
-            self.reverse_dependencies))
+            self.__reverse_dependencies))
         return "\n".join(messages)
 
     @property
@@ -138,17 +181,17 @@ class ModuleMonitor(object):
             self.__mtime = mtime
 
     def add_dependency(self, module):
-        self.dependencies.add(module)
+        self.__dependencies.append(module)
         module.add_reverse_dependency(self)
 
     def add_reverse_dependency(self, module):
-        self.reverse_dependencies.add(module)
+        self.__reverse_dependencies.append(module)
 
     def walk(self):
         """Walking reverse dependency (includes self)"""
         cycle = False
         yield self
-        for m in self.reverse_dependencies:
+        for m in self.__reverse_dependencies:
             for mm in m.walk():
                 if mm is self:
                     # cycle detected

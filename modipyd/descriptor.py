@@ -54,6 +54,9 @@ class OrderedSet(object):
     def __len__(self):
         return len(self.__items)
 
+    def __getitem__(self, i):
+        return self.__items[i]
+
     def __iter__(self):
         return iter(self.__items)
 
@@ -184,5 +187,4 @@ class ModuleDescriptor(object):
                     else:
                         LOGGER.info("Cycle detected: %s" % self.name)
                         cycle = True
-                        break
                 yield mm

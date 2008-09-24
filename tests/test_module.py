@@ -74,9 +74,19 @@ class TestModipydModuleCode(TestCase):
         # Can't import a module in no package
         self.assertRaises(ImportError, self.read_module_code, 'python3.c')
 
-    def test_imports_classdefs(self):
+    def test_imports(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
         self.assertEqual(2, len(modcode.imports))
+
+        # import sys
+        self.assertEqual('sys', modcode.imports[0][0])
+        self.assertEqual(0, len(modcode.imports[0][1]))
+
+        # from os.path import join, dirname
+        self.assertEqual('os.path', modcode.imports[1][0])
+        self.assertEqual(2, len(modcode.imports[1][1]))
+        self.assertEqual('join', modcode.imports[1][1][0])
+        self.assertEqual('dirname', modcode.imports[1][1][1])
 
 if __name__ == '__main__':
     unittest.main()

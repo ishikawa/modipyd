@@ -31,9 +31,9 @@ class TestModipydModuleCode(TestCase):
         self.assert_('python' in names)
 
     def read_module_code(self, modulename):
-        items = modulename.split('.')
+        items = [FILES_DIR] + list(modulename.split('.'))
         items[-1] += '.py'
-        filepath = join(FILES_DIR, *items)
+        filepath = join(*items)
         module = read_module_code(filepath, [FILES_DIR])
 
         self.assertNotNone(module)
@@ -42,7 +42,7 @@ class TestModipydModuleCode(TestCase):
         return module
 
     def test_python_module(self):
-        modcode = self.read_module_code('python.a')
+        self.read_module_code('python.a')
 
     def test_module_equality(self):
         modules = list(collect_module_code(

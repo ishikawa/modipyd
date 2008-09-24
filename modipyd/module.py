@@ -119,7 +119,8 @@ def scan_code(co, module):
                     baseclasses = ()
             elif STORE_NAME == op and baseclasses:
                 assert isinstance(baseclasses, tuple)
-                #print "class %s : %s:" % (co.co_names[oparg], ','.join(baseclasses))
+                #print "class %s : %s:" % (co.co_names[oparg],
+                #                          ','.join(baseclasses))
                 module.classdefs[co.co_names[oparg]] = baseclasses
                 baseclasses = None
                 del stack[:]

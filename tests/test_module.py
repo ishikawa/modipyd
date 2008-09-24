@@ -30,13 +30,19 @@ class TestModipydModuleCode(TestCase):
         self.assert_('python.a' in names)
         self.assert_('python' in names)
 
-    def test_python_module(self):
-        filepath = join(FILES_DIR, 'python', 'a.py')
+    def read_module_code(self, modulename):
+        items = modulename.split('.')
+        items[-1] += '.py'
+        filepath = join(FILES_DIR, *items)
         module = read_module_code(filepath, [FILES_DIR])
 
         self.assertNotNone(module)
-        self.assertEqual('python.a', module.name)
+        self.assertEqual(modulename, module.name)
         self.assertEqual(filepath, module.filepath)
+        return module
+
+    def test_python_module(self):
+        modcode = self.read_module_code('python.a')
 
     def test_module_equality(self):
         modules = list(collect_module_code(
@@ -63,17 +69,6 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual(hash(module1), hash(module1))
         self.assertEqual(hash(module1), hash(modules2[0]))
         self.assertEqual(hash(module2), hash(modules2[1]))
-
-    def read_module_code(self, modulename):
-        items = modulename.split('.')
-        items[-1] += '.py'
-        filepath = join(FILES_DIR, *items)
-        module = read_module_code(filepath, [FILES_DIR])
-
-        self.assertNotNone(module)
-        self.assertEqual(modulename, module.name)
-        self.assertEqual(filepath, module.filepath)
-        return module
 
     def test_read_module_code_not_existense(self):
         # Can't import a module in no package

@@ -19,7 +19,7 @@ class TestModuleDescriptor(TestCase):
         descriptor = ModuleDescriptor(code)
 
         self.assertEqual('python.a', descriptor.name)
-        self.assertEqual(filepath, descriptor.filepath)
+        self.assertEqual(filepath, descriptor.filename)
 
 
 class TestModuleDescriptorDependency(TestCase):

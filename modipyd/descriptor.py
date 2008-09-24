@@ -128,7 +128,7 @@ class ModuleDescriptor(object):
             return re.sub(r'\[( +)', "[\n\\1 ", s)
 
         messages = []
-        messages.append('%s: %s' % (self.name, self.filepath))
+        messages.append('%s: %s' % (self.name, self.filename))
         messages.append('  Dependencies: %s' % _format_monitor_list(
             self.__dependencies))
         messages.append('  Reverse: %s' % _format_monitor_list(
@@ -152,8 +152,8 @@ class ModuleDescriptor(object):
         return self.module_code.name
 
     @property
-    def filepath(self):
-        return self.module_code.filepath
+    def filename(self):
+        return self.module_code.filename
 
     def update(self):
         return self.update_mtime()
@@ -162,7 +162,7 @@ class ModuleDescriptor(object):
         """Update modification time and return ``True`` if modified"""
         mtime = None
         try:
-            mtime = os.path.getmtime(self.filepath)
+            mtime = os.path.getmtime(self.filename)
             return self.__mtime is None or mtime > self.__mtime
         finally:
             self.__mtime = mtime
@@ -197,8 +197,8 @@ class ModuleDescriptor(object):
         except ImportError:
             LOGGER.warn("ImportError occurred while "
                 "importing module '%s'" % (self.name))
-            if (self.filepath.endswith('.pyc') or
-                    self.filepath.endswith('.pyo')):
-                LOGGER.warn("Suggestion: An orphan file? %s" % self.filepath)
+            if (self.filename.endswith('.pyc') or
+                    self.filename.endswith('.pyo')):
+                LOGGER.warn("Suggestion: An orphan file? %s" % self.filename)
             raise
         

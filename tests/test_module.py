@@ -38,7 +38,7 @@ class TestModipydModuleCode(TestCase):
 
         self.assertNotNone(module)
         self.assertEqual(modulename, module.name)
-        self.assertEqual(filepath, module.filepath)
+        self.assertEqual(filepath, module.filename)
         return module
 
     def test_python_module(self):

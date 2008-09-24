@@ -60,7 +60,7 @@ def observe(module_descriptor):
         scan_code(modcode.code, modcode)
 
         # FIXME: But depending on filename is maybe a bad idea.
-        filename = os.path.basename(descriptor.filepath)
+        filename = os.path.basename(descriptor.filename)
         if filename.startswith('test_'):
             LOGGER.info("=> Loading:  %s" % descriptor.name)
 

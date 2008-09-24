@@ -254,10 +254,6 @@ class ModuleCode(object):
     def __hash__(self):
         return hash(self.name)
 
-    @property
-    def filepath(self):
-        return self.filename
-
 
 if __name__ == "__main__":
     import doctest

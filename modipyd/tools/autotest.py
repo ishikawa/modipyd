@@ -35,33 +35,24 @@ VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 # ----------------------------------------------------------------
 # Notification Observer
 # ----------------------------------------------------------------
-def scan_code(co, module):
-    import pprint
+def testcase_module(module_descriptor):
+    # We can't use ``unittest.TestLoader`` to loading tests,
+    # bacause ``TestLoader`` imports (execute) module code.
+    # If imported/executed module have a statement such as
+    # ``sys.exit()``, ...program exit!
 
-    print "Scan", module.name
-    code = co.co_code
-    pprint.pprint(co.co_consts)
-
+    # FIXME: But depending on filename is maybe a bad idea.
+    filename = os.path.basename(descriptor.filename)
+    if filename.startswith('test_'):
+        LOGGER.info("=> Loading:  %s" % descriptor.name)
 
 def observe(module_descriptor):
 
     # Walking dependency graph in imported module to
     # module imports order.
     for descriptor in module_descriptor.walk():
-
         LOGGER.info("-> Affected: %s" % descriptor.name)
-
-        # We can't use ``unittest.TestLoader`` to loading tests,
-        # bacause ``TestLoader`` imports (execute) module code.
-        # If imported/executed module have a statement such as
-        # ``sys.exit()``, ...program exit!
-
-        modcode = module_descriptor.module_code
-        scan_code(modcode.code, modcode)
-
-        # FIXME: But depending on filename is maybe a bad idea.
-        filename = os.path.basename(descriptor.filename)
-        if filename.startswith('test_'):
+        if testcase_module(module_descriptor):
             LOGGER.info("=> Loading:  %s" % descriptor.name)
 
 

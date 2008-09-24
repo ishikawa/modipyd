@@ -201,4 +201,3 @@ class ModuleDescriptor(object):
                     self.filename.endswith('.pyo')):
                 LOGGER.warn("Suggestion: An orphan file? %s" % self.filename)
             raise
-        

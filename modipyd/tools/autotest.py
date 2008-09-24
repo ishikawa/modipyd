@@ -19,7 +19,7 @@ import sys
 import logging
 from optparse import OptionParser
 
-from modipyd import LOGGER
+from modipyd import LOGGER, utils
 from modipyd.monitor import Monitor
 
 
@@ -93,38 +93,12 @@ def testcase_module(module_descriptor):
             LOGGER.debug("'%s' is derived from "
                 "imported class '%s'" % (base, '.'.join(names)))
 
-            # Import base class.
-            # As a workaround for __import__ behavior, 
-            #   1. import module
-            #   2. use getattr() to extract the desired class
-
-            # 1. import module
+            name = '.'.join(names)
             try:
-                modname = '.'.join(names[:-1])
-                module = __import__(modname)
-                for name in names[1:-1]:
-                    module = getattr(module, name)
-            except ImportError:
-                LOGGER.warn("ImportError occurred "
-                    "while importing module '%s' "
-                    "in module '%s', ignore" % (modname, modcode.name),
-                    exc_info=True)
-                continue
-            else:
-                assert module
-                assert module.__name__ == modname, \
-                    "Expected %s, but was %s" % (modname, module.__name__)
-                LOGGER.debug("Imported module %s" % module)
-
-            # 2. use getattr() to extract the desired class
-            try:
-                baseclass = getattr(module, names[-1])
-                assert baseclass
-                LOGGER.debug(
-                    "Loaded class %s in module %s" % (baseclass, module))
-            except AttributeError:
-                LOGGER.warn("No class named '%s' found "
-                    "in module '%s'" % (names[-1], module),
+                baseclass = utils.import_component(name)
+            except (ImportError, AttributeError):
+                LOGGER.warn("Exception occurred "
+                    "while importing component '%s'" % name,
                     exc_info=True)
             else:
                 # 5. Check loaded class is unittest.TestCase or its subclass

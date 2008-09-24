@@ -6,7 +6,6 @@ Regression tests for modipyd
 
 import os
 import unittest
-import types
 import doctest
 from os.path import join, dirname
 

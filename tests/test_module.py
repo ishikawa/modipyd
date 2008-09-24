@@ -76,7 +76,7 @@ class TestModipydModuleCode(TestCase):
 
     def test_imports(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
-        self.assertEqual(3, len(modcode.imports))
+        self.assertEqual(4, len(modcode.imports))
 
         # import sys
         self.assertEqual('sys', modcode.imports[0][0])

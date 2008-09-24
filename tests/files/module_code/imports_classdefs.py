@@ -1,6 +1,8 @@
 import sys
 from os.path import join, dirname
 import unittest
+import os as altos
+
 
 class A:
     """old-style"""

@@ -64,6 +64,24 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual(hash(module1), hash(modules2[0]))
         self.assertEqual(hash(module2), hash(modules2[1]))
 
+    def read_module_code(self, modulename):
+        items = modulename.split('.')
+        items[-1] += '.py'
+        filepath = join(FILES_DIR, *items)
+        module = read_module_code(filepath, [FILES_DIR])
+
+        self.assertNotNone(module)
+        self.assertEqual(modulename, module.name)
+        self.assertEqual(filepath, module.filepath)
+        return module
+
+    def test_read_module_code_not_existense(self):
+        # Can't import a module in no package
+        self.assertRaises(ImportError, self.read_module_code, 'python3.c')
+
+    def test_imports_classdefs(self):
+        modcode = self.read_module_code('module_code.imports_classdefs')
+
 
 if __name__ == '__main__':
     unittest.main()

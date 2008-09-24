@@ -194,14 +194,18 @@ def read_module_code(filepath, search_path=None):
             "instance of %s" % type(filepath))
 
     g = collect_module_code(filepath, search_path)
-    module = g.next()
     try:
-        g.next()
+        module = g.next()
     except StopIteration:
-        pass
+        raise ImportError("Can't import %s" % filepath)
     else:
-        raise RuntimeError("Multiple module instance at %s" % filepath)
-    return module
+        try:
+            g.next()
+        except StopIteration:
+            pass
+        else:
+            raise RuntimeError("Multiple module instance at %s" % filepath)
+        return module
 
 
 # ----------------------------------------------------------------

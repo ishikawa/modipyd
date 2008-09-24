@@ -76,7 +76,7 @@ class TestModipydModuleCode(TestCase):
 
     def test_imports_classdefs(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
-
+        self.assertEqual(2, len(modcode.imports))
 
 if __name__ == '__main__':
     unittest.main()

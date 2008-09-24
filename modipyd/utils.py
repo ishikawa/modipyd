@@ -160,6 +160,39 @@ def import_module(modulename):
         __import__(modulename)
     return sys.modules[modulename]
 
+def import_component(name):
+    """
+    As a workaround for __import__ behavior,
+    returns extract the desired component
+
+    >>> import_component('os').__name__
+    'os'
+    >>> import types
+    >>> type(import_component('os.path.join')) == types.FunctionType
+    True
+    """
+    # Import component
+    # As a workaround for __import__ behavior, 
+    #   1. import module
+    #   2. use getattr() to extract the desired component
+
+    # 1. import module
+    names = name.split('.')
+    assert names and len(names) > 0
+    if len(names) == 1:
+        return __import__(names[0])
+
+    try:
+        modname = '.'.join(names[:-1])
+        module = __import__(modname)
+        for name in names[1:-1]:
+            module = getattr(module, name)
+    except ImportError:
+        raise
+    else:
+        # 2. use getattr() to extract the desired component
+        return getattr(module, names[-1])
+
 def resolve_modulename(filepath, search_paths=None):
     """
     Try to detect the module name from *filepath* on
@@ -172,3 +205,8 @@ def resolve_modulename(filepath, search_paths=None):
     """
     from modipyd.resolve import ModuleNameResolver
     return ModuleNameResolver(search_paths).resolve(filepath)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

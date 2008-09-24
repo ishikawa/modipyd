@@ -238,7 +238,7 @@ class ModuleCode(object):
         >>> modcode = ModuleCode('__main__', code.co_filename, code)
         >>> modcode.name
         '__main__'
-        >>> modcode.filepath
+        >>> modcode.filename
         '<string>'
         >>> len(modcode.imports)
         2

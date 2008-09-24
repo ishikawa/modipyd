@@ -214,10 +214,28 @@ def read_module_code(filepath, search_path=None):
 class ModuleCode(object):
     """Python module representation"""
 
-    def __init__(self, modulename, filepath, code):
+    def __init__(self, modulename, filename, code):
+        """
+        Instanciates and initialize ``ModuleCode`` object
+
+        >>> code = compile("import os; import sys", '<string>', 'exec')
+        >>> code is not None
+        True
+        >>> modcode = ModuleCode('__main__', code.co_filename, code)
+        >>> modcode.name
+        '__main__'
+        >>> modcode.filepath
+        '<string>'
+        >>> len(modcode.imports)
+        2
+        >>> modcode.imports[0][0]
+        'os'
+        >>> modcode.imports[1][0]
+        'sys'
+        """
         super(ModuleCode, self).__init__()
         self.name = modulename
-        self.filepath = filepath
+        self.filename = filename
         self.code = code
 
         self.imports = []
@@ -225,7 +243,7 @@ class ModuleCode(object):
         scan_code(self.code, self)
 
     def __str__(self):
-        return "<module '%s' (%s)>" % (self.name, self.filepath)
+        return "<module '%s' (%s)>" % (self.name, self.filename)
 
     def __eq__(self, other):
         return (self is other or
@@ -234,3 +252,12 @@ class ModuleCode(object):
 
     def __hash__(self):
         return hash(self.name)
+
+    @property
+    def filepath(self):
+        return self.filename
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

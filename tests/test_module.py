@@ -76,7 +76,7 @@ class TestModipydModuleCode(TestCase):
 
     def test_imports(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
-        self.assertEqual(2, len(modcode.imports))
+        self.assertEqual(3, len(modcode.imports))
 
         # import sys
         self.assertEqual('sys', modcode.imports[0][0])
@@ -87,6 +87,34 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual(2, len(modcode.imports[1][1]))
         self.assertEqual('join', modcode.imports[1][1][0])
         self.assertEqual('dirname', modcode.imports[1][1][1])
+
+        # import unittest
+        self.assertEqual('unittest', modcode.imports[2][0])
+        self.assertEqual(0, len(modcode.imports[2][1]))
+
+    def test_classdefs(self):
+        modcode = self.read_module_code('module_code.imports_classdefs')
+        self.assertEqual(4, len(modcode.classdefs))
+
+        # class A:
+        self.assertEqual('A', modcode.classdefs[0][0])
+        self.assertEqual(0, len(modcode.imports[0][1]))
+
+        # class B(object):
+        self.assertEqual('B', modcode.classdefs[1][0])
+        self.assertEqual(1, len(modcode.classdefs[1][1]))
+        self.assertEqual('object', modcode.classdefs[1][1][0])
+
+        # class C(unittest.TestCase):
+        self.assertEqual('C', modcode.classdefs[2][0])
+        self.assertEqual(1, len(modcode.classdefs[2][1]))
+        self.assertEqual('unittest.TestCase', modcode.classdefs[2][1][0])
+
+        # class D(A, C):
+        self.assertEqual('D', modcode.classdefs[3][0])
+        self.assertEqual(2, len(modcode.classdefs[3][1]))
+        self.assertEqual('A', modcode.classdefs[3][1][0])
+
 
 if __name__ == '__main__':
     unittest.main()

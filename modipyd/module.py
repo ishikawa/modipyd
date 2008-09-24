@@ -102,27 +102,28 @@ def scan_code(co, module):
         else:
             if LOAD_NAME == op:
                 #print 'LOAD_NAME', co.co_names[oparg]
-                del stack[:]
                 stack.append(co.co_names[oparg])
             elif LOAD_ATTR == op:
                 #print 'LOAD_ATTR', co.co_names[oparg]
                 if stack and isinstance(stack[-1], basestring):
                     stack[-1] = "%s.%s" % (stack[-1], co.co_names[oparg])
             elif BUILD_TUPLE == op:
-                #print 'BUILD_TUPLE', oparg
+                assert len(stack) >= oparg
                 stack[-oparg:] = [tuple(stack[-oparg:])]
+                #print 'BUILD_TUPLE', oparg, stack[-1]
             elif BUILD_CLASS == op:
-                #print 'BUILD_CLASS'
                 if stack and isinstance(stack[-1], tuple):
                     baseclasses = stack.pop()
                 else:
                     baseclasses = ()
-            elif STORE_NAME == op and baseclasses:
-                assert isinstance(baseclasses, tuple)
-                #print "class %s : %s:" % (co.co_names[oparg],
-                #                          ','.join(baseclasses))
-                module.classdefs[co.co_names[oparg]] = baseclasses
-                baseclasses = None
+                #print 'BUILD_CLASS', baseclasses
+            elif STORE_NAME == op:
+                if baseclasses is not None:
+                    assert isinstance(baseclasses, tuple)
+                    name = co.co_names[oparg]
+                    module.classdefs.append((name, baseclasses))
+                    #print "class %s(%s):" % (name, ','.join(baseclasses))
+                    baseclasses = None
                 del stack[:]
 
     for c in co.co_consts:
@@ -240,7 +241,7 @@ class ModuleCode(object):
         self.code = code
 
         self.imports = []
-        self.classdefs = {}
+        self.classdefs = []
         scan_code(self.code, self)
 
     def __str__(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from modipyd.module import ImportDisasm
+from modipyd.disasm import ImportDisasm
 from tests import TestCase
 
 

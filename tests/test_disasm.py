@@ -48,6 +48,18 @@ class TestModipydImportDisasm(TestCase):
         self.assertEqual('path', imports[0][0])
         self.assertEqual('os.path', imports[0][1])
 
+        imports = self.compile_scan("from os.path import join")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('join', imports[0][0])
+        self.assertEqual('os.path.join', imports[0][1])
+
+        imports = self.compile_scan("from os.path import dirname, join")
+        self.assertEqual(2, len(imports))
+        self.assertEqual('dirname', imports[0][0])
+        self.assertEqual('os.path.dirname', imports[0][1])
+        self.assertEqual('join', imports[1][0])
+        self.assertEqual('os.path.join', imports[1][1])
+
 
 if __name__ == '__main__':
     unittest.main()

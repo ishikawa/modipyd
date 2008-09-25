@@ -144,7 +144,8 @@ class ImportDisassembler(object):
             self.fqn = self.import_name.split('.')
             self.store = 1
         elif IMPORT_FROM == op:
-            assert self.import_name
+            # import_name is an empty string in ``from .+ import ``
+            assert self.import_name is not None
             self.fromname = self.co.co_names[argc]
         elif IMPORT_STAR == op:
             assert self.import_name
@@ -165,7 +166,9 @@ class ImportDisassembler(object):
         del self.consts[:]
 
     def store_name(self, name):
-        if not self.import_name:
+        # import_name is an empty string in
+        # ``from .+ import `` statement
+        if self.import_name is None:
             return
 
         assert len(self.consts) >= 2
@@ -180,7 +183,13 @@ class ImportDisassembler(object):
             self.clear_states()
         else:
             # from ... import ...
-            fqn = '.'.join(self.fqn + [self.fromname])
+
+            # import_name is an empty string in
+            # ``from .+ import `` statement
+            if self.import_name:
+                fqn = '.'.join(self.fqn + [self.fromname])
+            else:
+                fqn = self.fromname
             self.imports.append((name, fqn, level))
             self.fromname = None
 

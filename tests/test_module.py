@@ -122,12 +122,24 @@ class TestModipydImportDisasm(TestCase):
     def compile(self, src):
         return compile(src, '<string>', 'exec')
 
-    def test_imports(self):
-        co = self.compile("import os")
+    def compile_scan(self, src):
+        co = self.compile(src)
         disasm = ImportDisasm(co)
-
         self.assertNotNone(disasm)
-        disasm.scan()
+        return disasm.scan()
+
+    def test_simple(self):
+        imports = self.compile_scan("import os")
+        self.assertEqual(1, len(imports))
+        self.assertEqual(2, len(imports[0]))
+        self.assertEqual('os', imports[0][0])
+        self.assertEqual('os', imports[0][1])
+
+    def test_submodule(self):
+        imports = self.compile_scan("import os.path")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('os.path', imports[0][0])
+        self.assertEqual('os.path', imports[0][1])
 
 if __name__ == '__main__':
     unittest.main()

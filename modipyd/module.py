@@ -80,6 +80,19 @@ def _print(*args):
         sys.stderr.write(' ')
     sys.stderr.write('\n')
 
+def _code_iter(co):
+    code = array.array('B', co.co_code)
+    return iter(code)
+
+def _read_argc(op, code_iter):
+    # opcodes which take arguments
+    argc = 0
+    if op >= dis.HAVE_ARGUMENT:
+        argc += code_iter.next()
+        argc += (code_iter.next() * 256)
+    return argc
+
+
 class ImportDisasm(object):
     """The disassembler for ``import`` statements"""
 
@@ -90,18 +103,20 @@ class ImportDisasm(object):
         self.fromlist = []
         self.has_star = False
 
+        # value stacks
         self.consts = []
 
-    def scan(self):
-        code = array.array('B', self.co.co_code)
-        code_iter = iter(code)
+        # results
+        self.imports = []
 
+    def scan(self):
+        code_iter = _code_iter(self.co)
+
+        del self.imports[:]
         for op in code_iter:
-            argc = 0
-            if op >= dis.HAVE_ARGUMENT:
-                argc += code_iter.next()
-                argc += (code_iter.next() * 256)
+            argc = _read_argc(op, code_iter)
             self.track(op, argc)
+        return self.imports
 
     def track(self, op, argc):
         if LOAD_CONST == op:
@@ -132,31 +147,24 @@ class ImportDisasm(object):
 
     def store_name(self, name):
         if self.import_name and not self.fromlist:
-            if DEBUG: _print("import %s as %s" % (self.import_name, name))
+            _print("import %s as %s" % (self.import_name, name))
+            self.imports.append((self.import_name, self.import_name))
             self.clear_states()
 
 
 # pylint: disable-msg=C0321
 def scan_code(co, module):
-    assert co and module
     if DEBUG: _print("scan_code: %s" % co.co_filename)
 
-    code = array.array('B', co.co_code)
-    code_iter = iter(code)
-
+    assert co and module
+    code_iter = _code_iter(co)
     fromlist = None
     values = []
     bases = None
 
     for op in code_iter:
-
-        # opcodes which take arguments
-        argc = 0
-        if op >= dis.HAVE_ARGUMENT:
-            argc += code_iter.next()
-            argc += (code_iter.next() * 256)
-
         #if DEBUG: print dis.opname[op], argc
+        argc = _read_argc(op, code_iter)
 
         # imports
         if LOAD_CONST == op:

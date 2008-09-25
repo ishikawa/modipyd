@@ -51,9 +51,14 @@ class TestModuleDescriptorRelativeImports(TestCase):
             B.dependencies[0])
 
     def test_relative_imports_level(self):
-        #c = self.descriptors['A.B.C.c']
-        #print c.module_code
-        pass
+        c = self.descriptors['A.B.C.c']
+        self.assertEqual(2, len(c.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B.C'],
+            c.dependencies[0])
+        self.assertEqual(
+            self.descriptors['A.B.D'],
+            c.dependencies[1])
 
 
 class TestModuleDescriptorDependency(TestCase):

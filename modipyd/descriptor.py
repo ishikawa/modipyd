@@ -44,10 +44,19 @@ def build_module_descriptors(module_codes):
                     names.append('%s.%s' % (descriptor.package_name, name))
                 for item in import_name_candidates(names):
                     yield item
-
             else:
                 # Relative imports
-                pass
+                package = descriptor.package_name
+                while package and level > 1:
+                    package = utils.split_module_name(package)[0]
+                    level -= 1
+
+                if not package:
+                    # illegal relative path
+                    continue
+                names = ['%s.%s' % (package, name)]
+                for item in import_name_candidates(names):
+                    yield item
 
     # Construct ``ModuleDescriptor`` mappings
     descriptors = dict([

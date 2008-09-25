@@ -124,6 +124,7 @@ class ImportDisasm(object):
     >>> disasm.scan()[0]
     ('os_path', 'os.path')
 
+
     """
 
     def __init__(self, co):

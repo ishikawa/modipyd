@@ -220,16 +220,20 @@ class ImportDisasm(object):
         if not self.import_name:
             return
 
+        assert len(self.consts) >= 2
+        level = self.consts[-2]
+        assert level >= -1
+
         if not self.fromname:
             # import ...
             symbol = self.fqn[self.store:]
             symbol.insert(0, name)
-            self.imports.append(('.'.join(symbol), '.'.join(self.fqn), -1))
+            self.imports.append(('.'.join(symbol), '.'.join(self.fqn), level))
             self.clear_states()
         else:
             # from ... import ...
             fqn = '.'.join(self.fqn + [self.fromname])
-            self.imports.append((name, fqn, -1))
+            self.imports.append((name, fqn, level))
             self.fromname = None
 
 

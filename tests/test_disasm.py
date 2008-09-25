@@ -42,5 +42,12 @@ class TestModipydImportDisasm(TestCase):
         self.assertEqual('sys_mod', imports[1][0])
         self.assertEqual('sys', imports[1][1])
 
+    def test_fromlist(self):
+        imports = self.compile_scan("from os import path")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('path', imports[0][0])
+        self.assertEqual('os.path', imports[0][1])
+
+
 if __name__ == '__main__':
     unittest.main()

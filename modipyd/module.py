@@ -124,6 +124,11 @@ class ImportDisasm(object):
     >>> disasm.scan()[0]
     ('os_path', 'os.path')
 
+    >>> disasm = ImportDisasm(compile(
+    ...     'from os import path', '<string>', 'exec'))
+    >>> disasm.scan()[0]
+    ('path', 'os.path')
+
 
     """
 
@@ -131,7 +136,7 @@ class ImportDisasm(object):
         self.co = co
 
         self.import_name = None
-        self.fromlist = []
+        self.fromname = None
         self.has_star = False
 
         # Fully Qualified Name ::= '.'.join(self.fqn)
@@ -182,7 +187,7 @@ class ImportDisasm(object):
             self.store = 1
         elif IMPORT_FROM == op:
             assert self.import_name
-            self.fromlist.append(self.co.co_names[argc])
+            self.fromname = self.co.co_names[argc]
         elif IMPORT_STAR == op:
             assert self.import_name
             self.has_star = True
@@ -192,16 +197,24 @@ class ImportDisasm(object):
             self.clear_states()
 
     def clear_states(self):
-        del self.fromlist[:]
-        self.import_name = None
+        self.import_name = self.fromname = None
         self.fqn = self.store = None
 
     def store_name(self, name):
-        if self.import_name and not self.fromlist:
+        if not self.import_name:
+            return
+
+        if not self.fromname:
+            # import ...
             symbol = self.fqn[self.store:]
             symbol.insert(0, name)
             self.imports.append(('.'.join(symbol), '.'.join(self.fqn)))
             self.clear_states()
+        else:
+            # from ... import ...
+            fqn = '.'.join(self.fqn + [self.fromname])
+            self.imports.append((name, fqn))
+            self.fromname = None
 
 
 # pylint: disable-msg=C0321

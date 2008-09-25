@@ -17,7 +17,7 @@ class TestModipydModuleCode(TestCase):
 
         module = ModuleCode('a', py, code)
         self.assertNotNone(module)
-        self.assertEqual(0, len(module.imports2))
+        self.assertEqual(0, len(module.imports))
 
     def test_collect_module_code(self):
         modules = list(collect_module_code(
@@ -76,15 +76,15 @@ class TestModipydModuleCode(TestCase):
 
     def test_imports(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
-        self.assertEqual(5, len(modcode.imports2))
+        self.assertEqual(5, len(modcode.imports))
 
         # import sys
-        self.assertEqual(('sys', 'sys', -1), modcode.imports2[0])
-        self.assertEqual(('join', 'os.path.join', -1), modcode.imports2[1])
+        self.assertEqual(('sys', 'sys', -1), modcode.imports[0])
+        self.assertEqual(('join', 'os.path.join', -1), modcode.imports[1])
         self.assertEqual(('dirname', 'os.path.dirname', -1),
-            modcode.imports2[2])
-        self.assertEqual(('unittest', 'unittest', -1), modcode.imports2[3])
-        self.assertEqual(('altos', 'os', -1), modcode.imports2[4])
+            modcode.imports[2])
+        self.assertEqual(('unittest', 'unittest', -1), modcode.imports[3])
+        self.assertEqual(('altos', 'os', -1), modcode.imports[4])
 
     def test_classdefs(self):
         modcode = self.read_module_code('module_code.imports_classdefs')

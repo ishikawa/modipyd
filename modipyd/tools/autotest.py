@@ -60,7 +60,7 @@ def testcase_module(module_descriptor):
     #
     symbols = dict([
         (imp[0], utils.split_module_name(imp[1])[0])
-        for imp in modcode.imports2])
+        for imp in modcode.imports])
 
     # 1. For all class definition in module code
     for klass in modcode.classdefs:

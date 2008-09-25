@@ -16,7 +16,7 @@ from modipyd import utils
 def build_module_descriptors(module_codes):
 
     def analyze_dependent_names(descriptor):
-        for imp in descriptor.module_code.imports2:
+        for imp in descriptor.module_code.imports:
             name = imp[1]
             if name not in descriptors:
                 # The qualified name referes a property

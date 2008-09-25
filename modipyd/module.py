@@ -129,7 +129,7 @@ def scan_code(co, module):
                 bases = None
                 del values[:]
 
-    module.imports2.extend(imp_disasm.imports)
+    module.imports.extend(imp_disasm.imports)
     for c in co.co_consts:
         if isinstance(c, type(co)):
             scan_code(c, module)
@@ -234,13 +234,13 @@ class ModuleCode(object):
         '__main__'
         >>> modcode.filename
         '<string>'
-        >>> len(modcode.imports2)
+        >>> len(modcode.imports)
         3
-        >>> modcode.imports2[0]
+        >>> modcode.imports[0]
         ('os', 'os', -1)
-        >>> modcode.imports2[1]
+        >>> modcode.imports[1]
         ('join_path', 'os.path.join', -1)
-        >>> modcode.imports2[2]
+        >>> modcode.imports[2]
         ('B', 'A.B', 2)
         """
         super(ModuleCode, self).__init__()
@@ -248,7 +248,7 @@ class ModuleCode(object):
         self.filename = filename
         self.code = code
 
-        self.imports2 = []
+        self.imports = []
         self.classdefs = []
         scan_code(self.code, self)
 

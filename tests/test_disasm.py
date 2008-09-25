@@ -19,7 +19,7 @@ class TestModipydImportDisasm(TestCase):
     def test_simple(self):
         imports = self.compile_scan("import os")
         self.assertEqual(1, len(imports))
-        self.assertEqual(2, len(imports[0]))
+        self.assertEqual(3, len(imports[0]))
         self.assertEqual('os', imports[0][0])
         self.assertEqual('os', imports[0][1])
 

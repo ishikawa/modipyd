@@ -99,41 +99,49 @@ class ImportDisasm(object):
 
     ImportDisasm.imports attribute is a list such as:
 
-        [(symbol, fully qualified)]
+        [(symbol, fully qualified, level)]
+
+    *level*
+
+    level specifies whether to use absolute or relative imports.
+    The default is -1 which indicates both absolute and relative imports
+    will be attempted. 0 means only perform absolute imports.
+    Positive values for level indicate the number of parent directories
+    to search relative to the directory of the module..
 
         e.g.
         import os
-        --> [('os', 'os')]
+        --> [('os', 'os', -1)]
         import os.path
-        --> [('os.path', 'os.path')]
+        --> [('os.path', 'os.path', -1)]
         from os.path import join as os_path_join
-        --> [('os_path_join', 'os.path.join')]
+        --> [('os_path_join', 'os.path.join', -1)]
 
     >>> disasm = ImportDisasm(compile(
     ...     'import os', '<string>', 'exec'))
     >>> disasm.scan()[0]
-    ('os', 'os')
+    ('os', 'os', -1)
 
     >>> disasm = ImportDisasm(compile(
     ...     'import os.path', '<string>', 'exec'))
     >>> disasm.scan()[0]
-    ('os.path', 'os.path')
+    ('os.path', 'os.path', -1)
 
     >>> disasm = ImportDisasm(compile(
     ...     'import os.path as os_path', '<string>', 'exec'))
     >>> disasm.scan()[0]
-    ('os_path', 'os.path')
+    ('os_path', 'os.path', -1)
 
     >>> disasm = ImportDisasm(compile(
     ...     'from os import path', '<string>', 'exec'))
     >>> disasm.scan()[0]
-    ('path', 'os.path')
+    ('path', 'os.path', -1)
 
     >>> # from ... import * is currently not fully supported
     >>> disasm = ImportDisasm(compile(
     ...     'from os.path import *', '<string>', 'exec'))
     >>> disasm.scan()[0]
-    ('*', 'os.path.*')
+    ('*', 'os.path.*', -1)
     """
 
     def __init__(self, co):
@@ -216,12 +224,12 @@ class ImportDisasm(object):
             # import ...
             symbol = self.fqn[self.store:]
             symbol.insert(0, name)
-            self.imports.append(('.'.join(symbol), '.'.join(self.fqn)))
+            self.imports.append(('.'.join(symbol), '.'.join(self.fqn), -1))
             self.clear_states()
         else:
             # from ... import ...
             fqn = '.'.join(self.fqn + [self.fromname])
-            self.imports.append((name, fqn))
+            self.imports.append((name, fqn, -1))
             self.fromname = None
 
 

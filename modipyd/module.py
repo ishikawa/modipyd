@@ -94,7 +94,37 @@ def _read_argc(op, code_iter):
 
 
 class ImportDisasm(object):
-    """The disassembler for ``import`` statements"""
+    """
+    The disassembler for ``import`` statements
+
+    ImportDisasm.imports attribute is a list such as:
+
+        [(symbol, fully qualified)]
+
+        e.g.
+        import os
+        --> [('os', 'os')]
+        import os.path
+        --> [('os.path', 'os.path')]
+        from os.path import join as os_path_join
+        --> [('os_path_join', 'os.path.join')]
+
+    >>> disasm = ImportDisasm(compile(
+    ...     'import os', '<string>', 'exec'))
+    >>> disasm.scan()[0]
+    ('os', 'os')
+
+    >>> disasm = ImportDisasm(compile(
+    ...     'import os.path', '<string>', 'exec'))
+    >>> disasm.scan()[0]
+    ('os.path', 'os.path')
+
+    >>> disasm = ImportDisasm(compile(
+    ...     'import os.path as os_path', '<string>', 'exec'))
+    >>> disasm.scan()[0]
+    ('os_path', 'os.path')
+
+    """
 
     def __init__(self, co):
         self.co = co
@@ -103,9 +133,14 @@ class ImportDisasm(object):
         self.fromlist = []
         self.has_star = False
 
+        # Fully Qualified Name ::= '.'.join(self.fqn)
+        # Access Name ::= Symbol + '.' + '.'.join(self.fqn[self.store:])
+        self.fqn = self.store = None
+
         # value stacks
         self.consts = []
 
+        # ``import``s
         self.imports = []
 
     def scan(self):
@@ -126,9 +161,24 @@ class ImportDisasm(object):
             #   (2) A tuple of "from" names, or None for regular import.
             #       The tuple may contain "*" for "from <mod> import *"
             self.consts.append(self.co.co_consts[argc])
+        elif LOAD_ATTR == op:
+            # import os.path as os_path
+            # ...
+            #  6 IMPORT_NAME              0 (os.path)
+            #  9 LOAD_ATTR                1 (path)
+            # 12 STORE_NAME               2 (os_path)
+            # ...
+            attr = self.co.co_names[argc]
+            
+            if self.import_name and self.store < len(self.fqn):
+                assert self.fqn[self.store] == attr
+                self.store += 1
+
         elif IMPORT_NAME == op:
             assert len(self.consts) >= 2
             self.import_name = self.co.co_names[argc]
+            self.fqn = self.import_name.split('.')
+            self.store = 1
         elif IMPORT_FROM == op:
             assert self.import_name
             self.fromlist.append(self.co.co_names[argc])
@@ -143,11 +193,13 @@ class ImportDisasm(object):
     def clear_states(self):
         del self.fromlist[:]
         self.import_name = None
+        self.fqn = self.store = None
 
     def store_name(self, name):
         if self.import_name and not self.fromlist:
-            _print("import %s as %s" % (self.import_name, name))
-            self.imports.append((self.import_name, self.import_name))
+            symbol = self.fqn[self.store:]
+            symbol.insert(0, name)
+            self.imports.append(('.'.join(symbol), '.'.join(self.fqn)))
             self.clear_states()
 
 

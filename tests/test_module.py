@@ -15,7 +15,7 @@ class TestModipydModuleCode(TestCase):
         code = compile_source(py)
         self.assertNotNone(code)
 
-        module = ModuleCode('a', py, code)
+        module = ModuleCode('a', None, py, code)
         self.assertNotNone(module)
         self.assertEqual(0, len(module.imports))
 

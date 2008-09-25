@@ -15,15 +15,39 @@ from modipyd import utils
 
 def build_module_descriptors(module_codes):
 
-    def analyze_dependent_names(descriptor):
-        for imp in descriptor.module_code.imports:
-            name = imp[1]
+    def import_name_candidates(import_names):
+        candidates = []
+        for name in import_names:
             if name not in descriptors:
                 # The qualified name referes a property
                 # of the module, so it depends imporintg module.
-                yield utils.split_module_name(name)[0]
+                candidates.append(utils.split_module_name(name)[0])
             else:
-                yield name
+                candidates.append(name)
+        return candidates
+
+    def analyze_dependent_names(descriptor):
+        for imp in descriptor.module_code.imports:
+            # name is the fully qualified name
+            name, level = imp[1], imp[2]
+            assert name and level is not None
+
+            if level == 0:
+                # 0 means only perform absolute imports
+                for item in import_name_candidates([name]):
+                    yield item
+            elif level == -1:
+                # -1 which indicates both absolute and relative imports
+                # will be attempted
+                names = [name]
+                if descriptor.package_name:
+                    names.append('%s.%s' % (descriptor.package_name, name))
+                for item in import_name_candidates(names):
+                    yield item
+
+            else:
+                # Relative imports
+                pass
 
     # Construct ``ModuleDescriptor`` mappings
     descriptors = dict([
@@ -145,6 +169,10 @@ class ModuleDescriptor(object):
     @property
     def name(self):
         return self.module_code.name
+
+    @property
+    def package_name(self):
+        return self.module_code.package_name
 
     @property
     def filename(self):

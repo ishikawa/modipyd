@@ -221,7 +221,7 @@ def resolve_modulename(filepath, search_paths=None):
     class for better performance.
     """
     from modipyd.resolve import ModuleNameResolver
-    return ModuleNameResolver(search_paths).resolve(filepath)
+    return ModuleNameResolver(search_paths).resolve(filepath)[0]
 
 
 if __name__ == "__main__":

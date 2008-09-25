@@ -69,6 +69,7 @@ class ModuleNameResolver(object):
         modname, _ = os.path.splitext(modname)
 
         skipped_name = None
+        package_name = None
         compiled_forms = [(dirpath, [modname])]
 
         for syspath in self.search_paths:
@@ -92,6 +93,11 @@ class ModuleNameResolver(object):
                     compiled_forms.append((d, names))
             else:
                 d, names = compiled_forms[i]
+                if self.python_package(dirpath):
+                    package_name = '.'.join(names[:-1])
+                else:
+                    package_name = None
+
                 if i == 0:
                     if self.python_package(d):
                         # script is created under a package,
@@ -115,6 +121,7 @@ class ModuleNameResolver(object):
                         # Store result name, and continues with
                         # the next iteration of the **for** loop.
                         skipped_name = names[0]
+                        package_name = None
                         continue
                 else:
                     if names[-1] == '__init__':
@@ -122,9 +129,9 @@ class ModuleNameResolver(object):
                         # Remove tail '__init__'
                         del names[-1]
 
-                return '.'.join(names)
+                return '.'.join(names), package_name
 
         if skipped_name is not None:
-            return skipped_name
+            return skipped_name, package_name
         else:
             raise ImportError("No module name found: %s" % filepath)

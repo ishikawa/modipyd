@@ -22,6 +22,35 @@ class TestModuleDescriptor(TestCase):
         self.assertEqual(filepath, descriptor.filename)
 
 
+class TestModuleDescriptorRelativeImports(TestCase):
+
+    def setUp(self):
+        d = join(FILES_DIR, 'imports')
+        codes = list(collect_module_code(d, [d]))
+        self.descriptors = build_module_descriptors(codes)
+        self.assertEqual(8, len(self.descriptors))
+
+    def test_imports(self):
+        a = self.descriptors['A.a']
+        self.assertEqual(1, len(a.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B'],
+            a.dependencies[0])
+
+    def test_relative_imports(self):
+        b = self.descriptors['A.B.b']
+        self.assertEqual(1, len(b.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B.C'],
+            b.dependencies[0])
+
+        B = self.descriptors['A.B']
+        self.assertEqual(1, len(B.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B.C'],
+            B.dependencies[0])
+
+
 class TestModuleDescriptorDependency(TestCase):
 
     def setUp(self):

@@ -9,6 +9,7 @@ Python module representation.
 import dis
 import sys
 from modipyd import disasm, utils, LOGGER
+from modipyd.resolve import ModuleNameResolver
 
 
 # ----------------------------------------------------------------
@@ -165,6 +166,7 @@ def _collect_module_code_files(filepath_or_list):
 
 
 def collect_module_code(filepath_or_list, search_path=None):
+    resolver = ModuleNameResolver(search_path)
     for path, typebits in _collect_module_code_files(filepath_or_list):
         # Since changing .py file is not reflected by .pyc, .pyo quickly,
         # the plain .py file takes first prioriry.
@@ -187,11 +189,11 @@ def collect_module_code(filepath_or_list, search_path=None):
 
         # module name
         try:
-            modname = utils.resolve_modulename(sourcepath, search_path)
+            module_name, package_name = resolver.resolve(sourcepath)
         except ImportError:
             LOGGER.info("Couldn't import file at %s, ignore" % sourcepath)
         else:
-            yield ModuleCode(modname, sourcepath, code)
+            yield ModuleCode(module_name, package_name, sourcepath, code)
 
 def read_module_code(filepath, search_path=None):
     if not isinstance(filepath, basestring):
@@ -220,7 +222,7 @@ def read_module_code(filepath, search_path=None):
 class ModuleCode(object):
     """Python module representation"""
 
-    def __init__(self, modulename, filename, code):
+    def __init__(self, modulename, packagename, filename, code):
         """
         Instanciates and initialize ``ModuleCode`` object
 
@@ -229,7 +231,7 @@ class ModuleCode(object):
         ...     "from os.path import join as join_path;"
         ...     "from .. A import B",
         ...     '<string>', 'exec')
-        >>> modcode = ModuleCode('__main__', code.co_filename, code)
+        >>> modcode = ModuleCode('__main__', '', code.co_filename, code)
         >>> modcode.name
         '__main__'
         >>> modcode.filename
@@ -245,6 +247,7 @@ class ModuleCode(object):
         """
         super(ModuleCode, self).__init__()
         self.name = modulename
+        self.package_name = packagename
         self.filename = filename
         self.code = code
 

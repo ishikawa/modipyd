@@ -60,6 +60,26 @@ class TestModipydImportDisasm(TestCase):
         self.assertEqual('join', imports[1][0])
         self.assertEqual('os.path.join', imports[1][1])
 
+        imports = self.compile_scan("from os.path import dirname as d, join")
+        self.assertEqual(2, len(imports))
+        self.assertEqual('d', imports[0][0])
+        self.assertEqual('os.path.dirname', imports[0][1])
+        self.assertEqual('join', imports[1][0])
+        self.assertEqual('os.path.join', imports[1][1])
+
+    def test_star(self):
+        imports = self.compile_scan("from os.path import *")
+        # from ... import * is currently not fully supported
+        self.assertEqual(1, len(imports))
+        self.assertEqual('*', imports[0][0])
+        self.assertEqual('os.path.*', imports[0][1])
+
+    def test_future(self):
+        imports = self.compile_scan("from __future__ import absolute_import")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('absolute_import', imports[0][0])
+        self.assertEqual('__future__.absolute_import', imports[0][1])
+
 
 if __name__ == '__main__':
     unittest.main()

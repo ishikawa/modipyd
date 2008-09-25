@@ -129,7 +129,11 @@ class ImportDisasm(object):
     >>> disasm.scan()[0]
     ('path', 'os.path')
 
-
+    >>> # from ... import * is currently not fully supported
+    >>> disasm = ImportDisasm(compile(
+    ...     'from os.path import *', '<string>', 'exec'))
+    >>> disasm.scan()[0]
+    ('*', 'os.path.*')
     """
 
     def __init__(self, co):
@@ -137,7 +141,6 @@ class ImportDisasm(object):
 
         self.import_name = None
         self.fromname = None
-        self.has_star = False
 
         # Fully Qualified Name ::= '.'.join(self.fqn)
         # Access Name ::= Symbol + '.' + '.'.join(self.fqn[self.store:])
@@ -190,7 +193,12 @@ class ImportDisasm(object):
             self.fromname = self.co.co_names[argc]
         elif IMPORT_STAR == op:
             assert self.import_name
-            self.has_star = True
+
+            # from ... import * is currently not fully supported
+            #self.has_star = True
+            self.fromname = '*'
+            self.store_name('*')
+
         elif STORE_NAME == op:
             self.store_name(self.co.co_names[argc])
         elif POP_TOP == op:

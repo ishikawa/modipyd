@@ -28,16 +28,16 @@ BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
 POP_TOP = dis.opname.index('POP_TOP')
 
 
-def _code_iter(co):
+def code_iter(co):
     code = array.array('B', co.co_code)
     return iter(code)
 
-def _read_argc(op, code_iter):
+def read_argc(op, it):
     # opcodes which take arguments
     argc = 0
     if op >= dis.HAVE_ARGUMENT:
-        argc += code_iter.next()
-        argc += (code_iter.next() * 256)
+        argc += it.next()
+        argc += (it.next() * 256)
     return argc
 
 
@@ -109,11 +109,10 @@ class ImportDisassembler(object):
         self.imports = []
 
     def scan(self):
-        code_iter = _code_iter(self.co)
-
+        code = code_iter(self.co)
         del self.imports[:]
-        for op in code_iter:
-            argc = _read_argc(op, code_iter)
+        for op in code:
+            argc = read_argc(op, code)
             self.track(op, argc)
         return self.imports
 

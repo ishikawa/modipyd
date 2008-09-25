@@ -58,13 +58,9 @@ def testcase_module(module_descriptor):
     #
     #   symbols ::= { symbol: parent module or '', ... }
     #
-    symbols = {}
-    for imp in modcode.imports:
-        if not imp[1]:
-            # import MODULE
-            symbols[imp[0]] = ''
-        else:
-            symbols.update([(name, imp[0])for name in imp[1]])
+    symbols = dict([
+        (imp[0], utils.split_module_name(imp[1])[0])
+        for imp in modcode.imports2])
 
     # 1. For all class definition in module code
     for klass in modcode.classdefs:

@@ -20,6 +20,23 @@ def wrap_sequence(obj, sequence_type=tuple):
     else:
         return sequence_type((obj,))
 
+def split_module_name(module_name):
+    """
+    >>> split_module_name('')
+    ('', '')
+    >>> split_module_name('module')
+    ('', 'module')
+    >>> split_module_name('module.a')
+    ('module', 'a')
+    >>> split_module_name('module.a.b')
+    ('module.a', 'b')
+    """
+    i = module_name.rfind('.')
+    if i == -1:
+        return ('', module_name)
+    else:
+        return (module_name[:i], module_name[i+1:])
+
 def compile_python_source(filepath, optimization=False):
     """
     Compile a source file to byte-code and write out

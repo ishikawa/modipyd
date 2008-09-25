@@ -16,20 +16,14 @@ from modipyd import utils
 def build_module_descriptors(module_codes):
 
     def analyze_dependent_names(descriptor):
-        for name, fromlist in descriptor.module_code.imports:
-            # 'import MODULE'
-            if not fromlist:
+        for imp in descriptor.module_code.imports2:
+            name = imp[1]
+            if name not in descriptors:
+                # The qualified name referes a property
+                # of the module, so it depends imporintg module.
+                yield utils.split_module_name(name)[0]
+            else:
                 yield name
-            # 'from MODULE import SYMBOLS'
-            for sym in fromlist:
-                quolified_name = '.'.join([name, sym])
-                if quolified_name in descriptors:
-                    # The quolified name referes a submodule
-                    yield quolified_name
-                else:
-                    # The quolified name referes a property
-                    # of the module, so it depends imporintg module.
-                    yield name
 
     # Construct ``ModuleDescriptor`` mappings
     descriptors = dict([
@@ -41,6 +35,7 @@ def build_module_descriptors(module_codes):
         for name in analyze_dependent_names(descriptor):
             if name in descriptors:
                 descriptor.add_dependency(descriptors[name])
+
     return descriptors
 
 

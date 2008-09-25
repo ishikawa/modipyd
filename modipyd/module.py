@@ -6,7 +6,6 @@ Python module representation.
 
 """
 
-import array
 import dis
 import sys
 from modipyd import disasm, utils, LOGGER
@@ -72,6 +71,7 @@ BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
 
 POP_TOP = dis.opname.index('POP_TOP')
 
+
 DEBUG = False
 
 def _print(*args):
@@ -80,43 +80,21 @@ def _print(*args):
         sys.stderr.write(' ')
     sys.stderr.write('\n')
 
-def _code_iter(co):
-    code = array.array('B', co.co_code)
-    return iter(code)
-
-def _read_argc(op, code_iter):
-    # opcodes which take arguments
-    argc = 0
-    if op >= dis.HAVE_ARGUMENT:
-        argc += code_iter.next()
-        argc += (code_iter.next() * 256)
-    return argc
-
-
 # pylint: disable-msg=C0321
 def scan_code(co, module):
     if DEBUG: _print("scan_code: %s" % co.co_filename)
 
     assert co and module
-    code_iter = _code_iter(co)
-    fromlist = None
+    code_iter = disasm.code_iter(co)
+
+    imp_disasm = disasm.ImportDisassembler(co)
     values = []
     bases = None
 
     for op in code_iter:
-        #if DEBUG: print dis.opname[op], argc
-        argc = _read_argc(op, code_iter)
-
-        # imports
-        if LOAD_CONST == op:
-            # An IMPORT_NAME is always preceded by a LOAD_CONST, it's
-            # a tuple of "from" names, or None for a regular import.
-            # The tuple may contain "*" for "from <mod> import *"
-            fromlist = co.co_consts[argc]
-        elif IMPORT_NAME == op:
-            assert fromlist is None or type(fromlist) is tuple
-            name = co.co_names[argc]
-            module.imports.append((name, fromlist or ()))
+        #if DEBUG: _print(dis.opname[op], argc)
+        argc = disasm.read_argc(op, code_iter)
+        imp_disasm.track(op, argc)
 
         # classdefs
         if LOAD_NAME == op:
@@ -151,6 +129,7 @@ def scan_code(co, module):
                 bases = None
                 del values[:]
 
+    module.imports2.extend(imp_disasm.imports)
     for c in co.co_consts:
         if isinstance(c, type(co)):
             scan_code(c, module)
@@ -245,27 +224,31 @@ class ModuleCode(object):
         """
         Instanciates and initialize ``ModuleCode`` object
 
-        >>> code = compile("import os; import sys", '<string>', 'exec')
-        >>> code is not None
-        True
+        >>> code = compile(
+        ...     "import os;"
+        ...     "from os.path import join as join_path;"
+        ...     "from .. A import B",
+        ...     '<string>', 'exec')
         >>> modcode = ModuleCode('__main__', code.co_filename, code)
         >>> modcode.name
         '__main__'
         >>> modcode.filename
         '<string>'
-        >>> len(modcode.imports)
-        2
-        >>> modcode.imports[0][0]
-        'os'
-        >>> modcode.imports[1][0]
-        'sys'
+        >>> len(modcode.imports2)
+        3
+        >>> modcode.imports2[0]
+        ('os', 'os', -1)
+        >>> modcode.imports2[1]
+        ('join_path', 'os.path.join', -1)
+        >>> modcode.imports2[2]
+        ('B', 'A.B', 2)
         """
         super(ModuleCode, self).__init__()
         self.name = modulename
         self.filename = filename
         self.code = code
 
-        self.imports = []
+        self.imports2 = []
         self.classdefs = []
         scan_code(self.code, self)
 

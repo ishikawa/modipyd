@@ -6,6 +6,7 @@ Python module representation.
 
 """
 
+import array
 import dis
 from modipyd import utils, LOGGER
 
@@ -68,28 +69,25 @@ BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
 
 DEBUG = False
 
+
 # pylint: disable-msg=C0321
 def scan_code(co, module):
     assert co and module
     if DEBUG: print co.co_filename
 
-    code = co.co_code
-    n, i = len(code), 0
+    code = array.array('B', co.co_code)
+    code_iter = iter(code)
 
     fromlist = None
-
     values = []
     bases = None
 
-    while i < n:
-        c = code[i]
-        i += 1
-        op = ord(c)
+    for op in code_iter:
 
         # opcodes which take arguments
         if op >= dis.HAVE_ARGUMENT:
-            argc = ord(code[i]) + ord(code[i+1])*256
-            i += 2
+            argc = code_iter.next()
+            argc += (code_iter.next() * 256)
 
         #if DEBUG: print dis.opname[op], argc
 
@@ -105,38 +103,37 @@ def scan_code(co, module):
             module.imports.append((name, fromlist or ()))
 
         # classdefs
-        else:
-            if LOAD_NAME == op:
-                if DEBUG: print 'LOAD_NAME', co.co_names[argc]
-                values.append(co.co_names[argc])
-            elif LOAD_ATTR == op:
-                if DEBUG: print 'LOAD_ATTR', co.co_names[argc]
-                if values and isinstance(values[-1], basestring):
-                    values[-1] = "%s.%s" % (values[-1], co.co_names[argc])
-            elif BUILD_TUPLE == op:
-                if DEBUG: print argc, values
+        if LOAD_NAME == op:
+            if DEBUG: print 'LOAD_NAME', co.co_names[argc]
+            values.append(co.co_names[argc])
+        elif LOAD_ATTR == op:
+            if DEBUG: print 'LOAD_ATTR', co.co_names[argc]
+            if values and isinstance(values[-1], basestring):
+                values[-1] = "%s.%s" % (values[-1], co.co_names[argc])
+        elif BUILD_TUPLE == op:
+            if DEBUG: print argc, values
 
-                # Because ``scan_code`` does not fully support
-                # python bytecode spec, stack can be illegal.
-                if len(values) >= argc:
-                    values[-argc:] = [tuple(values[-argc:])]
-                    if DEBUG: print 'BUILD_TUPLE', argc, values[-1]
+            # Because ``scan_code`` does not fully support
+            # python bytecode spec, stack can be illegal.
+            if len(values) >= argc:
+                values[-argc:] = [tuple(values[-argc:])]
+                if DEBUG: print 'BUILD_TUPLE', argc, values[-1]
 
-            elif BUILD_CLASS == op:
-                if values and isinstance(values[-1], tuple):
-                    bases = values.pop()
-                else:
-                    bases = ()
-                if DEBUG: print 'BUILD_CLASS', bases
-            elif STORE_NAME == op:
-                if bases is not None:
-                    assert isinstance(bases, tuple)
-                    name = co.co_names[argc]
-                    module.classdefs.append((name, bases))
-                    if DEBUG:
-                        print "class %s%s:" % (name, str(bases))
-                    bases = None
-                    del values[:]
+        elif BUILD_CLASS == op:
+            if values and isinstance(values[-1], tuple):
+                bases = values.pop()
+            else:
+                bases = ()
+            if DEBUG: print 'BUILD_CLASS', bases
+        elif STORE_NAME == op:
+            if bases is not None:
+                assert isinstance(bases, tuple)
+                name = co.co_names[argc]
+                module.classdefs.append((name, bases))
+                if DEBUG:
+                    print "class %s%s:" % (name, str(bases))
+                bases = None
+                del values[:]
 
     for c in co.co_consts:
         if isinstance(c, type(co)):

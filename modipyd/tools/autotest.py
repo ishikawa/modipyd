@@ -89,7 +89,7 @@ def testcase_module(module_descriptor):
             if symbols[symbol]:
                 names = symbols[symbol].split('.') + names
 
-            assert len(names) > 1, "names must be quorified class name"
+            assert len(names) > 1, "names must be qualified class name"
             LOGGER.debug("'%s' is derived from "
                 "imported class '%s'" % (base, '.'.join(names)))
 

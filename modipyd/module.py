@@ -106,7 +106,6 @@ class ImportDisasm(object):
         # value stacks
         self.consts = []
 
-        # results
         self.imports = []
 
     def scan(self):

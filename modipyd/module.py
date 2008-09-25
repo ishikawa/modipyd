@@ -76,7 +76,7 @@ DEBUG = False
 
 def _print(*args):
     for s in args:
-        sys.stderr.write(s)
+        sys.stderr.write(str(s))
         sys.stderr.write(' ')
     sys.stderr.write('\n')
 
@@ -91,6 +91,17 @@ class ImportDisasm(object):
         self.has_star = False
 
         self.consts = []
+
+    def scan(self):
+        code = array.array('B', self.co.co_code)
+        code_iter = iter(code)
+
+        for op in code_iter:
+            argc = 0
+            if op >= dis.HAVE_ARGUMENT:
+                argc += code_iter.next()
+                argc += (code_iter.next() * 256)
+            self.track(op, argc)
 
     def track(self, op, argc):
         if LOAD_CONST == op:

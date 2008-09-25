@@ -125,8 +125,9 @@ class TestModipydImportDisasm(TestCase):
     def test_imports(self):
         co = self.compile("import os")
         disasm = ImportDisasm(co)
-        self.assertNotNone(disasm)
 
+        self.assertNotNone(disasm)
+        disasm.scan()
 
 if __name__ == '__main__':
     unittest.main()

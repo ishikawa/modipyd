@@ -4,7 +4,8 @@ import unittest
 from os.path import join
 from modipyd.module import ModuleCode, compile_source, \
                            collect_module_code, \
-                           read_module_code
+                           read_module_code, \
+                           ImportDisasm
 from tests import TestCase, FILES_DIR
 
 
@@ -114,6 +115,17 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual('D', modcode.classdefs[3][0])
         self.assertEqual(2, len(modcode.classdefs[3][1]))
         self.assertEqual('A', modcode.classdefs[3][1][0])
+
+
+class TestModipydImportDisasm(TestCase):
+
+    def compile(self, src):
+        return compile(src, '<string>', 'exec')
+
+    def test_imports(self):
+        co = self.compile("import os")
+        disasm = ImportDisasm(co)
+        self.assertNotNone(disasm)
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ Python module representation.
 
 import array
 import dis
+import sys
 from modipyd import utils, LOGGER
 
 
@@ -59,6 +60,8 @@ LOAD_NAME = dis.opname.index('LOAD_NAME')
 LOAD_ATTR = dis.opname.index('LOAD_ATTR')
 
 IMPORT_NAME = dis.opname.index('IMPORT_NAME')
+IMPORT_FROM = dis.opname.index('IMPORT_FROM')
+IMPORT_STAR = dis.opname.index('IMPORT_STAR')
 
 STORE_NAME = dis.opname.index('STORE_NAME')
 STORE_GLOBAL = dis.opname.index('STORE_GLOBAL')
@@ -67,13 +70,65 @@ STORE_OPS = [STORE_NAME, STORE_GLOBAL]
 BUILD_CLASS = dis.opname.index('BUILD_CLASS')
 BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
 
+POP_TOP = dis.opname.index('POP_TOP')
+
 DEBUG = False
+
+def _print(*args):
+    for s in args:
+        sys.stderr.write(s)
+        sys.stderr.write(' ')
+    sys.stderr.write('\n')
+
+class ImportDisasm(object):
+    """The disassembler for ``import`` statements"""
+
+    def __init__(self, co):
+        self.co = co
+
+        self.import_name = None
+        self.fromlist = []
+        self.has_star = False
+
+        self.consts = []
+
+    def track(self, op, argc):
+        if LOAD_CONST == op:
+            # An ``IMPORT_NAME`` is always preceded by a 2 ``LOAD_CONST``s,
+            # they are:
+            #
+            #   (1) The level of relative imports
+            #   (2) A tuple of "from" names, or None for regular import.
+            #       The tuple may contain "*" for "from <mod> import *"
+            self.consts.append(self.co.co_consts[argc])
+        elif IMPORT_NAME == op:
+            assert len(self.consts) >= 2
+            self.import_name = self.co.co_names[argc]
+        elif IMPORT_FROM == op:
+            assert self.import_name
+            self.fromlist.append(self.co.co_names[argc])
+        elif IMPORT_STAR == op:
+            assert self.import_name
+            self.has_star = True
+        elif STORE_NAME == op:
+            self.store_name(self.co.co_names[argc])
+        elif POP_TOP == op:
+            self.clear_states()
+
+    def clear_states(self):
+        del self.fromlist[:]
+        self.import_name = None
+
+    def store_name(self, name):
+        if self.import_name and not self.fromlist:
+            if DEBUG: _print("import %s as %s" % (self.import_name, name))
+            self.clear_states()
 
 
 # pylint: disable-msg=C0321
 def scan_code(co, module):
     assert co and module
-    if DEBUG: print co.co_filename
+    if DEBUG: _print("scan_code: %s" % co.co_filename)
 
     code = array.array('B', co.co_code)
     code_iter = iter(code)
@@ -85,8 +140,9 @@ def scan_code(co, module):
     for op in code_iter:
 
         # opcodes which take arguments
+        argc = 0
         if op >= dis.HAVE_ARGUMENT:
-            argc = code_iter.next()
+            argc += code_iter.next()
             argc += (code_iter.next() * 256)
 
         #if DEBUG: print dis.opname[op], argc
@@ -104,34 +160,34 @@ def scan_code(co, module):
 
         # classdefs
         if LOAD_NAME == op:
-            if DEBUG: print 'LOAD_NAME', co.co_names[argc]
+            if DEBUG: _print('LOAD_NAME %s' % co.co_names[argc])
             values.append(co.co_names[argc])
         elif LOAD_ATTR == op:
-            if DEBUG: print 'LOAD_ATTR', co.co_names[argc]
+            if DEBUG: _print('LOAD_ATTR %s' % co.co_names[argc])
             if values and isinstance(values[-1], basestring):
                 values[-1] = "%s.%s" % (values[-1], co.co_names[argc])
         elif BUILD_TUPLE == op:
-            if DEBUG: print argc, values
+            if DEBUG: _print(argc, values)
 
             # Because ``scan_code`` does not fully support
             # python bytecode spec, stack can be illegal.
             if len(values) >= argc:
                 values[-argc:] = [tuple(values[-argc:])]
-                if DEBUG: print 'BUILD_TUPLE', argc, values[-1]
+                if DEBUG: _print('BUILD_TUPLE', argc, values[-1])
 
         elif BUILD_CLASS == op:
             if values and isinstance(values[-1], tuple):
                 bases = values.pop()
             else:
                 bases = ()
-            if DEBUG: print 'BUILD_CLASS', bases
+            if DEBUG: _print('BUILD_CLASS', bases)
         elif STORE_NAME == op:
             if bases is not None:
                 assert isinstance(bases, tuple)
                 name = co.co_names[argc]
                 module.classdefs.append((name, bases))
                 if DEBUG:
-                    print "class %s%s:" % (name, str(bases))
+                    _print("class %s%s:" % (name, str(bases)))
                 bases = None
                 del values[:]
 

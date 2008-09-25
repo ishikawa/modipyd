@@ -215,6 +215,7 @@ class ImportDisasm(object):
     def clear_states(self):
         self.import_name = self.fromname = None
         self.fqn = self.store = None
+        del self.consts[:]
 
     def store_name(self, name):
         if not self.import_name:

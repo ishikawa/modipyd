@@ -85,6 +85,19 @@ class TestModipydImportDisasm(TestCase):
         self.assertEqual('os.path.*', imports[0][1])
         self.assertEqual(-1, imports[0][2])
 
+    def test_relative_import(self):
+        imports = self.compile_scan("from . A import B")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('B', imports[0][0])
+        self.assertEqual('A.B', imports[0][1])
+        self.assertEqual(1, imports[0][2])
+
+        imports = self.compile_scan("from .. A import B")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('B', imports[0][0])
+        self.assertEqual('A.B', imports[0][1])
+        self.assertEqual(2, imports[0][2])
+
     def test_future(self):
         imports = self.compile_scan("from __future__ import absolute_import")
         self.assertEqual(1, len(imports))

@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
 import unittest
-from modipyd.disasm import ImportDisasm
+from modipyd.disasm import ImportDisassembler
 from tests import TestCase
 
 
-class TestModipydImportDisasm(TestCase):
+class TestModipydImportDisassembler(TestCase):
 
     def compile(self, src):
         return compile(src, '<string>', 'exec')
 
     def compile_scan(self, src):
         co = self.compile(src)
-        disasm = ImportDisasm(co)
+        disasm = ImportDisassembler(co)
         self.assertNotNone(disasm)
         return disasm.scan()
 

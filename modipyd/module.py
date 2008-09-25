@@ -9,7 +9,7 @@ Python module representation.
 import array
 import dis
 import sys
-from modipyd import utils, LOGGER
+from modipyd import disasm, utils, LOGGER
 
 
 # ----------------------------------------------------------------

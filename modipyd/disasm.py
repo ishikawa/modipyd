@@ -41,11 +41,11 @@ def _read_argc(op, code_iter):
     return argc
 
 
-class ImportDisasm(object):
+class ImportDisassembler(object):
     """
     The disassembler for ``import`` statements
 
-    ImportDisasm.imports attribute is a list such as:
+    ImportDisassembler.imports attribute is a list such as:
 
         [(symbol, fully qualified, level)]
 
@@ -65,28 +65,28 @@ class ImportDisasm(object):
         from os.path import join as os_path_join
         --> [('os_path_join', 'os.path.join', -1)]
 
-    >>> disasm = ImportDisasm(compile(
+    >>> disasm = ImportDisassembler(compile(
     ...     'import os', '<string>', 'exec'))
     >>> disasm.scan()[0]
     ('os', 'os', -1)
 
-    >>> disasm = ImportDisasm(compile(
+    >>> disasm = ImportDisassembler(compile(
     ...     'import os.path', '<string>', 'exec'))
     >>> disasm.scan()[0]
     ('os.path', 'os.path', -1)
 
-    >>> disasm = ImportDisasm(compile(
+    >>> disasm = ImportDisassembler(compile(
     ...     'import os.path as os_path', '<string>', 'exec'))
     >>> disasm.scan()[0]
     ('os_path', 'os.path', -1)
 
-    >>> disasm = ImportDisasm(compile(
+    >>> disasm = ImportDisassembler(compile(
     ...     'from os import path', '<string>', 'exec'))
     >>> disasm.scan()[0]
     ('path', 'os.path', -1)
 
     >>> # from ... import * is currently not fully supported
-    >>> disasm = ImportDisasm(compile(
+    >>> disasm = ImportDisassembler(compile(
     ...     'from os.path import *', '<string>', 'exec'))
     >>> disasm.scan()[0]
     ('*', 'os.path.*', -1)

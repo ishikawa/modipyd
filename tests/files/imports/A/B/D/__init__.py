@@ -1,0 +1,4 @@
+
+
+class DClass(object):
+    pass

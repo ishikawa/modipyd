@@ -1,0 +1,4 @@
+
+
+class CClass(object):
+    pass

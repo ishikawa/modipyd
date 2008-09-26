@@ -17,6 +17,9 @@ tests = unittest.TestSuite()
 
 # unittest
 for dirpath, dirnames, filenames in os.walk(dirname(__file__)):
+    if 'files' in dirnames:
+        dirnames.remove('files')
+
     for name in filenames:
         if not (name.startswith("test_") and name.endswith(".py")):
             continue

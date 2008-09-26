@@ -4,7 +4,7 @@ import unittest
 from os.path import join
 from modipyd.descriptor import build_module_descriptors
 from modipyd.module import collect_module_code
-from modipyd.tools.autotest import testcase_module
+from modipyd.analysis import testcase_module
 from tests import TestCase, FILES_DIR
 
 

@@ -17,9 +17,10 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 import os
 import sys
 import logging
+import unittest
 from optparse import OptionParser
 
-from modipyd import LOGGER
+from modipyd import LOGGER, utils
 from modipyd.monitor import Monitor
 from modipyd.analysis import testcase_module
 
@@ -30,6 +31,47 @@ from modipyd.analysis import testcase_module
 MAJOR_VERSION = 0
 MINOR_VERSION = 1
 VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
+
+
+# ----------------------------------------------------------------
+# UnitTest
+# ----------------------------------------------------------------
+def collect_unittest(module_names):
+    suite = unittest.TestSuite()
+    loader = unittest.defaultTestLoader
+    for name in module_names:
+        try:
+            module = utils.import_module(name)
+        except ImportError:
+            LOGGER.warn(
+                "ImportError occurred while loading module",
+                exc_info=True)
+        else:
+            tests = loader.loadTestsFromModule(module)
+            if tests.countTestCases():
+                suite.addTest(tests)
+                LOGGER.info("Found unittest.TestCase: %s" % module.__name__)
+    return suite
+
+def run_unittest(suite):
+    if suite.countTestCases():
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
+def spawn_unittest_runner(testables):
+    args = [sys.executable] + sys.argv
+    for t in testables:
+        args.append("-x")
+        args.append(t.name)
+
+    if sys.platform == "win32":
+        # Avoid argument parsing problem in
+        # windows, DOS platform
+        args = ['"%s"' % arg for arg in args]
+
+    LOGGER.info(
+        "Spawn test runner process: %s" % ' '.join(args))
+    return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
 
 
 # ----------------------------------------------------------------
@@ -48,21 +90,6 @@ def observe(module_descriptor):
     # Runntine tests
     if testables:
         spawn_unittest_runner(testables)
-
-
-def spawn_unittest_runner(testables):
-    module_names = [t.name for t in testables]
-    args = [sys.executable] + sys.argv
-    args.append("-x")
-    args.append(','.join(module_names))
-    if sys.platform == "win32":
-        # Avoid argument parsing problem in
-        # windows, DOS platform
-        args = ['"%s"' % arg for arg in args]
-
-    LOGGER.info(
-        "Spawn test runner process: %s" % ' '.join(args))
-    return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
 
 
 # ----------------------------------------------------------------
@@ -86,16 +113,21 @@ def main(options, filepath):
     # in ``sys.path`` module search path variable for convenience.
     sys.path.insert(0, os.getcwd())
 
-    # start monitoring
-    try:
+    if options.tests:
+        # Test runner mode, no monitoring
+        suite = collect_unittest(options.tests)
+        run_unittest(suite)
+    else:
+        # start monitoring
+        try:
 
-        monitor = Monitor(filepath)
-        for modified in monitor.start():
-            LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
-            observe(modified)
+            monitor = Monitor(filepath)
+            for modified in monitor.start():
+                LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
+                observe(modified)
 
-    except KeyboardInterrupt:
-        LOGGER.debug('KeyboardInterrupt', exc_info=True)
+        except KeyboardInterrupt:
+            LOGGER.debug('KeyboardInterrupt', exc_info=True)
 
 def make_option_parser():
     parser = OptionParser(
@@ -105,6 +137,9 @@ def make_option_parser():
     parser.add_option("-v", "--verbose",
         action="count", dest="verbosity", default=0,
         help="Make the operation more talkative")
+    parser.add_option("-x", "--tests",
+        action="append", dest="tests", default=[], type='string',
+        help="Execute testcase module")
 
     return parser
 

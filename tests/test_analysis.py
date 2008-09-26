@@ -8,7 +8,7 @@ from modipyd.analysis import testcase_module
 from tests import TestCase, FILES_DIR
 
 
-class TestAutotestTestCaseModule(TestCase):
+class TestAnalysisModule(TestCase):
 
     def setUp(self):
         self.search_path = join(FILES_DIR, 'autotest')

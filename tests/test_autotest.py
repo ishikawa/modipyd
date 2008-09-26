@@ -2,8 +2,7 @@
 
 import unittest
 from os.path import join
-from modipyd.descriptor import ModuleDescriptor, \
-                               build_module_descriptors
+from modipyd.descriptor import build_module_descriptors
 from modipyd.module import collect_module_code
 from modipyd.tools.autotest import testcase_module
 from tests import TestCase, FILES_DIR
@@ -17,7 +16,11 @@ class TestAutotestTestCaseModule(TestCase):
             self.search_path, self.search_path))
         self.descriptors = build_module_descriptors(codes)
 
-    def test_test_script(self):
+    def test_module_in_package(self):
+        mod = self.descriptors['tests.a']
+        self.assert_(testcase_module(mod))
+
+    def test_module_not_in_package(self):
         test_script = self.descriptors['test_script']
         self.assert_(testcase_module(test_script))
 

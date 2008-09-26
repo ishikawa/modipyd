@@ -147,6 +147,18 @@ def fn():
         self.assertEqual('__future__.absolute_import', imports[0][1])
         self.assertEqual(0, imports[0][2])
 
+    def test_django_contrib_gis_tests_test_gdal_geom(self):
+        imports = self.compile_scan("""
+from django.contrib.gis.tests.geometries import *
+class OGRGeomTest(unittest.TestCase):
+    pass
+""")
+        # from ... import * is currently not fully supported
+        self.assertEqual(1, len(imports))
+        self.assertEqual('*', imports[0][0])
+        self.assertEqual('django.contrib.gis.tests.geometries.*', imports[0][1])
+        self.assertEqual(-1, imports[0][2])
+
 
 if __name__ == '__main__':
     unittest.main()

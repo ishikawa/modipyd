@@ -161,11 +161,13 @@ class ImportDisassembler(object):
             self.fromname = co.co_names[argc]
         elif IMPORT_STAR == op:
             assert self.import_name
-
+            # ::= "from" module "import" "*"
+            #
             # from ... import * is currently not fully supported
             #self.has_star = True
             self.fromname = '*'
             self.store_name('*')
+            self.clear_states()
 
         elif STORE_NAME == op:
             # print"STORE_NAME", co.co_names[argc]

@@ -191,7 +191,7 @@ def collect_module_code(filepath_or_list, search_path=None):
         try:
             module_name, package_name = resolver.resolve(sourcepath)
         except ImportError:
-            LOGGER.info(
+            LOGGER.debug(
                 "Couldn't import file at %s, ignore" % sourcepath,
                 exc_info=True)
         else:
@@ -260,6 +260,14 @@ class ModuleCode(object):
         del self.imports[:]
         del self.classdefs[:]
         scan_code(co, self)
+
+    def reload(self):
+        if self.filename.endswith('.pyo') or self.filename.endswith('.pyc'):
+            co = load_compiled(self.filename)
+        else:
+            co = compile_source(self.filename)
+        self.update_code(co)
+        return co
 
     def __str__(self):
         return "<module '%s' (%s)>" % (self.name, self.filename)

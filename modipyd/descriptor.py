@@ -188,7 +188,13 @@ class ModuleDescriptor(object):
         return self.module_code.filename
 
     def update(self):
-        return self.update_mtime()
+        if self.update_mtime():
+            LOGGER.info(
+                "Reload module descriptor '%s' at %s" % \
+                (self.name, self.filename))
+            self.module_code.reload()
+            return True
+        return False
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""

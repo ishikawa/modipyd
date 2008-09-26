@@ -44,6 +44,12 @@ class TestModipydModuleCode(TestCase):
     def test_python_module(self):
         self.read_module_code('python.a')
 
+    def test_python_module_reload(self):
+        m = self.read_module_code('python.a')
+        co = m.reload()
+        self.assertNotNone(co)
+        self.assertEqual(m.filename, co.co_filename)
+
     def test_module_equality(self):
         modules = list(collect_module_code(
             join(FILES_DIR, 'python'),

@@ -165,40 +165,36 @@ def collect_module_code(filepath_or_list, search_path=None):
         # Since changing .py file is not reflected by .pyc, .pyo quickly,
         # the plain .py file takes first prioriry.
         code = None
-
-        if typebits & PYTHON_SOURCE_MASK:
-            # .py
-            sourcepath = path + '.py'
-            code = compile_source(sourcepath)
-        elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
-            # .pyc, .pyo
-            if typebits & PYTHON_OPTIMIZED_MASK:
-                sourcepath = path + '.pyo'
-            else:
-                sourcepath = path + '.pyc'
-
-            try:
-                code = load_compiled(sourcepath)
-            except StandardError:
-                # ignore, try to compile .py
-                code = None
-                LOGGER.warn(
-                    "Can't load compiled .pyc file: %s" % filepath,
-                    exc_info=True)
-
-        if not code:
-            LOGGER.info("Couldn't load file at %s" % sourcepath)
-            continue
-
-        # module name
         try:
-            module_name, package_name = resolver.resolve(sourcepath)
-        except ImportError:
-            LOGGER.debug(
-                "Couldn't import file at %s, ignore" % sourcepath,
+            if typebits & PYTHON_SOURCE_MASK:
+                # .py
+                sourcepath = path + '.py'
+                code = compile_source(sourcepath)
+            elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
+                # .pyc, .pyo
+                if typebits & PYTHON_OPTIMIZED_MASK:
+                    sourcepath = path + '.pyo'
+                else:
+                    sourcepath = path + '.pyc'
+                    code = load_compiled(sourcepath)
+            else:
+                assert False, "illegal typebits"
+        except StandardError:
+            # ignore
+            LOGGER.warn(
+                "Can't load compiled .pyc file: %s" % sourcepath,
                 exc_info=True)
+            continue
         else:
-            yield ModuleCode(module_name, package_name, sourcepath, code)
+            # module name
+            try:
+                module_name, package_name = resolver.resolve(sourcepath)
+            except ImportError:
+                LOGGER.debug(
+                    "Couldn't import file at %s, ignore" % sourcepath,
+                    exc_info=True)
+            else:
+                yield ModuleCode(module_name, package_name, sourcepath, code)
 
 def read_module_code(filepath, search_path=None):
     if not isinstance(filepath, basestring):

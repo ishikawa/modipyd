@@ -46,8 +46,23 @@ def observe(module_descriptor):
             testables.append(descriptor)
 
     # Runntine tests
-    for testable in testables:
-        LOGGER.info("=> Loading:  %s" % testable.name)
+    if testables:
+        spawn_unittest_runner(testables)
+
+
+def spawn_unittest_runner(testables):
+    module_names = [t.name for t in testables]
+    args = [sys.executable] + sys.argv
+    args.append("-x")
+    args.append(','.join(module_names))
+    if sys.platform == "win32":
+        # Avoid argument parsing problem in
+        # windows, DOS platform
+        args = ['"%s"' % arg for arg in args]
+
+    LOGGER.info(
+        "Spawn test runner process: %s" % ' '.join(args))
+    return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
 
 
 # ----------------------------------------------------------------
@@ -61,9 +76,9 @@ def main(options, filepath):
     program can import monitoring modules.
     """
     # options handling
-    if options.verbose:
+    if options.verbosity > 0:
         LOGGER.setLevel(logging.INFO)
-    if options.debug:
+    if options.verbosity > 1:
         LOGGER.setLevel(logging.DEBUG)
 
     # So many projects contain its modules and packages
@@ -82,19 +97,21 @@ def main(options, filepath):
     except KeyboardInterrupt:
         LOGGER.debug('KeyboardInterrupt', exc_info=True)
 
-def run():
-    """Standalone program interface"""
+def make_option_parser():
     parser = OptionParser(
         usage="usage: %prog [options] [files or directories]",
         version=("%prog " + VERSION_STRING))
 
     parser.add_option("-v", "--verbose",
-        action="store_true", dest="verbose", default=False,
+        action="count", dest="verbosity", default=0,
         help="Make the operation more talkative")
-    parser.add_option("--debug",
-        action="store_true", dest="debug", default=False,
-        help="Make the operation more talkative (debug mode)")
 
+    return parser
+
+
+def run():
+    """Standalone program interface"""
+    parser = make_option_parser()
     (options, args) = parser.parse_args()
     main(options, args or '.')
 

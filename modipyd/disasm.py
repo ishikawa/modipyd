@@ -144,7 +144,9 @@ class ImportDisassembler(object):
             if self.import_name and self.store < len(self.fqn):
                 assert self.fqn[self.store] == attr, \
                     "LOAD_ATTR '%s' must equal to '%s' in %s (at %s)" % \
-                        (attr, self.fqn[self.store], str(self.fqn), co.co_filename)
+                        (attr, self.fqn[self.store],
+                         str(self.fqn),
+                         co.co_filename)
                 self.store += 1
 
         elif IMPORT_NAME == op:

@@ -10,6 +10,7 @@ import types
 
 from modipyd import LOGGER, utils
 from modipyd.utils import split_module_name
+from modipyd.resolve import resolve_relative_modulename
 
 
 def has_subclass(module_descriptor, baseclass):
@@ -65,18 +66,12 @@ def has_subclass(module_descriptor, baseclass):
                 continue
 
             # Make name a qualified class name
-            names = []
+            name = base
             parent = split_module_name(import_[1])[0]
-            level = import_[2]
-            if level > 0:
-                # Relative imports
-                packages = modcode.package_name.split('.')
-                names.extend(packages[:len(packages) - (level-1)])
             if parent:
-                names.extend(parent.split('.'))
-            names.append(base)
+                name = '.'.join((parent, name))
+            name = resolve_relative_modulename(name, modcode.package_name, import_[2])
 
-            name = '.'.join(names)
             assert '.' in name, "names must be a qualified name"
             LOGGER.debug("'%s' is derived from "
                 "imported class '%s'" % (base, name))

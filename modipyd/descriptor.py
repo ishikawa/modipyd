@@ -9,8 +9,8 @@ for managing annotations of module.
 """
 
 import os
-from modipyd import LOGGER
-from modipyd import utils
+from modipyd import LOGGER, utils
+from modipyd.resolve import resolve_relative_modulename
 
 
 def build_module_descriptors(module_codes):
@@ -39,23 +39,20 @@ def build_module_descriptors(module_codes):
             elif level == -1:
                 # -1 which indicates both absolute and relative imports
                 # will be attempted
-                names = [name]
+                names = []
                 if descriptor.package_name:
-                    names.append('%s.%s' % (descriptor.package_name, name))
+                    names.append('.'.join((descriptor.package_name, name)))
+                names.append(name)
+
                 for item in import_name_candidates(names):
                     yield item
+
             else:
                 # Relative imports
-                package = descriptor.package_name
-                while package and level > 1:
-                    package = utils.split_module_name(package)[0]
-                    level -= 1
-
-                if not package:
-                    # illegal relative path
-                    continue
-                names = ['%s.%s' % (package, name)]
-                for item in import_name_candidates(names):
+                assert descriptor.package_name
+                resolved_name = resolve_relative_modulename(
+                    name, descriptor.package_name, level)
+                for item in import_name_candidates([resolved_name]):
                     yield item
 
     # Construct ``ModuleDescriptor`` mappings

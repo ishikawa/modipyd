@@ -18,6 +18,15 @@ def _normalize_path(filepath):
     #return os.path.realpath(abspath(expanduser(filepath)))
     return abspath(expanduser(filepath))
 
+def resolve_relative_modulename(modulename, package, level):
+    if level <= 0:
+        return modulename
+    else:
+        for _ in xrange(1, level):
+            package = package[:package.rindex('.')]
+
+        return '.'.join((package, modulename))
+
 class ModuleNameResolver(object):
     """
     This class provides an interface to the mechanisms

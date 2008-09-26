@@ -29,6 +29,8 @@ class TestAnalysisModule(TestCase):
         self.assert_(has_subclass(mod, unittest.TestCase))
         mod = self.descriptors['tests_module.a']
         self.assert_(has_subclass(mod, unittest.TestCase))
+        mod = self.descriptors['tests_module.a2']
+        self.assert_(has_subclass(mod, unittest.TestCase))
 
     def test_module_not_in_package(self):
         test_script = self.descriptors['test_script']
@@ -39,6 +41,9 @@ class TestAnalysisModule(TestCase):
         self.assert_(has_subclass(mod, unittest.TestCase))
 
         mod = self.descriptors['tests_module.B.b2']
+        self.assert_(has_subclass(mod, unittest.TestCase))
+
+        mod = self.descriptors['tests_module.B.b3']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
         mod = self.descriptors['tests_module.B']

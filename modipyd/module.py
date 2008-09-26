@@ -262,10 +262,15 @@ class ModuleCode(object):
         scan_code(co, self)
 
     def reload(self):
-        if self.filename.endswith('.pyo') or self.filename.endswith('.pyc'):
-            co = load_compiled(self.filename)
+        f = self.filename
+
+        if utils.python_source_file(f):
+            co = compile_source(f)
+        elif utils.python_compiled_file(f):
+            co = load_compiled(f)
         else:
-            co = compile_source(self.filename)
+            raise ImportError("No module named %s at %s" % (self.name, f))
+
         self.update_code(co)
         return co
 

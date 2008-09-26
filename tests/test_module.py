@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import unittest
-from os.path import join
+from os.path import join, exists
+from modipyd.utils import compile_python_source
 from modipyd.module import ModuleCode, compile_source, \
                            collect_module_code, \
                            read_module_code
@@ -43,12 +44,6 @@ class TestModipydModuleCode(TestCase):
 
     def test_python_module(self):
         self.read_module_code('python.a')
-
-    def test_python_module_reload(self):
-        m = self.read_module_code('python.a')
-        co = m.reload()
-        self.assertNotNone(co)
-        self.assertEqual(m.filename, co.co_filename)
 
     def test_module_equality(self):
         modules = list(collect_module_code(
@@ -114,6 +109,34 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual('D', modcode.classdefs[3][0])
         self.assertEqual(2, len(modcode.classdefs[3][1]))
         self.assertEqual('A', modcode.classdefs[3][1][0])
+
+    def test_python_module_reload(self):
+        search_path = join(FILES_DIR, 'imports')
+        pypath = join(search_path, 'A', 'a.py')
+        assert exists(pypath)
+
+        pycpath = join(search_path, 'A', 'a.pyc')
+        pyopath = join(search_path, 'A', 'a.pyo')
+        if not exists(pycpath) or not exists(pyopath):
+            compile_python_source(pypath)
+            compile_python_source(pypath, optimization=True)
+        assert exists(pycpath) and exists(pyopath)
+
+        m = read_module_code(pypath, [search_path])
+        old_imports = m.imports[:]
+        old_classdefs = m.classdefs[:]
+
+        for f in [pypath, pycpath, pyopath]:
+            # ugly ...
+            del m.imports[:]
+            del m.classdefs[:]
+            m.filename = f
+
+            co = m.reload()
+            self.assertNotNone(co)
+            self.assertEqual(pypath, co.co_filename)
+            self.assertEqual(old_imports, m.imports)
+            self.assertEqual(old_classdefs, m.classdefs)
 
 
 if __name__ == '__main__':

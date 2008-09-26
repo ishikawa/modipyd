@@ -8,6 +8,7 @@ Python module representation.
 
 import array
 import dis
+from modipyd import HAS_RELATIVE_IMPORTS
 
 
 LOAD_CONST = dis.opname.index('LOAD_CONST')
@@ -151,7 +152,7 @@ class ImportDisassembler(object):
 
         elif IMPORT_NAME == op:
             # print"IMPORT_NAME", co.co_names[argc]
-            assert len(self.consts) >= 2
+            assert len(self.consts) >= 1
             self.import_name = co.co_names[argc]
             self.fqn = self.import_name.split('.')
             self.store = 1
@@ -193,12 +194,18 @@ class ImportDisassembler(object):
         if self.import_name is None:
             return
 
-        assert len(self.consts) >= 2
-        level = self.consts[-2]
-
-        assert level >= -1, \
-            "import level is illegal: %s (%s)" % \
-            (str(level), str(self.consts))
+        # The Absolute and Relative Imports future has been
+        # implemented in Python 2.5
+        #
+        # http://docs.python.org/whatsnew/pep-328.html
+        level = -1
+        assert len(self.consts) >= 1
+        if HAS_RELATIVE_IMPORTS:
+            assert len(self.consts) >= 2
+            level = self.consts[-2]
+            assert level >= -1, \
+                "import level is illegal: %s (%s)" % \
+                (str(level), str(self.consts))
 
         if not self.fromname:
             # import ...

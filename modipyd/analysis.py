@@ -66,19 +66,27 @@ def has_subclass(module_descriptor, baseclass):
                 continue
 
             # Make name a qualified class name
-            name = base
+            name, level = base, import_[2]
             parent = split_module_name(import_[1])[0]
             if parent:
                 name = '.'.join((parent, name))
             name = resolve_relative_modulename(
-                name, modcode.package_name, import_[2])
+                name, modcode.package_name, level)
 
             assert '.' in name, "names must be a qualified name"
             LOGGER.debug("'%s' is derived from "
                 "imported class '%s'" % (base, name))
 
             try:
-                klass = utils.import_component(name)
+                try:
+                    klass = utils.import_component(name)
+                except ImportError:
+                    if level == -1 and modcode.package_name:
+                        # Relative import
+                        name = '.'.join((modcode.package_name, name))
+                        klass = utils.import_component(name)
+                    else:
+                        raise
             except (ImportError, AttributeError):
                 LOGGER.warn("Exception occurred "
                     "while importing component '%s'" % name,

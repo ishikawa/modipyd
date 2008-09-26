@@ -3,6 +3,7 @@
 import sys
 import unittest
 from os.path import join
+from modipyd import HAS_RELATIVE_IMPORTS
 from modipyd.descriptor import build_module_descriptors
 from modipyd.module import collect_module_code
 from modipyd.analysis import has_subclass
@@ -14,7 +15,10 @@ class TestAnalysisModule(TestCase):
     def setUp(self):
         self.syspath = sys.path[:]
 
-        self.search_path = join(FILES_DIR, 'autotest')
+        if HAS_RELATIVE_IMPORTS:
+            self.search_path = join(FILES_DIR, 'autotest')
+        else:
+            self.search_path = join(FILES_DIR, 'autotest24')
         sys.path.insert(0, self.search_path)
 
         codes = list(collect_module_code(

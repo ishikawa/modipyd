@@ -230,8 +230,7 @@ class ModuleCode(object):
 
         >>> code = compile(
         ...     "import os;"
-        ...     "from os.path import join as join_path;"
-        ...     "from .. A import B",
+        ...     "from os.path import join as join_path",
         ...     '<string>', 'exec')
         >>> modcode = ModuleCode('__main__', '', code.co_filename, code)
         >>> modcode.name
@@ -239,13 +238,11 @@ class ModuleCode(object):
         >>> modcode.filename
         '<string>'
         >>> len(modcode.imports)
-        3
+        2
         >>> modcode.imports[0]
         ('os', 'os', -1)
         >>> modcode.imports[1]
         ('join_path', 'os.path.join', -1)
-        >>> modcode.imports[2]
-        ('B', 'A.B', 2)
         """
         super(ModuleCode, self).__init__()
         self.name = modulename

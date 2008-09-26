@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
+from modipyd import HAS_RELATIVE_IMPORTS
 from os.path import join
 from modipyd.descriptor import ModuleDescriptor, \
                                build_module_descriptors
@@ -106,6 +107,9 @@ class TestModuleDescriptorDependency(TestCase):
         self.assertEqual(descriptors['cycles.e'], dep.next())
         self.assertRaises(StopIteration, dep.next)
 
+
+if not HAS_RELATIVE_IMPORTS:
+    del TestModuleDescriptorRelativeImports
 
 if __name__ == '__main__':
     unittest.main()

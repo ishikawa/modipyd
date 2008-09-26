@@ -24,6 +24,13 @@ class TestAutotestTestCaseModule(TestCase):
         test_script = self.descriptors['test_script']
         self.assert_(testcase_module(test_script))
 
+    def test_package_relative_imports(self):
+        mod = self.descriptors['tests.B.b']
+        self.assert_(testcase_module(mod))
+
+        mod = self.descriptors['tests.B']
+        self.assert_(testcase_module(mod))
+
 
 if __name__ == '__main__':
     unittest.main()

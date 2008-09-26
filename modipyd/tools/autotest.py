@@ -20,6 +20,7 @@ import logging
 from optparse import OptionParser
 
 from modipyd import LOGGER, utils
+from modipyd.utils import split_module_name
 from modipyd.monitor import Monitor
 
 
@@ -55,12 +56,7 @@ def testcase_module(module_descriptor):
 
     # Construct imported symbols.
     # This is used in phase 3.
-    #
-    #   symbols ::= { symbol: parent module or '', ... }
-    #
-    symbols = dict([
-        (imp[0], utils.split_module_name(imp[1])[0])
-        for imp in modcode.imports])
+    symbols = dict([(imp[0], imp) for imp in modcode.imports])
 
     # 1. For all class definition in module code
     for klass in modcode.classdefs:
@@ -74,22 +70,31 @@ def testcase_module(module_descriptor):
         for base in bases:
             # Search imported symbol that is class name or module name
             symbol = base
-            names = base.split('.')
-            if len(names) > 1:
-                symbol = '.'.join(names[:-1])
+            if '.' in symbol:
+                symbol = split_module_name(symbol)[0]
 
-            # Not an imported base class
-            if not symbol in symbols:
+            import_ = symbols.get(symbol)
+            if import_ is None:
+                # Not an imported base class
                 continue
 
-            if symbols[symbol]:
-                names = symbols[symbol].split('.') + names
-
-            assert len(names) > 1, "names must be qualified class name"
-            LOGGER.debug("'%s' is derived from "
-                "imported class '%s'" % (base, '.'.join(names)))
+            # Make name a qualified class name
+            names = []
+            parent = split_module_name(import_[1])[0]
+            level = import_[2]
+            if level > 0:
+                # Relative imports
+                packages = modcode.package_name.split('.')
+                names.extend(packages[:len(packages) - (level-1)])
+            if parent:
+                names.extend(parent.split('.'))
+            names.append(base)
 
             name = '.'.join(names)
+            assert '.' in name, "names must be a qualified name"
+            LOGGER.debug("'%s' is derived from "
+                "imported class '%s'" % (base, name))
+
             try:
                 baseclass = utils.import_component(name)
             except (ImportError, AttributeError):

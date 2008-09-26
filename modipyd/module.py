@@ -88,14 +88,14 @@ def scan_code(co, module):
     assert co and module
     code_iter = disasm.code_iter(co)
 
-    imp_disasm = disasm.ImportDisassembler(co)
+    imp_disasm = disasm.ImportDisassembler()
     values = []
     bases = None
 
     for op in code_iter:
         #if DEBUG: _print(dis.opname[op], argc)
         argc = disasm.read_argc(op, code_iter)
-        imp_disasm.track(op, argc)
+        imp_disasm.track(op, argc, co)
 
         # classdefs
         if LOAD_NAME == op:
@@ -256,6 +256,7 @@ class ModuleCode(object):
         self.imports = []
         self.classdefs = []
         scan_code(self.code, self)
+        #del self.code
 
     def __str__(self):
         return "<module '%s' (%s)>" % (self.name, self.filename)

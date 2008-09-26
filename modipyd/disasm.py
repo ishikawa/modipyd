@@ -19,8 +19,8 @@ IMPORT_FROM = dis.opname.index('IMPORT_FROM')
 IMPORT_STAR = dis.opname.index('IMPORT_STAR')
 
 STORE_NAME = dis.opname.index('STORE_NAME')
-STORE_GLOBAL = dis.opname.index('STORE_GLOBAL')
-STORE_OPS = [STORE_NAME, STORE_GLOBAL]
+STORE_FAST = dis.opname.index('STORE_FAST')
+STORE_DEREF = dis.opname.index('STORE_DEREF')
 
 BUILD_CLASS = dis.opname.index('BUILD_CLASS')
 BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
@@ -65,36 +65,34 @@ class ImportDisassembler(object):
         from os.path import join as os_path_join
         --> [('os_path_join', 'os.path.join', -1)]
 
-    >>> disasm = ImportDisassembler(compile(
-    ...     'import os', '<string>', 'exec'))
-    >>> disasm.scan()[0]
+    >>> disasm = ImportDisassembler()
+    >>> co = compile('import os', '<string>', 'exec')
+    >>> disasm.scan(co)[0]
     ('os', 'os', -1)
 
-    >>> disasm = ImportDisassembler(compile(
-    ...     'import os.path', '<string>', 'exec'))
-    >>> disasm.scan()[0]
+    >>> co = compile(
+    ...     'import os.path', '<string>', 'exec')
+    >>> disasm.scan(co)[0]
     ('os.path', 'os.path', -1)
 
-    >>> disasm = ImportDisassembler(compile(
-    ...     'import os.path as os_path', '<string>', 'exec'))
-    >>> disasm.scan()[0]
+    >>> co = compile(
+    ...     'import os.path as os_path', '<string>', 'exec')
+    >>> disasm.scan(co)[0]
     ('os_path', 'os.path', -1)
 
-    >>> disasm = ImportDisassembler(compile(
-    ...     'from os import path', '<string>', 'exec'))
-    >>> disasm.scan()[0]
+    >>> co = compile(
+    ...     'from os import path', '<string>', 'exec')
+    >>> disasm.scan(co)[0]
     ('path', 'os.path', -1)
 
     >>> # from ... import * is currently not fully supported
-    >>> disasm = ImportDisassembler(compile(
-    ...     'from os.path import *', '<string>', 'exec'))
-    >>> disasm.scan()[0]
+    >>> co = compile(
+    ...     'from os.path import *', '<string>', 'exec')
+    >>> disasm.scan(co)[0]
     ('*', 'os.path.*', -1)
     """
 
-    def __init__(self, co):
-        self.co = co
-
+    def __init__(self):
         self.import_name = None
         self.fromname = None
 
@@ -108,15 +106,23 @@ class ImportDisassembler(object):
         # ``import``s
         self.imports = []
 
-    def scan(self):
-        code = code_iter(self.co)
-        del self.imports[:]
+    def __scan(self, co):
+        code = code_iter(co)
         for op in code:
             argc = read_argc(op, code)
-            self.track(op, argc)
-        return self.imports
+            self.track(op, argc, co)
+        for c in co.co_consts:
+            if isinstance(c, type(co)):
+                self.__scan(c)
 
-    def track(self, op, argc):
+    def scan(self, co):
+        del self.imports[:]
+        self.__scan(co)
+        ret = self.imports[:]
+        del self.imports[:]
+        return ret
+
+    def track(self, op, argc, co):
         if LOAD_CONST == op:
             # An ``IMPORT_NAME`` is always preceded by a 2 ``LOAD_CONST``s,
             # they are:
@@ -124,7 +130,8 @@ class ImportDisassembler(object):
             #   (1) The level of relative imports
             #   (2) A tuple of "from" names, or None for regular import.
             #       The tuple may contain "*" for "from <mod> import *"
-            self.consts.append(self.co.co_consts[argc])
+            # print"LOAD_CONST", co.co_consts[argc]
+            self.consts.append(co.co_consts[argc])
         elif LOAD_ATTR == op:
             # import os.path as os_path
             # ...
@@ -132,21 +139,24 @@ class ImportDisassembler(object):
             #  9 LOAD_ATTR                1 (path)
             # 12 STORE_NAME               2 (os_path)
             # ...
-            attr = self.co.co_names[argc]
-            
+            attr = co.co_names[argc]
+            # print"LOAD_CONST", attr
             if self.import_name and self.store < len(self.fqn):
-                assert self.fqn[self.store] == attr
+                assert self.fqn[self.store] == attr, \
+                    "LOAD_ATTR '%s' must equal to '%s' in %s (at %s)" % \
+                        (attr, self.fqn[self.store], str(self.fqn), co.co_filename)
                 self.store += 1
 
         elif IMPORT_NAME == op:
+            # print"IMPORT_NAME", co.co_names[argc]
             assert len(self.consts) >= 2
-            self.import_name = self.co.co_names[argc]
+            self.import_name = co.co_names[argc]
             self.fqn = self.import_name.split('.')
             self.store = 1
         elif IMPORT_FROM == op:
             # import_name is an empty string in ``from .+ import ``
             assert self.import_name is not None
-            self.fromname = self.co.co_names[argc]
+            self.fromname = co.co_names[argc]
         elif IMPORT_STAR == op:
             assert self.import_name
 
@@ -156,7 +166,15 @@ class ImportDisassembler(object):
             self.store_name('*')
 
         elif STORE_NAME == op:
-            self.store_name(self.co.co_names[argc])
+            # print"STORE_NAME", co.co_names[argc]
+            self.store_name(co.co_names[argc])
+        elif STORE_FAST == op:
+            # print"STORE_FAST", co.co_varnames[argc]
+            self.store_name(co.co_varnames[argc])
+        elif STORE_DEREF == op:
+            # print"STORE_DEREF", co.co_cellvars[argc]
+            self.store_name(co.co_cellvars[argc])
+
         elif POP_TOP == op:
             self.clear_states()
 
@@ -173,7 +191,10 @@ class ImportDisassembler(object):
 
         assert len(self.consts) >= 2
         level = self.consts[-2]
-        assert level >= -1
+
+        assert level >= -1, \
+            "import level is illegal: %s (%s)" % \
+            (str(level), str(self.consts))
 
         if not self.fromname:
             # import ...

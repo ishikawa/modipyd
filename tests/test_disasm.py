@@ -7,14 +7,14 @@ from tests import TestCase
 
 class TestModipydImportDisassembler(TestCase):
 
-    def compile(self, src):
-        return compile(src, '<string>', 'exec')
+    def compile(self, src, filename='<string>'):
+        return compile(src, filename, 'exec')
 
-    def compile_scan(self, src):
-        co = self.compile(src)
-        disasm = ImportDisassembler(co)
+    def compile_scan(self, src, filename='<string>'):
+        co = self.compile(src, filename)
+        disasm = ImportDisassembler()
         self.assertNotNone(disasm)
-        return disasm.scan()
+        return disasm.scan(co)
 
     def test_simple(self):
         imports = self.compile_scan("import os")
@@ -35,6 +35,28 @@ class TestModipydImportDisassembler(TestCase):
         self.assertEqual(1, len(imports))
         self.assertEqual('os_path', imports[0][0])
         self.assertEqual('os.path', imports[0][1])
+        self.assertEqual(-1, imports[0][2])
+
+    def test_local_scope(self):
+        imports = self.compile_scan("""
+def import_module():
+    import os.path""", "<test_local_scope>")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('os.path', imports[0][0])
+        self.assertEqual('os.path', imports[0][1])
+        self.assertEqual(-1, imports[0][2])
+
+    def test_bind_scope(self):
+        imports = self.compile_scan("""
+def fn():
+    import fnmatch
+    def ignore(filename):
+        if fnmatch.fnmatch(filename, '*'):
+            pass
+""", "<test_local_scope>")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('fnmatch', imports[0][0])
+        self.assertEqual('fnmatch', imports[0][1])
         self.assertEqual(-1, imports[0][2])
 
     def test_multiple(self):
@@ -108,6 +130,13 @@ class TestModipydImportDisassembler(TestCase):
         imports = self.compile_scan("from .. import A")
         self.assertEqual(1, len(imports))
         self.assertEqual('A', imports[0][0])
+        self.assertEqual('A', imports[0][1])
+        self.assertEqual(2, imports[0][2])
+
+    def test_relative_import_without_modulename_as(self):
+        imports = self.compile_scan("from .. import A as b")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('b', imports[0][0])
         self.assertEqual('A', imports[0][1])
         self.assertEqual(2, imports[0][2])
 

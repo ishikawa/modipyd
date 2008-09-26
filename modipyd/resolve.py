@@ -52,14 +52,16 @@ class ModuleNameResolver(object):
     def resolve(self, filepath):
         """
         Resolve the module name from *filepath* on search_paths.
+        Return (module name, package name), if the module is not
+        in a package, package name is ``None``.
         """
 
         if not filepath:
-            raise RuntimeError("Empty string passed")
+            raise ImportError("filepath is empty")
 
         filepath = _normalize_path(filepath)
         if not utils.python_module_file(filepath):
-            raise RuntimeError("Not a python script: %s" % filepath)
+            raise ImportError("Not a python script: %s" % filepath)
 
         # Searching...
         #

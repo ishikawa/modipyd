@@ -125,11 +125,11 @@ class TestModipyPathUtils(TestCase):
         self.assert_(not utils.python_package(FILES_DIR))
 
 
-class TestDetectModulename(TestCase):
+class TestResolveModulename(TestCase):
 
     def test_empty(self):
-        self.assertRaises(RuntimeError, utils.resolve_modulename, None)
-        self.assertRaises(RuntimeError, utils.resolve_modulename, "")
+        self.assertRaises(ImportError, utils.resolve_modulename, None)
+        self.assertRaises(ImportError, utils.resolve_modulename, "")
 
     def assert_resolve_modulename_in_dir(self,
                             expected_name, filepath, directory):

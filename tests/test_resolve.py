@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-import os
-import sys
-from os.path import abspath, splitext, join, normpath, dirname, exists, isdir
-from errno import ENOENT
+from os.path import abspath, splitext, join
 
 from modipyd import utils
 from modipyd.resolve import ModuleNameResolver

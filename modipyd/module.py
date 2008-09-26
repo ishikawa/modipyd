@@ -24,16 +24,10 @@ def load_compiled(filepath):
     import imp
     fp = open(filepath, 'rb')
     try:
-        try:
-            if fp.read(4) != imp.get_magic():
-                raise ImportError, "Bad magic number in %s" % filepath
-            fp.read(4)
-            return marshal.load(fp)
-        except StandardError:
-            # ignore, try to compile .py
-            LOGGER.warn(
-                "Can't load compiled .pyc file: %s" % filepath,
-                exc_info=True)
+        if fp.read(4) != imp.get_magic():
+            raise ImportError, "Bad magic number in %s" % filepath
+        fp.read(4)
+        return marshal.load(fp)
     finally:
         fp.close()
 
@@ -182,7 +176,16 @@ def collect_module_code(filepath_or_list, search_path=None):
                 sourcepath = path + '.pyo'
             else:
                 sourcepath = path + '.pyc'
-            code = load_compiled(sourcepath)
+
+            try:
+                code = load_compiled(sourcepath)
+            except StandardError:
+                # ignore, try to compile .py
+                code = None
+                LOGGER.warn(
+                    "Can't load compiled .pyc file: %s" % filepath,
+                    exc_info=True)
+
         if not code:
             LOGGER.info("Couldn't load file at %s" % sourcepath)
             continue

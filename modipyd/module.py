@@ -251,11 +251,14 @@ class ModuleCode(object):
         self.name = modulename
         self.package_name = packagename
         self.filename = filename
+
+        self.imports = []
+        self.classdefs = []
         self.update_code(code)
 
     def update_code(self, co):
-        self.imports = []
-        self.classdefs = []
+        del self.imports[:]
+        del self.classdefs[:]
         scan_code(co, self)
 
     def __str__(self):

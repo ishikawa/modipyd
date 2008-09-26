@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import unittest
 from os.path import join
 from modipyd.descriptor import build_module_descriptors
@@ -11,15 +12,22 @@ from tests import TestCase, FILES_DIR
 class TestAnalysisModule(TestCase):
 
     def setUp(self):
+        self.syspath = sys.path[:]
+
         self.search_path = join(FILES_DIR, 'autotest')
+        sys.path.insert(0, self.search_path)
+
         codes = list(collect_module_code(
             self.search_path, self.search_path))
         self.descriptors = build_module_descriptors(codes)
 
+    def tearDown(self):
+        sys.path = self.syspath
+
     def test_module_in_package(self):
-        mod = self.descriptors['tests']
+        mod = self.descriptors['tests_module']
         self.assert_(has_subclass(mod, unittest.TestCase))
-        mod = self.descriptors['tests.a']
+        mod = self.descriptors['tests_module.a']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
     def test_module_not_in_package(self):
@@ -27,13 +35,13 @@ class TestAnalysisModule(TestCase):
         self.assert_(has_subclass(test_script, unittest.TestCase))
 
     def test_package_relative_imports(self):
-        mod = self.descriptors['tests.B.b']
+        mod = self.descriptors['tests_module.B.b']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
-        mod = self.descriptors['tests.B.b2']
+        mod = self.descriptors['tests_module.B.b2']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
-        mod = self.descriptors['tests.B']
+        mod = self.descriptors['tests_module.B']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
 

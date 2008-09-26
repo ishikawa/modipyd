@@ -137,10 +137,10 @@ def make_option_parser():
 
     parser.add_option("-v", "--verbose",
         action="count", dest="verbosity", default=0,
-        help="Make the operation more talkative")
-    parser.add_option("-x", "--tests",
-        action="append", dest="tests", default=[], type='string',
-        help="Execute testcase module")
+        help="make the operation more talkative")
+    parser.add_option("-x", "--test",
+        action="append", dest="tests", metavar='TEST',
+        help="execute module with the unittest.TestRunner")
 
     return parser
 

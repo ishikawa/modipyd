@@ -34,6 +34,9 @@ class ModuleNameResolver(object):
 
         # Cofigure module search path (copy it)
         syspaths = (search_paths or sys.path)
+        syspaths = utils.wrap_sequence(syspaths)
+        assert isinstance(syspaths, (list, tuple))
+
         self.search_paths = [_normalize_path(d) for d in syspaths if isdir(d)]
         for d in self.search_paths:
             assert isinstance(d, basestring)

@@ -191,7 +191,9 @@ def collect_module_code(filepath_or_list, search_path=None):
         try:
             module_name, package_name = resolver.resolve(sourcepath)
         except ImportError:
-            LOGGER.info("Couldn't import file at %s, ignore" % sourcepath)
+            LOGGER.info(
+                "Couldn't import file at %s, ignore" % sourcepath,
+                exc_info=True)
         else:
             yield ModuleCode(module_name, package_name, sourcepath, code)
 

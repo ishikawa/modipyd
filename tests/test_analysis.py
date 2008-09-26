@@ -4,7 +4,7 @@ import unittest
 from os.path import join
 from modipyd.descriptor import build_module_descriptors
 from modipyd.module import collect_module_code
-from modipyd.analysis import testcase_module
+from modipyd.analysis import has_subclass
 from tests import TestCase, FILES_DIR
 
 
@@ -18,18 +18,18 @@ class TestAnalysisModule(TestCase):
 
     def test_module_in_package(self):
         mod = self.descriptors['tests.a']
-        self.assert_(testcase_module(mod))
+        self.assert_(has_subclass(mod, unittest.TestCase))
 
     def test_module_not_in_package(self):
         test_script = self.descriptors['test_script']
-        self.assert_(testcase_module(test_script))
+        self.assert_(has_subclass(test_script, unittest.TestCase))
 
     def test_package_relative_imports(self):
         mod = self.descriptors['tests.B.b']
-        self.assert_(testcase_module(mod))
+        self.assert_(has_subclass(mod, unittest.TestCase))
 
         mod = self.descriptors['tests.B']
-        self.assert_(testcase_module(mod))
+        self.assert_(has_subclass(mod, unittest.TestCase))
 
 
 if __name__ == '__main__':

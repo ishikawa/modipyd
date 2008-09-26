@@ -6,19 +6,26 @@ Module Dependency Analysis
 
 """
 
+import types
+
 from modipyd import LOGGER, utils
 from modipyd.utils import split_module_name
 
 
-def testcase_module(module_descriptor):
+def has_subclass(module_descriptor, baseclass):
     """
-    Return ``True`` if the module in *module_descriptor*
-    includes ``unittest.TestCase`` subclasses.
+    Return ``True`` if the module has a class
+    derived from *baseclass*
     """
     # We can't use ``unittest.TestLoader`` to loading tests,
     # bacause ``TestLoader`` imports (execute) module code.
     # If imported/executed module have a statement such as
     # ``sys.exit()``, ...program exit!
+
+    if not isinstance(baseclass, (type, types.ClassType)):
+        raise TypeError(
+            "The baseclass argument must be instance of type of class, "
+            "but was instance of %s" % type(baseclass))
 
     modcode = module_descriptor.module_code
     assert modcode
@@ -31,7 +38,7 @@ def testcase_module(module_descriptor):
     # 4. Load base class(s) from that module
     #    Notes: Assume the module contains base class does not have
     #           a dangerous code such as ``sys.exit``.
-    # 5. Check loaded class is unittest.TestCase or its subclass
+    # 5. Check loaded class is *baseclass* or its subclass
 
     # Construct imported symbols.
     # This is used in phase 3.
@@ -75,17 +82,14 @@ def testcase_module(module_descriptor):
                 "imported class '%s'" % (base, name))
 
             try:
-                baseclass = utils.import_component(name)
+                klass = utils.import_component(name)
             except (ImportError, AttributeError):
                 LOGGER.warn("Exception occurred "
                     "while importing component '%s'" % name,
                     exc_info=True)
             else:
                 # 5. Check loaded class is unittest.TestCase or its subclass
-                import types
-                import unittest
-
-                return (isinstance(baseclass, (type, types.ClassType)) and
-                        issubclass(baseclass, unittest.TestCase))
+                return (isinstance(klass, (type, types.ClassType)) and
+                        issubclass(klass, baseclass))
 
     return False

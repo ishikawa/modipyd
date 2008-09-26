@@ -22,7 +22,7 @@ from optparse import OptionParser
 
 from modipyd import LOGGER, utils
 from modipyd.monitor import Monitor
-from modipyd.analysis import testcase_module
+from modipyd.analysis import has_subclass
 
 
 # ----------------------------------------------------------------
@@ -84,7 +84,7 @@ def observe(module_descriptor):
     testables = []
     for descriptor in module_descriptor.walk():
         LOGGER.info("-> Affected: %s" % descriptor.name)
-        if testcase_module(descriptor):
+        if has_subclass(descriptor, unittest.TestCase):
             testables.append(descriptor)
 
     # Runntine tests

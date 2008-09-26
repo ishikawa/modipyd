@@ -52,8 +52,9 @@ class Monitor(object):
                 for desc in descriptors.itervalues():
                     if desc.update():
                         yield desc
-        finally:
+        except:
             self.monitoring = False
+            raise
 
     def stop(self):
         self.monitoring = False

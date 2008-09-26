@@ -70,7 +70,8 @@ def has_subclass(module_descriptor, baseclass):
             parent = split_module_name(import_[1])[0]
             if parent:
                 name = '.'.join((parent, name))
-            name = resolve_relative_modulename(name, modcode.package_name, import_[2])
+            name = resolve_relative_modulename(
+                name, modcode.package_name, import_[2])
 
             assert '.' in name, "names must be a qualified name"
             LOGGER.debug("'%s' is derived from "

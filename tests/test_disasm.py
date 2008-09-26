@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 import unittest
+from modipyd import HAS_RELATIVE_IMPORTS
 from modipyd.disasm import ImportDisassembler
 from tests import TestCase
 
 
-class TestModipydImportDisassembler(TestCase):
-
+class DisassemblerTestCase(TestCase):
     def compile(self, src, filename='<string>'):
         return compile(src, filename, 'exec')
 
@@ -15,6 +15,52 @@ class TestModipydImportDisassembler(TestCase):
         disasm = ImportDisassembler()
         self.assertNotNone(disasm)
         return disasm.scan(co)
+
+
+class TestDisassembler25(DisassemblerTestCase):
+
+    def test_relative_import_with_modulename(self):
+        imports = self.compile_scan("from . A import B")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('B', imports[0][0])
+        self.assertEqual('A.B', imports[0][1])
+        self.assertEqual(1, imports[0][2])
+
+        imports = self.compile_scan("from .. A import B")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('B', imports[0][0])
+        self.assertEqual('A.B', imports[0][1])
+        self.assertEqual(2, imports[0][2])
+
+    def test_relative_import_without_modulename(self):
+        imports = self.compile_scan("from . import A")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('A', imports[0][0])
+        self.assertEqual('A', imports[0][1])
+        self.assertEqual(1, imports[0][2])
+
+        imports = self.compile_scan("from .. import A")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('A', imports[0][0])
+        self.assertEqual('A', imports[0][1])
+        self.assertEqual(2, imports[0][2])
+
+    def test_relative_import_without_modulename_as(self):
+        imports = self.compile_scan("from .. import A as b")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('b', imports[0][0])
+        self.assertEqual('A', imports[0][1])
+        self.assertEqual(2, imports[0][2])
+
+    def test_future(self):
+        imports = self.compile_scan("from __future__ import absolute_import")
+        self.assertEqual(1, len(imports))
+        self.assertEqual('absolute_import', imports[0][0])
+        self.assertEqual('__future__.absolute_import', imports[0][1])
+        self.assertEqual(0, imports[0][2])
+
+
+class TestDisassembler(DisassemblerTestCase):
 
     def test_simple(self):
         imports = self.compile_scan("import os")
@@ -107,46 +153,6 @@ def fn():
         self.assertEqual('os.path.*', imports[0][1])
         self.assertEqual(-1, imports[0][2])
 
-    def test_relative_import_with_modulename(self):
-        imports = self.compile_scan("from . A import B")
-        self.assertEqual(1, len(imports))
-        self.assertEqual('B', imports[0][0])
-        self.assertEqual('A.B', imports[0][1])
-        self.assertEqual(1, imports[0][2])
-
-        imports = self.compile_scan("from .. A import B")
-        self.assertEqual(1, len(imports))
-        self.assertEqual('B', imports[0][0])
-        self.assertEqual('A.B', imports[0][1])
-        self.assertEqual(2, imports[0][2])
-
-    def test_relative_import_without_modulename(self):
-        imports = self.compile_scan("from . import A")
-        self.assertEqual(1, len(imports))
-        self.assertEqual('A', imports[0][0])
-        self.assertEqual('A', imports[0][1])
-        self.assertEqual(1, imports[0][2])
-
-        imports = self.compile_scan("from .. import A")
-        self.assertEqual(1, len(imports))
-        self.assertEqual('A', imports[0][0])
-        self.assertEqual('A', imports[0][1])
-        self.assertEqual(2, imports[0][2])
-
-    def test_relative_import_without_modulename_as(self):
-        imports = self.compile_scan("from .. import A as b")
-        self.assertEqual(1, len(imports))
-        self.assertEqual('b', imports[0][0])
-        self.assertEqual('A', imports[0][1])
-        self.assertEqual(2, imports[0][2])
-
-    def test_future(self):
-        imports = self.compile_scan("from __future__ import absolute_import")
-        self.assertEqual(1, len(imports))
-        self.assertEqual('absolute_import', imports[0][0])
-        self.assertEqual('__future__.absolute_import', imports[0][1])
-        self.assertEqual(0, imports[0][2])
-
     def test_django_contrib_gis_tests_test_gdal_geom(self):
         imports = self.compile_scan("""
 from django.contrib.gis.tests.geometries import *
@@ -159,6 +165,9 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual('django.contrib.gis.tests.geometries.*', imports[0][1])
         self.assertEqual(-1, imports[0][2])
 
+
+if not HAS_RELATIVE_IMPORTS:
+    del TestDisassembler25
 
 if __name__ == '__main__':
     unittest.main()

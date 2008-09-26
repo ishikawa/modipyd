@@ -25,7 +25,7 @@ def has_subclass(module_descriptor, baseclass):
 
     if not isinstance(baseclass, (type, types.ClassType)):
         raise TypeError(
-            "The baseclass argument must be instance of type of class, "
+            "The baseclass argument must be instance of type or class, "
             "but was instance of %s" % type(baseclass))
 
     modcode = module_descriptor.module_code

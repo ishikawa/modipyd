@@ -28,6 +28,10 @@ class TestAnalysisModule(TestCase):
     def tearDown(self):
         sys.path = self.syspath
 
+    def test_illegal_argument(self):
+        mod = self.descriptors['tests_module']
+        self.assertRaises(TypeError, has_subclass, mod, 12345)
+
     def test_module_in_package(self):
         mod = self.descriptors['tests_module']
         self.assert_(has_subclass(mod, unittest.TestCase))

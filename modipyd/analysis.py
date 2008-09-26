@@ -68,10 +68,20 @@ def has_subclass(module_descriptor, baseclass):
             names = []
             parent = split_module_name(import_[1])[0]
             level = import_[2]
+
+            def resolve_relative_modulename(modulename, package, level):
+                if level <= 0:
+                    return modulename
+                else:
+
+                    i = package.rfind('.')
+                    return None
+
             if level > 0:
                 # Relative imports
                 packages = modcode.package_name.split('.')
                 names.extend(packages[:len(packages) - (level-1)])
+                print packages, names, resolve_relative_modulename(base, modcode.package_name, level)
             if parent:
                 names.extend(parent.split('.'))
             names.append(base)

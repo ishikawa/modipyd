@@ -17,6 +17,8 @@ class TestAnalysisModule(TestCase):
         self.descriptors = build_module_descriptors(codes)
 
     def test_module_in_package(self):
+        mod = self.descriptors['tests']
+        self.assert_(has_subclass(mod, unittest.TestCase))
         mod = self.descriptors['tests.a']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
@@ -26,6 +28,9 @@ class TestAnalysisModule(TestCase):
 
     def test_package_relative_imports(self):
         mod = self.descriptors['tests.B.b']
+        self.assert_(has_subclass(mod, unittest.TestCase))
+
+        mod = self.descriptors['tests.B.b2']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
         mod = self.descriptors['tests.B']

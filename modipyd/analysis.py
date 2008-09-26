@@ -97,3 +97,8 @@ def has_subclass(module_descriptor, baseclass):
                         issubclass(klass, baseclass))
 
     return False
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

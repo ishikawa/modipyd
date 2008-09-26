@@ -58,3 +58,8 @@ class Monitor(object):
 
     def stop(self):
         self.monitoring = False
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

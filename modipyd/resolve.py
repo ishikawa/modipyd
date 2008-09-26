@@ -149,3 +149,8 @@ class ModuleNameResolver(object):
             return skipped_name, package_name
         else:
             raise ImportError("No module name found: %s" % filepath)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

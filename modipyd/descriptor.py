@@ -152,12 +152,13 @@ class ModuleDescriptor(object):
                 LOGGER.warn("SyntaxError found in %s" % self.filename,
                     exc_info=True)
             else:
-                self.update_dependency()
+                self.update_dependencies()
                 return True
         return False
 
-    def update_dependency(self):
-        pass
+    def update_dependencies(self):
+        LOGGER.debug("Update dependencies %s" % str(self))
+        LOGGER.info("Dependencies updated:\n%s" % self.describe())
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""
@@ -177,10 +178,11 @@ class ModuleDescriptor(object):
 
     def walk(self):
         """
-        Walking dependency graph in imported module to
-        module imports order (includes itself).
+        Walking dependency graph in an imported module
+        (self included) to a module imports order
         """
         yield self
+
         # Use Breadth First Search (BFS) algorithm
         vqueue = [self]
         discovered = set(vqueue)

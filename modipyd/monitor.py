@@ -15,8 +15,6 @@ import time
 
 from modipyd import LOGGER
 from modipyd import utils
-from modipyd.module import collect_module_code
-from modipyd.descriptor import build_module_descriptors
 
 
 class Monitor(object):
@@ -31,12 +29,49 @@ class Monitor(object):
         assert not isinstance(self.paths, basestring)
         self.search_path = search_path
         self.monitoring = False
+        self.__descriptors = None
 
+    @property
+    def descriptors(self):
+        if self.__descriptors is None:
+            from modipyd.module import collect_module_code
+            from modipyd.descriptor import build_module_descriptors
+
+            codes = list(collect_module_code(self.paths, self.search_path))
+            self.__descriptors = build_module_descriptors(codes)
+
+        return self.__descriptors
+
+    def monitor(self):
+        descriptors = self.descriptors
+        modifieds = []
+        removals = []
+
+        for name, desc in descriptors.iteritems():
+            try:
+                if desc.modified():
+                    desc.reload(descriptors)
+                    modifieds.append(desc)
+            except os.error, e:
+                if e.errno == ENOENT:
+                    # No such file
+                    LOGGER.info("Removed:\n%s" % desc)
+                    removals.append(name)
+                else:
+                    raise
+
+        # Remove removal entries
+        for name in removals:
+            if name not in descriptors:
+                continue
+            desc = descriptors[name]
+            desc.clear_dependencies()
+            del descriptors[name]
+
+        return modifieds
 
     def start(self):
-        module_codes = list(
-            collect_module_code(self.paths, self.search_path))
-        descriptors = build_module_descriptors(module_codes)
+        descriptors = self.descriptors
 
         # Logging
         if LOGGER.isEnabledFor(logging.INFO):
@@ -52,29 +87,10 @@ class Monitor(object):
             self.monitoring = True
             while descriptors and self.monitoring:
                 time.sleep(1)
-
-                removals = []
-                for name, desc in descriptors.iteritems():
-                    try:
-                        if desc.modified():
-                            desc.reload(descriptors)
-                            yield desc
-                    except os.error, e:
-                        if e.errno == ENOENT:
-                            # No such file
-                            LOGGER.info("Removed:\n%s" % desc)
-                            removals.append(name)
-                        else:
-                            raise
-
-                # Remove removal entries
-                for name in removals:
-                    if name not in descriptors:
-                        continue
-                    desc = descriptors[name]
-                    desc.clear_dependencies()
-                    del descriptors[name]
-
+                for modified in self.monitor():
+                    yield modified
+            else:
+                LOGGER.info("Terminating monitor %s" % str(self))
         except:
             self.monitoring = False
             raise

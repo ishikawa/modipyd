@@ -104,6 +104,21 @@ class TestModuleDescriptorDependency(TestCase):
         self.assertEqual(descriptors['cycles.e'], dep.next())
         self.assertRaises(StopIteration, dep.next)
 
+    def test_package_dependency(self):
+        codes = list(collect_module_code(
+            join(FILES_DIR, 'package_dependency'),
+            [FILES_DIR]))
+        descriptors = build_module_descriptors(codes)
+
+        init = descriptors['package_dependency']
+        a = descriptors['package_dependency.a']
+        self.assertNotNone(init)
+        self.assertNotNone(a)
+
+        self.assert_(a in init.dependencies)
+        self.assert_(init in a.reverse_dependencies)
+        self.assertEqual(0, len(a.dependencies))
+
 
 if not HAS_RELATIVE_IMPORTS:
     del TestModuleDescriptorRelativeImports

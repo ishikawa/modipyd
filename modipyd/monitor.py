@@ -50,7 +50,8 @@ class Monitor(object):
             while descriptors and self.monitoring:
                 time.sleep(1)
                 for desc in descriptors.itervalues():
-                    if desc.update():
+                    if desc.modified():
+                        desc.reload(descriptors)
                         yield desc
         except:
             self.monitoring = False

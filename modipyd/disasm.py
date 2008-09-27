@@ -131,7 +131,7 @@ class ImportDisassembler(object):
             #   (1) The level of relative imports
             #   (2) A tuple of "from" names, or None for regular import.
             #       The tuple may contain "*" for "from <mod> import *"
-            # print"LOAD_CONST", co.co_consts[argc]
+            #print "LOAD_CONST", co.co_consts[argc]
             self.consts.append(co.co_consts[argc])
         elif LOAD_ATTR == op:
             # import os.path as os_path
@@ -141,7 +141,7 @@ class ImportDisassembler(object):
             # 12 STORE_NAME               2 (os_path)
             # ...
             attr = co.co_names[argc]
-            # print"LOAD_CONST", attr
+            #print "LOAD_CONST", attr
             if self.import_name and self.store < len(self.fqn):
                 assert self.fqn[self.store] == attr, \
                     "LOAD_ATTR '%s' must equal to '%s' in %s (at %s)" % \
@@ -151,7 +151,7 @@ class ImportDisassembler(object):
                 self.store += 1
 
         elif IMPORT_NAME == op:
-            # print"IMPORT_NAME", co.co_names[argc]
+            #print "IMPORT_NAME", co.co_names[argc]
             assert len(self.consts) >= 1
             self.import_name = co.co_names[argc]
             self.fqn = self.import_name.split('.')
@@ -171,13 +171,13 @@ class ImportDisassembler(object):
             self.clear_states()
 
         elif STORE_NAME == op:
-            # print"STORE_NAME", co.co_names[argc]
+            #print "STORE_NAME", co.co_names[argc]
             self.store_name(co.co_names[argc])
         elif STORE_FAST == op:
-            # print"STORE_FAST", co.co_varnames[argc]
+            #print "STORE_FAST", co.co_varnames[argc]
             self.store_name(co.co_varnames[argc])
         elif STORE_DEREF == op:
-            # print"STORE_DEREF", co.co_cellvars[argc]
+            #print "STORE_DEREF", co.co_cellvars[argc]
             self.store_name(co.co_cellvars[argc])
 
         elif POP_TOP == op:
@@ -212,6 +212,7 @@ class ImportDisassembler(object):
             symbol = self.fqn[self.store:]
             symbol.insert(0, name)
             self.imports.append(('.'.join(symbol), '.'.join(self.fqn), level))
+            #print "-> import %s" % str(self.imports[-1])
             self.clear_states()
         else:
             # from ... import ...
@@ -223,6 +224,7 @@ class ImportDisassembler(object):
             else:
                 fqn = self.fromname
             self.imports.append((name, fqn, level))
+            #print "-> import %s" % str(self.imports[-1])
             self.fromname = None
 
 

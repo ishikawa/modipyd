@@ -14,59 +14,70 @@ from modipyd.utils import OrderedSet
 from modipyd.resolve import resolve_relative_modulename
 
 
-def build_module_descriptors(module_codes):
+def update_dependencies(descriptor, descriptor_space):
+    pass
 
-    def import_name_candidates(import_names):
-        candidates = []
-        for name in import_names:
-            if name not in descriptors:
-                # The qualified name referes a property
-                # of the module, so it depends imporintg module.
-                candidates.append(utils.split_module_name(name)[0])
-            else:
-                candidates.append(name)
-        return candidates
+def update_module_dependencies(descriptors):
+
+    def _modulename(name):
+        if name not in descriptors and '.' in name:
+            # The qualified name maybe refere a property
+            # of the module, so it depends that module.
+            module_name = utils.split_module_name(name)[0]
+            assert module_name
+            return module_name
+        else:
+            return name
 
     def analyze_dependent_names(descriptor):
+        #print "analyze_dependent_names: %s" % descriptor.name
         for imp in descriptor.module_code.imports:
+            #print "  import: %s" % str(imp)
             # name is the fully qualified name
             name, level = imp[1], imp[2]
             assert name and level is not None
 
+            modulename = name
             if level == 0:
                 # 0 means only perform absolute imports
-                for item in import_name_candidates([name]):
-                    yield item
+                modulename = _modulename(name)
             elif level == -1:
                 # -1 which indicates both absolute and relative imports
                 # will be attempted
-                names = []
-                if descriptor.package_name:
-                    names.append('.'.join((descriptor.package_name, name)))
-                names.append(name)
 
-                for item in import_name_candidates(names):
-                    yield item
+                # Implicit relative import
+                if descriptor.package_name:
+                    modulename = '.'.join((descriptor.package_name, name))
+                    if modulename not in descriptors and '.' in name:
+                        modulename = _modulename(modulename)
+
+                # Implicit relative import failed
+                if modulename not in descriptors:
+                    modulename = _modulename(name)
 
             else:
                 # Relative imports
                 assert descriptor.package_name
-                resolved_name = resolve_relative_modulename(
+                modulename = resolve_relative_modulename(
                     name, descriptor.package_name, level)
-                for item in import_name_candidates([resolved_name]):
-                    yield item
+                modulename = _modulename(modulename)
 
-    # Construct ``ModuleDescriptor`` mappings
-    descriptors = dict([
-        (code.name, ModuleDescriptor(code))
-        for code in module_codes])
+            if modulename in descriptors:
+                yield modulename
 
     # Dependency Analysis
     for descriptor in descriptors.itervalues():
         for name in analyze_dependent_names(descriptor):
-            if name in descriptors:
-                descriptor.add_dependency(descriptors[name])
+            #print "  -> dependent: ", name
+            descriptor.add_dependency(descriptors[name])
 
+
+def build_module_descriptors(module_codes):
+    # Construct ``ModuleDescriptor`` mappings
+    descriptors = dict([
+        (code.name, ModuleDescriptor(code))
+        for code in module_codes])
+    update_module_dependencies(descriptors)
     return descriptors
 
 
@@ -76,7 +87,7 @@ class ModuleDescriptor(object):
         super(ModuleDescriptor, self).__init__()
         self.__module_code = module_code
         self.__mtime = None
-        self.update_mtime()
+        self.modified()
 
         self.__dependencies = OrderedSet()
         self.__reverse_dependencies = OrderedSet()
@@ -139,28 +150,27 @@ class ModuleDescriptor(object):
     def filename(self):
         return self.module_code.filename
 
-    def update(self):
-        if self.update_mtime():
-            LOGGER.info(
-                "Reload module descriptor '%s' at %s" % \
-                (self.name, self.filename))
+    def reload(self, descriptors):
+        """
+        Reload module code, update dependency graph
+        """
+        LOGGER.info(
+            "Reload module descriptor '%s' at %s" % \
+            (self.name, self.filename))
 
-            try:
-                self.module_code.reload()
-            except SyntaxError:
-                # SyntaxError is OK
-                LOGGER.warn("SyntaxError found in %s" % self.filename,
-                    exc_info=True)
-            else:
-                self.update_dependencies()
-                return True
-        return False
+        try:
+            self.module_code.reload()
+        except SyntaxError:
+            # SyntaxError is OK
+            LOGGER.warn("SyntaxError found in %s" % self.filename,
+                exc_info=True)
+        else:
+            self.update_dependencies(descriptors)
 
-    def update_dependencies(self):
-        LOGGER.debug("Update dependencies %s" % str(self))
-        LOGGER.info("Dependencies updated:\n%s" % self.describe())
+    def update_dependencies(self, descriptors):
+        update_dependencies(self, descriptors)
 
-    def update_mtime(self):
+    def modified(self):
         """Update modification time and return ``True`` if modified"""
         mtime = None
         try:

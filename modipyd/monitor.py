@@ -19,10 +19,6 @@ from modipyd.module import collect_module_code
 from modipyd.descriptor import build_module_descriptors
 
 
-def monitor(filepath_or_list):
-    return Monitor(filepath_or_list).start()
-
-
 class Monitor(object):
     """
     This class provides an interface to the mechanisms

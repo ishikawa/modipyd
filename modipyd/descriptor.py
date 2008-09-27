@@ -177,7 +177,7 @@ class ModuleDescriptor(object):
 
     def modified(self):
         """Update modification time and return ``True`` if modified"""
-        mtime = None
+        mtime = self.__mtime
         try:
             mtime = os.path.getmtime(self.filename)
             return self.__mtime is None or mtime > self.__mtime

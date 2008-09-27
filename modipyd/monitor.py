@@ -25,16 +25,18 @@ class Monitor(object):
     used to monitor Python module file modifications.
     """
 
-    def __init__(self, filepath_or_list):
+    def __init__(self, filepath_or_list, search_path=None):
         super(Monitor, self).__init__()
         self.paths = utils.wrap_sequence(filepath_or_list)
         assert not isinstance(self.paths, basestring)
+        self.search_path = search_path
         self.descriptors = {}
         self.monitoring = False
 
 
     def start(self):
-        module_codes = list(collect_module_code(self.paths))
+        module_codes = list(
+            collect_module_code(self.paths, self.search_path))
         descriptors = build_module_descriptors(module_codes)
         self.descriptors = descriptors
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import time
+import os
 from os.path import join, exists
 
 from tests import TestCase, FILES_DIR
@@ -50,11 +51,15 @@ class TestMonitor(TestCase):
         f = open(join(PRISONERS_DIR, 'b.py'), 'w')
         try:
             f.write("""\
-import prisoners.a
 money = 4321.09
 """)
         finally:
             f.close()
+
+        # c.py
+        path = join(PRISONERS_DIR, 'c.py')
+        if exists(path):
+            os.remove(path)
 
     def setUp(self):
         self.mkfiles()
@@ -72,12 +77,13 @@ money = 4321.09
     def test_modified(self):
         modified = self.monitor.monitor()
         self.assertEqual(0, len(modified))
-        time.sleep(1.5)
+        time.sleep(1)
 
         # modify
         f = open(join(PRISONERS_DIR, 'b.py'), 'w')
         f.write("")
         f.close()
+        time.sleep(0.1)
 
         modified = self.monitor.monitor()
         self.assertEqual(1, len(modified))
@@ -86,6 +92,13 @@ money = 4321.09
         self.assertEqual(0, len(m.dependencies))
         self.assertEqual(1, len(m.reverse_dependencies))
 
+    def test_deleted(self):
+        os.remove(join(PRISONERS_DIR, 'a.py'))
+        time.sleep(0.1)
+        modified = self.monitor.monitor()
+        self.assertEqual(0, len(modified))
+        descriptors = self.monitor.descriptors
+        self.assertEqual(2, len(descriptors))
 
 
 if __name__ == '__main__':

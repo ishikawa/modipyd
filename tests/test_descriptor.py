@@ -110,9 +110,7 @@ class TestModuleDescriptorDependency(TestCase):
 
     def test_update_dependencies(self):
         descriptors = self.descriptors
-        init = descriptors['package_dependency']
         a = descriptors['package_dependency.a']
-        b = descriptors['package_dependency.b']
 
         self.assert_original_depencencies()
         a.update_dependencies(self.descriptors)

@@ -14,7 +14,7 @@ from modipyd.utils import OrderedSet
 from modipyd.resolve import resolve_relative_modulename
 
 
-def update_module_dependencies(module_descriptor, descriptors):
+def _update_module_dependencies(module_descriptor, descriptors):
 
     def _modulename(name):
         if name not in descriptors and '.' in name:
@@ -73,7 +73,7 @@ def update_module_dependencies(module_descriptor, descriptors):
 def build_module_dependencies(descriptors):
     # Dependency Analysis
     for descriptor in descriptors.itervalues():
-        update_module_dependencies(descriptor, descriptors)
+        descriptor.update_dependencies(descriptors)
 
 
 def build_module_descriptors(module_codes):
@@ -154,7 +154,7 @@ class ModuleDescriptor(object):
     def filename(self):
         return self.module_code.filename
 
-    def reload(self, descriptors):
+    def reload(self, descriptors, co=None):
         """
         Reload module code, update dependency graph
         """
@@ -163,17 +163,13 @@ class ModuleDescriptor(object):
             (self.name, self.filename))
 
         try:
-            self.module_code.reload()
+            self.module_code.reload(co)
         except SyntaxError:
             # SyntaxError is OK
             LOGGER.warn("SyntaxError found in %s" % self.filename,
                 exc_info=True)
         else:
             self.update_dependencies(descriptors)
-
-    def update_dependencies(self, descriptors):
-        LOGGER.info("Update dependencies of '%s'" % self.name)
-        update_module_dependencies(self, descriptors)
 
     def modified(self):
         """Update modification time and return ``True`` if modified"""
@@ -194,11 +190,14 @@ class ModuleDescriptor(object):
     def remove_reverse_dependencies(self, descriptor):
         self.__reverse_dependencies.remove(descriptor)
 
+    def update_dependencies(self, descriptors):
+        LOGGER.debug("Update dependencies of '%s'" % self.name)
+        _update_module_dependencies(self, descriptors)
+
     def clear_dependencies(self):
         for d in self.__dependencies:
             d.remove_reverse_dependencies(self)
         self.__dependencies.clear()
-
 
     def walk_dependency_graph(self, reverse=False):
         """

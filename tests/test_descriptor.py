@@ -73,21 +73,72 @@ class TestModuleDescriptorDependency(TestCase):
             join(FILES_DIR, 'package_dependency'),
             [FILES_DIR]))
         self.descriptors = build_module_descriptors(codes)
+        self.assertEqual(3, len(self.descriptors))
 
-    def test_package_dependency(self):
-        descriptors = self.descriptors
+        init = self.descriptors['package_dependency']
+        a = self.descriptors['package_dependency.a']
+        b = self.descriptors['package_dependency.b']
 
-        init = descriptors['package_dependency']
-        a = descriptors['package_dependency.a']
         self.assertNotNone(init)
         self.assertNotNone(a)
+        self.assertNotNone(b)
 
+        self.assertEqual('package_dependency', init.name)
+        self.assertEqual('package_dependency.a', a.name)
+        self.assertEqual('package_dependency.b', b.name)
+
+    def assert_original_depencencies(self):
+        descriptors = self.descriptors
+        init = descriptors['package_dependency']
+        a = descriptors['package_dependency.a']
+        b = descriptors['package_dependency.b']
+
+        self.assertEqual(1, len(init.dependencies))
+        self.assertEqual(0, len(init.reverse_dependencies))
         self.assert_(a in init.dependencies)
-        self.assert_(init in a.reverse_dependencies)
-        self.assertEqual(0, len(a.dependencies))
 
-    def test_updated_dependencies(self):
-        pass
+        self.assertEqual(0, len(a.dependencies))
+        self.assertEqual(2, len(a.reverse_dependencies))
+        self.assert_(init in a.reverse_dependencies)
+
+        self.assertEqual(1, len(b.dependencies))
+        self.assertEqual(0, len(b.reverse_dependencies))
+        self.assert_(a in b.dependencies)
+
+    def test_package_dependency(self):
+        self.assert_original_depencencies()
+
+    def test_update_dependencies(self):
+        descriptors = self.descriptors
+        init = descriptors['package_dependency']
+        a = descriptors['package_dependency.a']
+        b = descriptors['package_dependency.b']
+
+        self.assert_original_depencencies()
+        a.update_dependencies(self.descriptors)
+        self.assert_original_depencencies()
+
+    def test_reload(self):
+        descriptors = self.descriptors
+        init = descriptors['package_dependency']
+        a = descriptors['package_dependency.a']
+        b = descriptors['package_dependency.b']
+
+        # update with empty code
+        co = compile('', '<string>', 'exec')
+        b.reload(descriptors, co)
+
+        self.assertEqual(1, len(init.dependencies))
+        self.assertEqual(0, len(init.reverse_dependencies))
+        self.assert_(a in init.dependencies)
+
+        self.assertEqual(0, len(a.dependencies))
+        self.assertEqual(1, len(a.reverse_dependencies))
+        self.assert_(init in a.reverse_dependencies)
+
+        self.assertEqual(0, len(b.dependencies))
+        self.assertEqual(0, len(b.reverse_dependencies))
+        self.assert_(a not in b.dependencies)
 
 
 class TestModuleDescriptorRelativeImports(TestCase):

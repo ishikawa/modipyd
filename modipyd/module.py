@@ -266,15 +266,16 @@ class ModuleCode(object):
         del self.classdefs[:]
         scan_code(co, self)
 
-    def reload(self):
-        f = self.filename
+    def reload(self, co=None):
+        if co is None:
+            f = self.filename
 
-        if utils.python_source_file(f):
-            co = compile_source(f)
-        elif utils.python_compiled_file(f):
-            co = load_compiled(f)
-        else:
-            raise ImportError("No module named %s at %s" % (self.name, f))
+            if utils.python_source_file(f):
+                co = compile_source(f)
+            elif utils.python_compiled_file(f):
+                co = load_compiled(f)
+            else:
+                raise ImportError("No module named %s at %s" % (self.name, f))
 
         self.update_code(co)
         return co

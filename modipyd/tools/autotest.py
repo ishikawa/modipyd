@@ -130,7 +130,6 @@ def main(options, filepath):
             monitor = Monitor(filepath)
             for modified in monitor.start():
                 LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
-                #modified.reload()
                 observe(modified)
 
         except KeyboardInterrupt:

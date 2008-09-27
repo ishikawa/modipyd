@@ -226,17 +226,6 @@ class ModuleDescriptor(object):
                     L.append(v)
                     yield v
 
-    def import_module(self):
-        try:
-            return utils.import_module(self.name)
-        except ImportError:
-            LOGGER.warn("ImportError occurred while "
-                "importing module '%s'" % (self.name))
-            if (self.filename.endswith('.pyc') or
-                    self.filename.endswith('.pyo')):
-                LOGGER.warn("Suggestion: An orphan file? %s" % self.filename)
-            raise
-
 
 if __name__ == "__main__":
     import doctest

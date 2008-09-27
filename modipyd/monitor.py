@@ -34,13 +34,17 @@ class Monitor(object):
     @property
     def descriptors(self):
         if self.__descriptors is None:
-            from modipyd.module import collect_module_code
-            from modipyd.descriptor import build_module_descriptors
-
-            codes = list(collect_module_code(self.paths, self.search_path))
-            self.__descriptors = build_module_descriptors(codes)
-
+            self.__descriptors = {}
+            self.refresh()
         return self.__descriptors
+
+    def refresh(self):
+        from modipyd.module import collect_module_code
+        from modipyd.descriptor import build_module_descriptors
+
+        codes = list(collect_module_code(self.paths, self.search_path))
+        self.__descriptors.clear()
+        self.__descriptors.update(build_module_descriptors(codes))
 
     def monitor(self):
         descriptors = self.descriptors

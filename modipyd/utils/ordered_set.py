@@ -68,7 +68,10 @@ class OrderedSet(object):
             curnode = curnode.next
 
     def extend(self, iterable):
-        """Extend the right side of the OrderedSet with elements from the iterable."""
+        """
+        Extend the right side of the OrderedSet with
+        elements from the iterable.
+        """
         self.update(iterable)
 
     def append(self, element):

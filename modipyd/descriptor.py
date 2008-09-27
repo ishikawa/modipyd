@@ -149,7 +149,6 @@ class ModuleDescriptor(object):
                 self.module_code.reload()
             except SyntaxError:
                 # SyntaxError is OK
-                code = None
                 LOGGER.warn("SyntaxError found in %s" % self.filename,
                     exc_info=True)
             else:

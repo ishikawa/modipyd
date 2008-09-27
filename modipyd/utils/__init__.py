@@ -9,6 +9,7 @@ import os
 import sys
 import stat
 
+# pylint: disable-msg=W0401
 # Make 'from modipyd.utils import OrderedSet' statement works
 from modipyd.utils.ordered_set import *
 

@@ -23,46 +23,7 @@ class TestModuleDescriptor(TestCase):
         self.assertEqual(filepath, descriptor.filename)
 
 
-class TestModuleDescriptorRelativeImports(TestCase):
-
-    def setUp(self):
-        d = join(FILES_DIR, 'imports')
-        codes = list(collect_module_code(d, [d]))
-        self.descriptors = build_module_descriptors(codes)
-        self.assertEqual(8, len(self.descriptors))
-
-    def test_imports(self):
-        a = self.descriptors['A.a']
-        self.assertEqual(1, len(a.dependencies))
-        self.assertEqual(
-            self.descriptors['A.B'],
-            a.dependencies[0])
-
-    def test_relative_imports(self):
-        b = self.descriptors['A.B.b']
-        self.assertEqual(1, len(b.dependencies))
-        self.assertEqual(
-            self.descriptors['A.B.C'],
-            b.dependencies[0])
-
-        B = self.descriptors['A.B']
-        self.assertEqual(1, len(B.dependencies))
-        self.assertEqual(
-            self.descriptors['A.B.C'],
-            B.dependencies[0])
-
-    def test_relative_imports_level(self):
-        c = self.descriptors['A.B.C.c']
-        self.assertEqual(2, len(c.dependencies))
-        self.assertEqual(
-            self.descriptors['A.B.C'],
-            c.dependencies[0])
-        self.assertEqual(
-            self.descriptors['A.B.D'],
-            c.dependencies[1])
-
-
-class TestModuleDescriptorDependency(TestCase):
+class TestModuleDescriptorCycleDependency(TestCase):
 
     def setUp(self):
         codes = list(collect_module_code(
@@ -104,11 +65,17 @@ class TestModuleDescriptorDependency(TestCase):
         self.assertEqual(descriptors['cycles.e'], dep.next())
         self.assertRaises(StopIteration, dep.next)
 
-    def test_package_dependency(self):
+
+class TestModuleDescriptorDependency(TestCase):
+
+    def setUp(self):
         codes = list(collect_module_code(
             join(FILES_DIR, 'package_dependency'),
             [FILES_DIR]))
-        descriptors = build_module_descriptors(codes)
+        self.descriptors = build_module_descriptors(codes)
+
+    def test_package_dependency(self):
+        descriptors = self.descriptors
 
         init = descriptors['package_dependency']
         a = descriptors['package_dependency.a']
@@ -118,6 +85,48 @@ class TestModuleDescriptorDependency(TestCase):
         self.assert_(a in init.dependencies)
         self.assert_(init in a.reverse_dependencies)
         self.assertEqual(0, len(a.dependencies))
+
+    def test_updated_dependencies(self):
+        pass
+
+
+class TestModuleDescriptorRelativeImports(TestCase):
+
+    def setUp(self):
+        d = join(FILES_DIR, 'imports')
+        codes = list(collect_module_code(d, [d]))
+        self.descriptors = build_module_descriptors(codes)
+        self.assertEqual(8, len(self.descriptors))
+
+    def test_imports(self):
+        a = self.descriptors['A.a']
+        self.assertEqual(1, len(a.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B'],
+            a.dependencies[0])
+
+    def test_relative_imports(self):
+        b = self.descriptors['A.B.b']
+        self.assertEqual(1, len(b.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B.C'],
+            b.dependencies[0])
+
+        B = self.descriptors['A.B']
+        self.assertEqual(1, len(B.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B.C'],
+            B.dependencies[0])
+
+    def test_relative_imports_level(self):
+        c = self.descriptors['A.B.C.c']
+        self.assertEqual(2, len(c.dependencies))
+        self.assertEqual(
+            self.descriptors['A.B.C'],
+            c.dependencies[0])
+        self.assertEqual(
+            self.descriptors['A.B.D'],
+            c.dependencies[1])
 
 
 if not HAS_RELATIVE_IMPORTS:

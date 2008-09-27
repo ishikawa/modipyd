@@ -235,7 +235,7 @@ class TestResolveModulename(TestCase):
                 search_path))
         self.assertEqual("modipyd.utils", 
             utils.resolve_modulename(
-                join(top, "modipyd/utils.py"),
+                join(top, "modipyd/utils/__init__.py"),
                 search_path))
         self.assertEqual("modipyd.tools", 
             utils.resolve_modulename(

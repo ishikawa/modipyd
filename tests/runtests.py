@@ -33,7 +33,12 @@ for dirpath, dirnames, filenames in os.walk(dirname(__file__)):
 # doctest
 for modcode in collect_module_code(join(dirname(__file__), '..', 'modipyd')):
     module = import_module(modcode.name)
-    tests.addTest(doctest.DocTestSuite(module))
+    try:
+        suite = doctest.DocTestSuite(module)
+    except ValueError:
+        pass
+    else:
+        tests.addTest(suite)
 
 
 if __name__ == '__main__':

@@ -9,6 +9,9 @@ import os
 import sys
 import stat
 
+# Make 'from modipyd.utils import OrderedSet' statement works
+from modipyd.utils.ordered_set import *
+
 
 def wrap_sequence(obj, sequence_type=tuple):
     """

@@ -2,7 +2,8 @@
 
 import unittest
 
-from modipyd.descriptor import OrderedSet
+#from modipyd.descriptor import OrderedSet
+from modipyd.utils import OrderedSet
 from tests import TestCase
 
 

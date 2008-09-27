@@ -10,6 +10,7 @@ for managing annotations of module.
 
 import os
 from modipyd import LOGGER, utils
+from modipyd.utils import OrderedSet
 from modipyd.resolve import resolve_relative_modulename
 
 
@@ -67,52 +68,6 @@ def build_module_descriptors(module_codes):
                 descriptor.add_dependency(descriptors[name])
 
     return descriptors
-
-
-class OrderedSet(object):
-
-    def __init__(self, items=None):
-        super(OrderedSet, self).__init__()
-        self.__items = []
-        self.__set = set()
-        self.update(items or ())
-
-    def __len__(self):
-        return len(self.__items)
-
-    def __getitem__(self, i):
-        return self.__items[i]
-
-    def __iter__(self):
-        return iter(self.__items)
-
-    def __contains__(self, item):
-        return item in self.__set
-
-    def __str__(self):
-        return str(self.__items)
-
-    def __repr__(self):
-        return repr(self.__items)
-
-    def update(self, items):
-        for i in items:
-            self.add(i)
-
-    def add(self, item):
-        if item not in self.__set:
-            self.__items.append(item)
-            self.__set.add(item)
-
-    append = add
-
-    def remove(self, item):
-        self.__items.remove(item)
-        self.__set.remove(item)
-
-    def clear(self):
-        self.__items[:] = []
-        self.__set.clear()
 
 
 class ModuleDescriptor(object):

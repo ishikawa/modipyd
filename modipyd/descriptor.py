@@ -216,14 +216,14 @@ class ModuleDescriptor(object):
         """
         yield self
         # Use Breadth First Search (BFS) algorithm
-        L = [self]
-        discovered = set(L)
-        while L:
-            u = L.pop()
+        vqueue = [self]
+        discovered = set(vqueue)
+        while vqueue:
+            u = vqueue.pop()
             for v in u.reverse_dependencies:
                 if v not in discovered:
                     discovered.add(v)
-                    L.append(v)
+                    vqueue.append(v)
                     yield v
 
 

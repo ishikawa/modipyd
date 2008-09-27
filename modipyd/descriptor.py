@@ -14,10 +14,7 @@ from modipyd.utils import OrderedSet
 from modipyd.resolve import resolve_relative_modulename
 
 
-def update_dependencies(descriptor, descriptor_space):
-    pass
-
-def update_module_dependencies(descriptors):
+def update_module_dependencies(module_descriptor, descriptors):
 
     def _modulename(name):
         if name not in descriptors and '.' in name:
@@ -29,7 +26,7 @@ def update_module_dependencies(descriptors):
         else:
             return name
 
-    def analyze_dependent_names(descriptor):
+    def _dependent_names(descriptor):
         #print "analyze_dependent_names: %s" % descriptor.name
         for imp in descriptor.module_code.imports:
             #print "  import: %s" % str(imp)
@@ -66,10 +63,17 @@ def update_module_dependencies(descriptors):
                 yield modulename
 
     # Dependency Analysis
+    module_descriptor.clear_dependencies()
+    for dependent_name in _dependent_names(module_descriptor):
+        #print "  -> dependent: ", name
+        module_descriptor.add_dependency(
+                descriptors[dependent_name])
+
+
+def build_module_dependencies(descriptors):
+    # Dependency Analysis
     for descriptor in descriptors.itervalues():
-        for name in analyze_dependent_names(descriptor):
-            #print "  -> dependent: ", name
-            descriptor.add_dependency(descriptors[name])
+        update_module_dependencies(descriptor, descriptors)
 
 
 def build_module_descriptors(module_codes):
@@ -77,7 +81,7 @@ def build_module_descriptors(module_codes):
     descriptors = dict([
         (code.name, ModuleDescriptor(code))
         for code in module_codes])
-    update_module_dependencies(descriptors)
+    build_module_dependencies(descriptors)
     return descriptors
 
 
@@ -168,7 +172,8 @@ class ModuleDescriptor(object):
             self.update_dependencies(descriptors)
 
     def update_dependencies(self, descriptors):
-        update_dependencies(self, descriptors)
+        LOGGER.info("Update dependencies of '%s'" % self.name)
+        update_module_dependencies(self, descriptors)
 
     def modified(self):
         """Update modification time and return ``True`` if modified"""
@@ -185,6 +190,15 @@ class ModuleDescriptor(object):
 
     def add_reverse_dependency(self, descriptor):
         self.__reverse_dependencies.append(descriptor)
+
+    def remove_reverse_dependencies(self, descriptor):
+        self.__reverse_dependencies.remove(descriptor)
+
+    def clear_dependencies(self):
+        for d in self.__dependencies:
+            d.remove_reverse_dependencies(self)
+        self.__dependencies.clear()
+
 
     def walk_dependency_graph(self, reverse=False):
         """

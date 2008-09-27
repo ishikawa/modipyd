@@ -179,22 +179,27 @@ def collect_module_code(filepath_or_list, search_path=None):
                     code = load_compiled(sourcepath)
             else:
                 assert False, "illegal typebits"
+        except SyntaxError:
+            # SyntaxError is OK
+            code = None
+            LOGGER.warn("SyntaxError found in %s" % sourcepath,
+                exc_info=True)
         except StandardError:
-            # ignore
-            LOGGER.warn(
-                "Can't load compiled .pyc file: %s" % sourcepath,
+            # ignore file
+            LOGGER.warn("Exception occurred while "
+                "loading compiled bytecode at %s" % sourcepath,
                 exc_info=True)
             continue
+
+        # module name
+        try:
+            module_name, package_name = resolver.resolve(sourcepath)
+        except ImportError:
+            LOGGER.debug(
+                "Couldn't import file at %s, ignore" % sourcepath,
+                exc_info=True)
         else:
-            # module name
-            try:
-                module_name, package_name = resolver.resolve(sourcepath)
-            except ImportError:
-                LOGGER.debug(
-                    "Couldn't import file at %s, ignore" % sourcepath,
-                    exc_info=True)
-            else:
-                yield ModuleCode(module_name, package_name, sourcepath, code)
+            yield ModuleCode(module_name, package_name, sourcepath, code)
 
 def read_module_code(filepath, search_path=None):
     if not isinstance(filepath, basestring):
@@ -250,7 +255,11 @@ class ModuleCode(object):
 
         self.imports = []
         self.classdefs = []
-        self.update_code(code)
+        if code is None:
+            # Maybe source file contains SyntaxError?
+            pass
+        else:
+            self.update_code(code)
 
     def update_code(self, co):
         del self.imports[:]
@@ -271,7 +280,7 @@ class ModuleCode(object):
         return co
 
     def __str__(self):
-        return "<module '%s' (%s)>" % (self.name, self.filename)
+        return "<ModuleCode '%s' (%s)>" % (self.name, self.filename)
 
     def __eq__(self, other):
         return (self is other or

@@ -82,7 +82,7 @@ class ModuleDescriptor(object):
         self.__reverse_dependencies = OrderedSet()
 
     def __str__(self):
-        return str(self.module_code)
+        return "<ModuleDescriptor '%s' (%s)>" % (self.name, self.filename)
 
     def __eq__(self, other):
         return (self is other or
@@ -144,9 +144,21 @@ class ModuleDescriptor(object):
             LOGGER.info(
                 "Reload module descriptor '%s' at %s" % \
                 (self.name, self.filename))
-            self.module_code.reload()
-            return True
+
+            try:
+                self.module_code.reload()
+            except SyntaxError:
+                # SyntaxError is OK
+                code = None
+                LOGGER.warn("SyntaxError found in %s" % self.filename,
+                    exc_info=True)
+            else:
+                self.update_dependency()
+                return True
         return False
+
+    def update_dependency(self):
+        pass
 
     def update_mtime(self):
         """Update modification time and return ``True`` if modified"""

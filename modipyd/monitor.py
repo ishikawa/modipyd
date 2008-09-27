@@ -46,12 +46,21 @@ class Monitor(object):
         self.__descriptors.clear()
         self.__descriptors.update(build_module_descriptors(codes))
 
+    def remove(self, descriptor):
+        if descriptor.name not in self.descriptors:
+            raise KeyError(
+                "No monitoring descriptor '%s'" % \
+                descriptor.name)
+
+        descriptor.clear_dependencies()
+        del self.descriptors[descriptor.name]
+
     def monitor(self):
         descriptors = self.descriptors
         modifieds = []
         removals = []
 
-        for name, desc in descriptors.iteritems():
+        for desc in descriptors.itervalues():
             try:
                 if desc.modified():
                     desc.reload(descriptors)
@@ -60,18 +69,20 @@ class Monitor(object):
                 if e.errno == ENOENT:
                     # No such file
                     LOGGER.info("Removed:\n%s" % desc)
-                    removals.append(name)
+                    removals.append(desc)
                 else:
                     raise
 
         # Remove removal entries
-        for name in removals:
-            if name not in descriptors:
-                continue
-            desc = descriptors[name]
-            desc.clear_dependencies()
-            del descriptors[name]
+        for desc in removals:
+            try:
+                self.remove(desc)
+            except KeyError:
+                LOGGER.debug(
+                    "No monitoring descriptor '%s' for removal" % desc.name,
+                    exc_info=True)
 
+        del removals
         return modifieds
 
     def start(self):

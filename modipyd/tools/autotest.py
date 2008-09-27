@@ -58,11 +58,17 @@ def run_unittest(suite):
         runner = unittest.TextTestRunner()
         runner.run(suite)
 
-def spawn_unittest_runner(testables):
+def spawn_unittest_runner(testables, extra_arguments=None):
+    """
+    Spawn process with testables modules as '-x' arguments.
+    """
     args = [sys.executable] + sys.argv
     for t in testables:
         args.append("-x")
         args.append(t.name)
+
+    if extra_arguments:
+        args.extend(extra_arguments)
 
     if sys.platform == "win32":
         # Avoid argument parsing problem in

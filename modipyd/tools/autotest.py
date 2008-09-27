@@ -88,7 +88,7 @@ def observe(module_descriptor):
     # Walking dependency graph in imported module to
     # module imports order.
     testables = []
-    for descriptor in module_descriptor.walk():
+    for descriptor in module_descriptor.walk_dependency_graph(reverse=True):
         LOGGER.info("-> Affected: %s" % descriptor.name)
         if has_subclass(descriptor, unittest.TestCase):
             testables.append(descriptor)

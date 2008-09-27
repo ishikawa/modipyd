@@ -176,11 +176,19 @@ class ModuleDescriptor(object):
     def add_reverse_dependency(self, descriptor):
         self.__reverse_dependencies.append(descriptor)
 
-    def walk(self):
+    def walk_dependency_graph(self, reverse=False):
         """
-        Walking dependency graph in an imported module
-        (self included) to a module imports order
+        Walking on the module dependency graph.
+        *reverse* is a boolean value. If set to ``True``,
+        then the walking is in an imported module (self included)
+        to a module imports order.
         """
+        if reverse:
+            graph_name = 'reverse_dependencies'
+        else:
+            graph_name = 'dependencies'
+
+        # self first
         yield self
 
         # Use Breadth First Search (BFS) algorithm
@@ -188,7 +196,7 @@ class ModuleDescriptor(object):
         discovered = set(vqueue)
         while vqueue:
             u = vqueue.pop()
-            for v in u.reverse_dependencies:
+            for v in getattr(u, graph_name):
                 if v not in discovered:
                     discovered.add(v)
                     vqueue.append(v)

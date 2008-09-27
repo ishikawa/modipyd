@@ -95,10 +95,7 @@ class TestModuleDescriptorDependency(TestCase):
         descriptors = self.descriptors
         a = descriptors['cycles.a']
 
-        #print a.describe()
-        #print [str(x.name) for x in a.walk()]
-
-        dep = a.walk()
+        dep = a.walk_dependency_graph(reverse=True)
         self.assertEqual(descriptors['cycles.a'], dep.next())
         self.assertEqual(descriptors['cycles.b'], dep.next())
         self.assertEqual(descriptors['cycles.c'], dep.next())

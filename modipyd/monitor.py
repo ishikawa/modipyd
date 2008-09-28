@@ -21,6 +21,7 @@ from modipyd.module import read_module_code, \
                            collect_python_module_file
 from modipyd.resolve import ModuleNameResolver
 from modipyd.descriptor import ModuleDescriptor
+from modipyd.utils.decorators import require
 
 
 class Monitor(object):
@@ -44,12 +45,14 @@ class Monitor(object):
         self.monitoring = False
         self.__descriptors = None
         self.__filenames = None
+        self.__failures = None
 
     @property
     def descriptors(self):
         if self.__descriptors is None:
             self.__descriptors = {}
             self.__filenames = {}
+            self.__failures = set()
             self.refresh()
         return self.__descriptors
 
@@ -63,20 +66,22 @@ class Monitor(object):
         assert isinstance(self.paths, (tuple, list))
         assert isinstance(self.__descriptors, dict)
         assert isinstance(self.__filenames, dict)
+        assert isinstance(self.__failures, set)
 
         # short variable names
         descriptors = self.__descriptors
         filenames = self.__filenames
+        failures = self.__failures
 
         # ``monitor()`` updates all entries and
         # removes deleted entries.
-        self.monitor()
+        modifieds = self.monitor()
 
         # For now, only need to check new entries.
         resolver = ModuleNameResolver(self.search_path)
         newcomers = []
         for filename, typebits in collect_python_module_file(self.paths):
-            if filename in filenames:
+            if filename in filenames or filename in failures:
                 continue
             try:
                 mc = read_module_code(filename, typebits=typebits,
@@ -84,6 +89,7 @@ class Monitor(object):
                         resolver=resolver, allow_compilation_failure=True)
             except ImportError:
                 LOGGER.debug("Couldn't import file", exc_info=True)
+                failures.add(filename)
                 continue
             else:
                 desc = ModuleDescriptor(mc)
@@ -93,7 +99,12 @@ class Monitor(object):
 
         for desc in newcomers:
             desc.update_dependencies(descriptors)
+            LOGGER.info("Added: %s" % desc.describe())
 
+        return modifieds
+
+
+    @require(descriptor=ModuleDescriptor)
     def remove(self, descriptor):
         filename = splitext(descriptor.filename)[0]
         descriptors, filenames = self.__descriptors, self.__filenames
@@ -104,6 +115,7 @@ class Monitor(object):
                 "No monitoring descriptor '%s'" % \
                 descriptor.name)
 
+        LOGGER.info("Removed: %s" % descriptor.describe())
         descriptor.clear_dependencies()
         del descriptors[descriptor.name]
         del filenames[filename]
@@ -122,7 +134,6 @@ class Monitor(object):
             except os.error, e:
                 if e.errno == ENOENT:
                     # No such file
-                    LOGGER.info("Removed:\n%s" % desc)
                     removals.append(desc)
                 else:
                     raise
@@ -156,7 +167,7 @@ class Monitor(object):
             self.monitoring = True
             while descriptors and self.monitoring:
                 time.sleep(1)
-                for modified in self.monitor():
+                for modified in self.refresh():
                     yield modified
             else:
                 LOGGER.info("Terminating monitor %s" % str(self))

@@ -5,6 +5,9 @@ Functions that help with dynamically creating decorators.
     :license: MIT (See ``LICENSE`` file for more details)
 
 """
+from types import NoneType
+from modipyd.utils import wrap_sequence, unwrap_sequence
+
 
 def require(**types):
     """
@@ -18,15 +21,11 @@ def require(**types):
         argnames = code.co_varnames[:code.co_argcount]
         argmaps = dict((name, i) for i, name in enumerate(argnames))
 
-        # None -> type(None) (= types.NoneType)
-        for name in types:
-            constraint = types[name]
-            if type(constraint) in (tuple, list):
-                constraint = tuple(type(None) if c is None else c for c in constraint)
-            else:
-                if constraint is None:
-                    constraint = type(None)
-            types[name] = constraint
+        # None -> NoneType convertion
+        for name, constraints in types.iteritems():
+            constraints = wrap_sequence(constraints)
+            constraints = tuple(map(lambda c: c is None and NoneType or c, constraints))
+            types[name] = unwrap_sequence(constraints)
 
         def type_checker(*args, **kwargs):
             for name in argmaps:
@@ -39,8 +38,8 @@ def require(**types):
                     # maybe default value
                     continue
 
-                if name in types:
-                    constraint = types[name]
+                constraint = types.get(name)
+                if constraint is not None:
                     if callable(constraint) and not isinstance(constraint, type):
                         check = constraint(value)
                         if not check in (True, False):

@@ -167,45 +167,24 @@ def collect_python_module_file(filepath_or_list):
 
 def collect_module_code(filepath_or_list, search_path=None):
     resolver = ModuleNameResolver(search_path)
-    for path, typebits in collect_python_module_file(filepath_or_list):
+    for filename, typebits in collect_python_module_file(filepath_or_list):
         # Since changing .py file is not reflected by .pyc, .pyo quickly,
         # the plain .py file takes first prioriry.
-        code = None
         try:
-            if typebits & PYTHON_SOURCE_MASK:
-                # .py
-                sourcepath = path + '.py'
-                code = compile_source(sourcepath)
-            elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
-                # .pyc, .pyo
-                if typebits & PYTHON_OPTIMIZED_MASK:
-                    sourcepath = path + '.pyo'
-                else:
-                    sourcepath = path + '.pyc'
-                    code = load_compiled(sourcepath)
-            else:
-                assert False, "illegal typebits"
+            yield read_module_code(filename,
+                search_path=search_path, typebits=typebits, resolver=resolver)
         except SyntaxError:
             # SyntaxError is OK
-            code = None
-            LOGGER.warn("SyntaxError found in %s" % sourcepath,
-                exc_info=True)
+            LOGGER.warn("SyntaxError found", exc_info=True)
         except StandardError:
             # ignore file
-            LOGGER.warn("Exception occurred while "
-                "loading compiled bytecode at %s" % sourcepath,
+            LOGGER.warn(
+                "Exception occurred while "
+                "loading compiled bytecode",
                 exc_info=True)
-            continue
-
-        # module name
-        try:
-            module_name, package_name = resolver.resolve(sourcepath)
         except ImportError:
-            LOGGER.debug(
-                "Couldn't import file at %s, ignore" % sourcepath,
-                exc_info=True)
-        else:
-            yield ModuleCode(module_name, package_name, sourcepath, code)
+            LOGGER.debug("Couldn't import file", exc_info=True)
+
 
 @require(filename=basestring)
 @require(typebits=(int, None))

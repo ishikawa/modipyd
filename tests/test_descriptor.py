@@ -14,7 +14,7 @@ class TestModuleDescriptor(TestCase):
 
     def test_init(self):
         filepath = join(FILES_DIR, 'python', 'a.py')
-        code = read_module_code(filepath, [FILES_DIR])
+        code = read_module_code(filepath, search_path=[FILES_DIR])
 
         self.assertNotNone(code)
         descriptor = ModuleDescriptor(code)

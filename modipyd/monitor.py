@@ -24,22 +24,36 @@ class Monitor(object):
     """
 
     def __init__(self, filepath_or_list, search_path=None):
+        from modipyd.resolve import normalize_path
+
         super(Monitor, self).__init__()
-        self.paths = utils.wrap_sequence(filepath_or_list)
-        assert not isinstance(self.paths, basestring)
         self.search_path = search_path
+
+        # paths will be used as dictionary key,
+        # so make it normalized.
+        paths = utils.wrap_sequence(filepath_or_list)
+        self.paths = [normalize_path(i) for i in paths]
+        assert not isinstance(self.paths, basestring)
+
         self.monitoring = False
         self.__descriptors = None
+        self.__filenames = None
 
     @property
     def descriptors(self):
         if self.__descriptors is None:
             self.__descriptors = {}
+            self.__filenames = {}
             self.refresh()
         return self.__descriptors
 
     def refresh(self):
+        assert isinstance(self.paths, (tuple, list))
+        assert isinstance(self.__descriptors, dict)
+        assert isinstance(self.__filenames, dict)
+
         from modipyd.module import collect_module_code
+        from modipyd.module import collect_python_module_file
         from modipyd.descriptor import build_module_descriptors
 
         codes = list(collect_module_code(self.paths, self.search_path))

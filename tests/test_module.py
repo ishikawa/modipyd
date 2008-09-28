@@ -35,7 +35,7 @@ class TestModipydModuleCode(TestCase):
         items = [FILES_DIR] + list(modulename.split('.'))
         items[-1] += '.py'
         filepath = join(*items)
-        module = read_module_code(filepath, [FILES_DIR])
+        module = read_module_code(filepath, search_path=[FILES_DIR])
 
         self.assertNotNone(module)
         self.assertEqual(modulename, module.name)
@@ -122,7 +122,7 @@ class TestModipydModuleCode(TestCase):
             compile_python_source(pypath, optimization=True)
         assert exists(pycpath) and exists(pyopath)
 
-        m = read_module_code(pypath, [search_path])
+        m = read_module_code(pypath, search_path=[search_path])
         old_imports = m.imports[:]
         old_classdefs = m.classdefs[:]
 

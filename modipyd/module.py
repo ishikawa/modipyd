@@ -10,6 +10,7 @@ import dis
 import sys
 from modipyd import disasm, utils, LOGGER
 from modipyd.resolve import ModuleNameResolver
+from modipyd.utils.decorators import require
 
 
 # ----------------------------------------------------------------
@@ -138,26 +139,31 @@ PYTHON_SOURCE_MASK    = 1
 PYTHON_COMPILED_MASK  = 2
 PYTHON_OPTIMIZED_MASK = 4
 
+# file extention -> typebits mask
+PYTHON_FILE_TYPES = {
+    '.py': PYTHON_SOURCE_MASK,
+    '.pyc': PYTHON_COMPILED_MASK,
+    '.pyo': PYTHON_OPTIMIZED_MASK,
+}
+
+
+@require(filename=basestring)
+def module_file_typebits(filename):
+    from os.path import splitext
+    path, ext = splitext(filename)
+    typebits = PYTHON_FILE_TYPES.get(ext, 0)
+    return (path, ext, typebits)
+
 def collect_python_module_file(filepath_or_list):
     """Generates (filepath without extention, bitmask)"""
-    from os.path import splitext
-
     modules = {}
     for filepath in utils.collect_files(filepath_or_list, ['.?*', 'CVS']):
-        path, ext = splitext(filepath)
-
         # For performance gain, use bitmask value
         # instead of filepath string.
+        path, ext, typebits = module_file_typebits(filepath)
         modules.setdefault(path, 0)
-        if ext == '.py':
-            modules[path] |= PYTHON_SOURCE_MASK
-        elif ext == '.pyc':
-            modules[path] |= PYTHON_COMPILED_MASK
-        elif ext == '.pyo':
-            modules[path] |= PYTHON_OPTIMIZED_MASK
-
+        modules[path] |= typebits
     return (item for item in modules.iteritems() if item[1] > 0)
-
 
 def collect_module_code(filepath_or_list, search_path=None):
     resolver = ModuleNameResolver(search_path)
@@ -201,25 +207,40 @@ def collect_module_code(filepath_or_list, search_path=None):
         else:
             yield ModuleCode(module_name, package_name, sourcepath, code)
 
-def read_module_code(filepath, search_path=None):
-    if not isinstance(filepath, basestring):
-        raise TypeError("The filepath argument "
-            "must be instance of basestring, but was "
-            "instance of %s" % type(filepath))
+@require(filename=basestring)
+@require(typebits=(int, None))
+@require(resolver=(ModuleNameResolver, None))
+def read_module_code(filename, typebits=None, resolver=None, search_path=None):
+    """
+    Read python module file, and return ``ModuleCode`` instance.
+    If *typebits* argument is not ``None``, *filename* must be
+    filepath without file extention.
+    If *typebits* argument is ``None``, it is detected by filename.
+    """
 
-    g = collect_module_code(filepath, search_path)
-    try:
-        module = g.next()
-    except StopIteration:
-        raise ImportError("Can't import %s" % filepath)
-    else:
-        try:
-            g.next()
-        except StopIteration:
-            pass
+    if typebits is None:
+        filename, ext, typebits = module_file_typebits(filename)
+    if resolver is None:
+        resolver = ModuleNameResolver(search_path)
+
+    code = None
+    if typebits & PYTHON_SOURCE_MASK:
+        # .py
+        sourcepath = filename + '.py'
+        code = compile_source(sourcepath)
+    elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
+        # .pyc, .pyo
+        if typebits & PYTHON_OPTIMIZED_MASK:
+            sourcepath = filename + '.pyo'
         else:
-            raise RuntimeError("Multiple module instance at %s" % filepath)
-        return module
+            sourcepath = filename + '.pyc'
+            code = load_compiled(sourcepath)
+    else:
+        assert False, "illegal typebits: %d" % typebits
+
+    # Resolve module name
+    module_name, package_name = resolver.resolve(sourcepath)
+    return ModuleCode(module_name, package_name, sourcepath, code)
 
 
 # ----------------------------------------------------------------

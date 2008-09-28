@@ -13,7 +13,7 @@ from os.path import isdir, abspath, expanduser
 from modipyd import utils
 
 
-def _normalize_path(filepath):
+def normalize_path(filepath):
     """Normalize path name"""
     #return os.path.realpath(abspath(expanduser(filepath)))
     return abspath(expanduser(filepath))
@@ -46,7 +46,7 @@ class ModuleNameResolver(object):
         syspaths = utils.wrap_sequence(syspaths)
         assert isinstance(syspaths, (list, tuple))
 
-        self.search_paths = [_normalize_path(d) for d in syspaths if isdir(d)]
+        self.search_paths = [normalize_path(d) for d in syspaths if isdir(d)]
         for d in self.search_paths:
             assert isinstance(d, basestring)
             assert isdir(d)
@@ -71,7 +71,7 @@ class ModuleNameResolver(object):
         if not filepath:
             raise ImportError("filepath is empty")
 
-        filepath = _normalize_path(filepath)
+        filepath = normalize_path(filepath)
         if not utils.python_module_file(filepath):
             raise ImportError("Not a python script: %s" % filepath)
 

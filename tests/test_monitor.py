@@ -112,6 +112,7 @@ money = 4321.09
     def test_deleted(self):
         os.remove(join(PRISONERS_DIR, 'a.py'))
         time.sleep(0.1)
+
         modified = self.monitor.monitor()
         self.assertEqual(0, len(modified))
         descriptors = self.monitor.descriptors
@@ -125,37 +126,38 @@ money = 4321.09
         self.assertEqual(0, len(a.dependencies))
         self.assertEqual(0, len(a.reverse_dependencies))
 
-        # create new file
-        path = join(PRISONERS_DIR, 'c.py')
-        f = open(path, 'w')
-        try:
-            f.write("import prisoners.a")
-        finally:
-            f.close()
+        for _ in range(2):
+            # create new file
+            path = join(PRISONERS_DIR, 'c.py')
+            f = open(path, 'w')
+            try:
+                f.write("import prisoners.a")
+            finally:
+                f.close()
+                time.sleep(0.1)
+                assert exists(path)
+
+            self.monitor.refresh()
+            self.assertEqual(4, len(descriptors))
+            #a = descriptors['prisoners.a']
+            c = descriptors['prisoners.c']
+
+            self.assertEqual(0, len(a.dependencies))
+            self.assertEqual(1, len(a.reverse_dependencies))
+            self.assertEqual(1, len(c.dependencies))
+            self.assertEqual(0, len(c.reverse_dependencies))
+
+            # remove file
+            os.remove(path)
             time.sleep(0.1)
-            assert exists(path)
+            assert not exists(path)
+            self.monitor.refresh()
+            self.assertEqual(3, len(descriptors))
 
-        self.monitor.refresh()
-        self.assertEqual(4, len(descriptors))
-        a = descriptors['prisoners.a']
-        c = descriptors['prisoners.c']
-
-        self.assertEqual(0, len(a.dependencies))
-        self.assertEqual(1, len(a.reverse_dependencies))
-        self.assertEqual(1, len(c.dependencies))
-        self.assertEqual(0, len(c.reverse_dependencies))
-
-        # remove file
-        os.remove(path)
-        time.sleep(0.1)
-        assert not exists(path)
-        self.monitor.refresh()
-        self.assertEqual(3, len(descriptors))
-
-        a = descriptors['prisoners.a']
-        self.assertEqual(0, len(a.dependencies))
-        self.assertEqual(0, len(a.reverse_dependencies))
-        self.assert_('prisoners.c' not in descriptors)
+            #a = descriptors['prisoners.a']
+            self.assertEqual(0, len(a.dependencies))
+            self.assertEqual(0, len(a.reverse_dependencies))
+            self.assert_('prisoners.c' not in descriptors)
 
 
 if __name__ == '__main__':

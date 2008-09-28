@@ -24,8 +24,8 @@ def require(**types):
         # None -> NoneType convertion
         for name, constraints in types.iteritems():
             constraints = wrap_sequence(constraints)
-            constraints = tuple(map(lambda c: c is None and NoneType or c, constraints))
-            types[name] = unwrap_sequence(constraints)
+            constraints = [c is None and NoneType or c for c in constraints]
+            types[name] = unwrap_sequence(tuple(constraints))
 
         def type_checker(*args, **kwargs):
             for name in argmaps:
@@ -40,7 +40,8 @@ def require(**types):
 
                 constraint = types.get(name)
                 if constraint is not None:
-                    if callable(constraint) and not isinstance(constraint, type):
+                    if (callable(constraint) and
+                            not isinstance(constraint, type)):
                         check = constraint(value)
                         if not check in (True, False):
                             raise RuntimeError("Callable constraint must return"

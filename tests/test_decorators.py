@@ -5,6 +5,7 @@ from modipyd.utils.decorators import require
 from tests import TestCase
 
 
+# pylint: disable-msg=W0613
 class RequireDecoratorTestCase(TestCase):
 
     def test_simple(self):

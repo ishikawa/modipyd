@@ -8,13 +8,19 @@ used to monitor Python module file modifications.
 
 """
 
+
 import os
 from errno import ENOENT
 import logging
 import time
+from os.path import splitext
 
 from modipyd import LOGGER
 from modipyd import utils
+from modipyd.module import read_module_code, \
+                           collect_python_module_file
+from modipyd.resolve import ModuleNameResolver
+from modipyd.descriptor import ModuleDescriptor
 
 
 class Monitor(object):
@@ -47,27 +53,61 @@ class Monitor(object):
             self.refresh()
         return self.__descriptors
 
+    #def refresh(self):
+    #    from modipyd.module import collect_module_code
+    #    from modipyd.descriptor import build_module_descriptors
+    #    codes = list(collect_module_code(self.paths, self.search_path))
+    #    self.__descriptors.clear()
+    #    self.__descriptors.update(build_module_descriptors(codes))
     def refresh(self):
         assert isinstance(self.paths, (tuple, list))
         assert isinstance(self.__descriptors, dict)
         assert isinstance(self.__filenames, dict)
 
-        from modipyd.module import collect_module_code
-        from modipyd.module import collect_python_module_file
-        from modipyd.descriptor import build_module_descriptors
+        # short variable names
+        descriptors = self.__descriptors
+        filenames = self.__filenames
 
-        codes = list(collect_module_code(self.paths, self.search_path))
-        self.__descriptors.clear()
-        self.__descriptors.update(build_module_descriptors(codes))
+        # ``monitor()`` updates all entries and
+        # removes deleted entries.
+        self.monitor()
+
+        # For now, only need to check new entries.
+        resolver = ModuleNameResolver(self.search_path)
+        newcomers = []
+        for filename, typebits in collect_python_module_file(self.paths):
+            if filename in filenames:
+                continue
+            try:
+                mc = read_module_code(filename, typebits=typebits,
+                        search_path=self.search_path,
+                        resolver=resolver, allow_compilation_failure=True)
+            except ImportError:
+                LOGGER.debug("Couldn't import file", exc_info=True)
+                continue
+            else:
+                desc = ModuleDescriptor(mc)
+                descriptors[mc.name] = desc
+                filenames[filename] = desc
+                newcomers.append(desc)
+
+        for desc in newcomers:
+            desc.update_dependencies(descriptors)
 
     def remove(self, descriptor):
-        if descriptor.name not in self.descriptors:
+        filename = splitext(descriptor.filename)[0]
+        descriptors, filenames = self.__descriptors, self.__filenames
+
+        if (descriptor.name not in descriptors or 
+                filename not in filenames):
             raise KeyError(
                 "No monitoring descriptor '%s'" % \
                 descriptor.name)
 
         descriptor.clear_dependencies()
-        del self.descriptors[descriptor.name]
+        del descriptors[descriptor.name]
+        del filenames[filename]
+
 
     def monitor(self):
         descriptors = self.descriptors

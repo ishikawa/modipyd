@@ -160,7 +160,7 @@ def collect_python_module_file(filepath_or_list):
     for filepath in utils.collect_files(filepath_or_list, ['.?*', 'CVS']):
         # For performance gain, use bitmask value
         # instead of filepath string.
-        path, ext, typebits = module_file_typebits(filepath)
+        path, _, typebits = module_file_typebits(filepath)
         modules.setdefault(path, 0)
         modules[path] |= typebits
     return (item for item in modules.iteritems() if item[1] > 0)
@@ -172,16 +172,8 @@ def collect_module_code(filepath_or_list, search_path=None):
         # the plain .py file takes first prioriry.
         try:
             yield read_module_code(filename,
-                search_path=search_path, typebits=typebits, resolver=resolver)
-        except SyntaxError:
-            # SyntaxError is OK
-            LOGGER.warn("SyntaxError found", exc_info=True)
-        except StandardError:
-            # ignore file
-            LOGGER.warn(
-                "Exception occurred while "
-                "loading compiled bytecode",
-                exc_info=True)
+                search_path=search_path, typebits=typebits,
+                resolver=resolver, allow_compilation_failure=True)
         except ImportError:
             LOGGER.debug("Couldn't import file", exc_info=True)
 
@@ -189,7 +181,9 @@ def collect_module_code(filepath_or_list, search_path=None):
 @require(filename=basestring)
 @require(typebits=(int, None))
 @require(resolver=(ModuleNameResolver, None))
-def read_module_code(filename, typebits=None, resolver=None, search_path=None):
+def read_module_code(filename, typebits=None, search_path=None,
+        resolver=None,
+        allow_compilation_failure=False):
     """
     Read python module file, and return ``ModuleCode`` instance.
     If *typebits* argument is not ``None``, *filename* must be
@@ -198,26 +192,33 @@ def read_module_code(filename, typebits=None, resolver=None, search_path=None):
     """
 
     if typebits is None:
-        filename, ext, typebits = module_file_typebits(filename)
+        filename, _, typebits = module_file_typebits(filename)
     if resolver is None:
         resolver = ModuleNameResolver(search_path)
 
     code = None
-    if typebits & PYTHON_SOURCE_MASK:
-        # .py
-        sourcepath = filename + '.py'
-        code = compile_source(sourcepath)
-    elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
-        # .pyc, .pyo
-        if typebits & PYTHON_OPTIMIZED_MASK:
-            sourcepath = filename + '.pyo'
+    try:
+        if typebits & PYTHON_SOURCE_MASK:
+            # .py
+            sourcepath = filename + '.py'
+            code = compile_source(sourcepath)
+        elif typebits & (PYTHON_OPTIMIZED_MASK | PYTHON_COMPILED_MASK):
+            # .pyc, .pyo
+            if typebits & PYTHON_OPTIMIZED_MASK:
+                sourcepath = filename + '.pyo'
+            else:
+                sourcepath = filename + '.pyc'
+                code = load_compiled(sourcepath)
         else:
-            sourcepath = filename + '.pyc'
-            code = load_compiled(sourcepath)
-    else:
-        assert False, "illegal typebits: %d" % typebits
+            assert False, "illegal typebits: %d" % typebits
+    except (SyntaxError, ImportError):
+        LOGGER.warn(
+            "Exception occurred while loading compiled bytecode",
+            exc_info=True)
+        if not allow_compilation_failure:
+            raise
 
-    # Resolve module name
+    # Resolve module name, may raise ImportError
     module_name, package_name = resolver.resolve(sourcepath)
     return ModuleCode(module_name, package_name, sourcepath, code)
 

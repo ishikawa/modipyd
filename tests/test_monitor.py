@@ -68,11 +68,28 @@ money = 4321.09
     def test_init(self):
         self.assertNotNone(self.monitor)
         descriptors = self.monitor.descriptors
+
         self.assertNotNone(self.monitor.descriptors)
         self.assertEqual(3, len(descriptors))
         self.assert_('prisoners' in descriptors)
         self.assert_('prisoners.a' in descriptors)
         self.assert_('prisoners.b' in descriptors)
+
+    def test_init_dependencies(self):
+        descriptors = self.monitor.descriptors
+        init = descriptors['prisoners']
+        a = descriptors['prisoners.a']
+        b = descriptors['prisoners.b']
+
+        self.assertEqual(1, len(init.dependencies))
+        self.assert_(b in init.dependencies)
+        self.assertEqual(0, len(init.reverse_dependencies))
+
+        self.assertEqual(0, len(a.dependencies))
+        self.assertEqual(0, len(a.reverse_dependencies))
+
+        self.assertEqual(0, len(b.dependencies))
+        self.assertEqual(1, len(b.reverse_dependencies))
 
     def test_modified(self):
         modified = self.monitor.monitor()

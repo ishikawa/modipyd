@@ -56,6 +56,15 @@ money = 4321.09
         finally:
             f.close()
 
+        # c.py
+        f = open(join(PRISONERS_DIR, 'c.py'), 'w')
+        try:
+            f.write("""\
+import prisoners.b
+""")
+        finally:
+            f.close()
+
         # d.py
         path = join(PRISONERS_DIR, 'd.py')
         if exists(path):
@@ -70,7 +79,7 @@ money = 4321.09
         descriptors = self.monitor.descriptors
 
         self.assertNotNone(self.monitor.descriptors)
-        self.assertEqual(3, len(descriptors))
+        self.assertEqual(4, len(descriptors))
         self.assert_('prisoners' in descriptors)
         self.assert_('prisoners.a' in descriptors)
         self.assert_('prisoners.b' in descriptors)
@@ -89,7 +98,7 @@ money = 4321.09
         self.assertEqual(0, len(a.reverse_dependencies))
 
         self.assertEqual(0, len(b.dependencies))
-        self.assertEqual(1, len(b.reverse_dependencies))
+        self.assertEqual(2, len(b.reverse_dependencies))
 
     def test_modified(self):
         modified = list(self.monitor.monitor())
@@ -107,14 +116,14 @@ money = 4321.09
         m = modified[0]
         self.assertEqual('prisoners.b', m.name)
         self.assertEqual(0, len(m.dependencies))
-        self.assertEqual(1, len(m.reverse_dependencies))
+        self.assertEqual(2, len(m.reverse_dependencies))
 
     def test_deleted(self):
         descriptors = self.monitor.descriptors
         init = descriptors['prisoners']
         b = descriptors['prisoners.b']
 
-        self.assertEqual(3, len(descriptors))
+        self.assertEqual(4, len(descriptors))
         self.assert_(b in init.dependencies)
         self.assert_(init in b.reverse_dependencies)
 
@@ -129,11 +138,11 @@ money = 4321.09
         self.assertRaises(StopIteration, modified_it.next)
         self.assert_(b in init.dependencies)
         self.assert_(init in b.reverse_dependencies)
-        self.assertEqual(2, len(descriptors))
+        self.assertEqual(3, len(descriptors))
 
     def test_refresh(self):
         descriptors = self.monitor.descriptors
-        self.assertEqual(3, len(descriptors))
+        self.assertEqual(4, len(descriptors))
 
         a = descriptors['prisoners.a']
         self.assertEqual(0, len(a.dependencies))
@@ -156,7 +165,7 @@ money = 4321.09
             else:
                 self.fail("Empty modifieds")
 
-            self.assertEqual(4, len(descriptors))
+            self.assertEqual(5, len(descriptors))
             #a = descriptors['prisoners.a']
             d = descriptors['prisoners.d']
             self.assertEqual(0, len(a.dependencies))
@@ -174,7 +183,7 @@ money = 4321.09
             else:
                 self.fail("Empty modifieds")
 
-            self.assertEqual(3, len(descriptors))
+            self.assertEqual(4, len(descriptors))
 
             #a = descriptors['prisoners.a']
             self.assertEqual(0, len(a.dependencies))

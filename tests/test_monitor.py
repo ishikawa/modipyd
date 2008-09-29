@@ -140,14 +140,15 @@ money = 4321.09
                 time.sleep(0.1)
                 assert exists(path)
 
-            modifieds = self.monitor.refresh()
+            for m in self.monitor.refresh():
+                self.assertEqual(descriptors['prisoners.c'], m)
+                break
+            else:
+                self.fail("Empty modifieds")
+
             self.assertEqual(4, len(descriptors))
             #a = descriptors['prisoners.a']
             c = descriptors['prisoners.c']
-
-            self.assertEqual(1, len(modifieds))
-            self.assertEqual(c, modifieds[0])
-
             self.assertEqual(0, len(a.dependencies))
             self.assertEqual(1, len(a.reverse_dependencies))
             self.assertEqual(1, len(c.dependencies))
@@ -157,7 +158,12 @@ money = 4321.09
             os.remove(path)
             time.sleep(0.1)
             assert not exists(path)
-            self.monitor.refresh()
+            for m in self.monitor.refresh():
+                self.assertEqual(c, m)
+                break
+            else:
+                self.fail("Empty modifieds")
+
             self.assertEqual(3, len(descriptors))
 
             #a = descriptors['prisoners.a']

@@ -130,7 +130,8 @@ def main(options, filepath):
 
             monitor = Monitor(filepath)
             for event in monitor.start():
-                LOGGER.info("Modified:\n%s" % event.descriptor.describe(indent=4))
+                LOGGER.info(
+                    "Modified:\n%s" % event.descriptor.describe(indent=4))
                 observe(event)
 
         except KeyboardInterrupt:

@@ -113,9 +113,19 @@ from modipyd.analysis import has_subclass
 
 
 class Autotest(object):
+    """
+    Runs tests based on modules changed, and its dependencies.
+
+    Options specified by context:
+    ------------------------------------------------
+        :autotest.test_runner: 
+            The qualified name of ``unittest.TestRunner`` class
+            (default is unittest.TextTestRunner)
+    """
 
     def __init__(self, event, monitor, context):
         self.descriptor = event.descriptor
+        self.test_runner = context.get('autotest.test_runner')
 
     def __call__(self):
 
@@ -140,6 +150,8 @@ class Autotest(object):
         args = [sys.executable, '-m', 'modipyd.tools.unittest_runner']
         if extra_arguments:
             args.extend(extra_arguments)
+        if self.test_runner:
+            args.extend(['-r', self.test_runner])
         for t in testables:
             args.append(t.name)
 

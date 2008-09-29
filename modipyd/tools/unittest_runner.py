@@ -7,8 +7,8 @@ test modules conveniently executable.
 
 """
 
-import sys
 import unittest
+from optparse import OptionParser
 
 from modipyd import LOGGER, utils
 from modipyd.utils import import_component
@@ -42,4 +42,11 @@ def main(module_names, test_runner_class='unittest.TextTestRunner'):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    parser = OptionParser(usage="usage: %prog [options] modules")
+    parser.add_option("-r", "--runner", default='unittest.TextTestRunner',
+        action="store", dest="runner", metavar='CLASS_NAME',
+        help="qualified name of the unittest.TestRunner subclass "
+             "(default: unittest.TextTestRunner)")
+
+    options, args = parser.parse_args()
+    main(args, options.runner)

@@ -99,7 +99,12 @@ def make_application(options, filepath):
             variables[var] = ''
         else:
             variables[var[:i]] = var[i+1:]
-    application.update_variables(variables)
+
+    if variables:
+        import pprint
+        application.update_variables(variables)
+        LOGGER.info(
+            "Predefined variables: %s" % pprint.pformat(variables))
 
     # Load configuration (startup) file
     for rcfile in startup_files(options.rcfile):

@@ -168,6 +168,8 @@ class Monitor(object):
             while descriptors and self.monitoring:
                 time.sleep(1)
                 for modified in self.refresh():
+                    if not self.monitoring:
+                        break
                     yield modified
             else:
                 LOGGER.info("Terminating monitor %s" % str(self))

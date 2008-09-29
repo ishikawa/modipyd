@@ -48,7 +48,7 @@ def make_option_parser():
     parser.add_option("-v", "--verbose",
         action="count", dest="verbosity", default=0,
         help="make the operation more talkative")
-    parser.add_option("-m", "--plugin", default=[],
+    parser.add_option("-x", "--plugin", default=[],
         action="append", dest="plugins", metavar='PLUGIN_NAME',
         help="qualified name of the plugin, "
              "the plugin must be callable object (e.g. function, class).")

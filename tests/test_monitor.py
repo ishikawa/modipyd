@@ -110,12 +110,15 @@ money = 4321.09
         self.assertEqual(1, len(m.reverse_dependencies))
 
     def test_deleted(self):
+        descriptors = self.monitor.descriptors
+        a = descriptors['prisoners.a']
+
         os.remove(join(PRISONERS_DIR, 'a.py'))
         time.sleep(0.1)
 
         modified = self.monitor.monitor()
-        self.assertEqual(0, len(modified))
-        descriptors = self.monitor.descriptors
+        self.assertEqual(1, len(modified))
+        self.assertEqual(a, modified[0])
         self.assertEqual(2, len(descriptors))
 
     def test_refresh(self):

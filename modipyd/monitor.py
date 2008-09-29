@@ -56,12 +56,22 @@ class Monitor(object):
             self.refresh()
         return self.__descriptors
 
-    #def refresh(self):
-    #    from modipyd.module import collect_module_code
-    #    from modipyd.descriptor import build_module_descriptors
-    #    codes = list(collect_module_code(self.paths, self.search_path))
-    #    self.__descriptors.clear()
-    #    self.__descriptors.update(build_module_descriptors(codes))
+    @require(descriptor=ModuleDescriptor)
+    def remove(self, descriptor):
+        filename = splitext(descriptor.filename)[0]
+        descriptors, filenames = self.__descriptors, self.__filenames
+
+        if (descriptor.name not in descriptors or 
+                filename not in filenames):
+            raise KeyError(
+                "No monitoring descriptor '%s'" % \
+                descriptor.name)
+
+        LOGGER.debug("Removed: %s" % descriptor.describe())
+        descriptor.clear_dependencies()
+        del descriptors[descriptor.name]
+        del filenames[filename]
+
     def refresh(self):
         assert isinstance(self.paths, (tuple, list))
         assert isinstance(self.__descriptors, dict)
@@ -105,24 +115,6 @@ class Monitor(object):
 
         return modifieds
 
-
-    @require(descriptor=ModuleDescriptor)
-    def remove(self, descriptor):
-        filename = splitext(descriptor.filename)[0]
-        descriptors, filenames = self.__descriptors, self.__filenames
-
-        if (descriptor.name not in descriptors or 
-                filename not in filenames):
-            raise KeyError(
-                "No monitoring descriptor '%s'" % \
-                descriptor.name)
-
-        LOGGER.debug("Removed: %s" % descriptor.describe())
-        descriptor.clear_dependencies()
-        del descriptors[descriptor.name]
-        del filenames[filename]
-
-
     def monitor(self):
         descriptors = self.descriptors
         modifieds = []
@@ -143,13 +135,14 @@ class Monitor(object):
         # Remove removal entries
         for desc in removals:
             try:
+                
                 self.remove(desc)
             except KeyError:
                 LOGGER.debug(
                     "No monitoring descriptor '%s' for removal" % desc.name,
                     exc_info=True)
 
-        del removals
+        modifieds.extend(removals)
         return modifieds
 
     def start(self):

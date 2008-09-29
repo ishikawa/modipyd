@@ -178,9 +178,9 @@ def collect_module_code(filepath_or_list, search_path=None):
             LOGGER.debug("Couldn't import file", exc_info=True)
 
 
-@require(filename=basestring)
-@require(typebits=(int, None))
-@require(resolver=(ModuleNameResolver, None))
+@require(filename=basestring,
+         typebits=(int, None),
+         resolver=(ModuleNameResolver, None))
 def read_module_code(filename, typebits=None, search_path=None,
         resolver=None,
         allow_compilation_failure=False):

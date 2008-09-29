@@ -17,6 +17,7 @@ class GenericToolTestCase(TestCase):
         options, args = parser.parse_args(args)
         return generic.make_application(options, args or '.')
 
+
 class TestGenericTool(GenericToolTestCase):
 
     def test_startup_files(self):

@@ -11,12 +11,15 @@ from modipyd.utils import import_component
 from modipyd.monitor import Event, Monitor
 
 
+# Monitor event descriptions
 TYPE_STRINGS = dict(
     zip(Event.TYPES, ('Modified', 'Created', 'Removed')))
 
-class Application(object):
 
-    def __init__(self, paths):
+class Application(object):
+    """Generic modipyd application"""
+
+    def __init__(self, paths='.'):
         self.paths = paths
         self.plugins = []
         self.variables = {}

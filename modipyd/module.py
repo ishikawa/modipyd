@@ -151,11 +151,21 @@ def load_bytecode_processors():
     settings. Return ChainedBytecodeProcessor instance holds
     all loaded processors.
     """
-    if not BYTECODE_PROCESSORS_CACHE and BYTECODE_PROCESSORS:
-        for name in BYTECODE_PROCESSORS:
+    if (BYTECODE_PROCESSORS and 
+            (len(BYTECODE_PROCESSORS_CACHE) != len(BYTECODE_PROCESSORS))):
+        del BYTECODE_PROCESSORS_CACHE[:]
+        for i, name in enumerate(BYTECODE_PROCESSORS[:]):
             LOGGER.info("Loading BytecodeProcesser '%s'" % name)
-            klass = utils.import_component(name)
-            BYTECODE_PROCESSORS_CACHE.append(klass)
+            try:
+                klass = utils.import_component(name)
+            except (ImportError, AttributeError):
+                LOGGER.warn(
+                    "Loading BytecodeProcesser '%s' failed. "
+                    "This setting is removed" % name,
+                    exc_info=True)
+                del BYTECODE_PROCESSORS[i]
+            else:
+                BYTECODE_PROCESSORS_CACHE.append(klass)
 
     processors = []
     for klass in BYTECODE_PROCESSORS_CACHE:

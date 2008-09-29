@@ -51,7 +51,11 @@ class Application(object):
         context = {}
         for plugin in self.plugins:
             try:
-                plugin(event, monitor, context)
+                ret = plugin(event, monitor, context)
+                # the plugin object can return (but not required)
+                # a callable object. It is called with no arguments
+                if callable(ret):
+                    ret()
             except StandardError:
                 LOGGER.warn(
                     "Exception occurred while invoking plugin",

@@ -23,13 +23,13 @@ is a class:
         print "Event occurred:", event.type
         print "Modified module:", event.descriptor
     
-    class PluginClass:
-        \"\"\"Provide same function, but using a class\"\"\"
+    class SimplePlugin:
+        \"\"\"Produce the same output, but using a class\"\"\"
     
         def __init__(self, event, monitor, context):
             self.event = event
     
-        def __call__(self)
+        def __call__(self):
             print "Event occurred:", self.event.type
             print "Modified module:", self.event.descriptor
 
@@ -81,8 +81,22 @@ not required)a callable object. It is called with no arguments
 .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
 """
 
+
+# ----------------------------------------------------------------
+# Example Plugins
+# ----------------------------------------------------------------
 # pylint: disable-msg=W0613
 def simple_plugin(event, monitor, context):
     """Simplest possible plugin object"""
     print "Event occurred:", event.type
     print "Modified module:", event.descriptor
+
+class SimplePlugin:
+    """Produce the same output, but using a class"""
+
+    def __init__(self, event, monitor, context):
+        self.event = event
+
+    def __call__(self):
+        print "Event occurred:", self.event.type
+        print "Modified module:", self.event.descriptor

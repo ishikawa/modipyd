@@ -64,23 +64,26 @@ class Monitor(object):
 
         self.monitoring = False
         self.__descriptors = None
-        self.__filenames = None
-        self.__failures = None
+        self.__filenames = {}
+        self.__failures = set()
 
     @property
     def descriptors(self):
+        """
+        All the monitoring modules. This is dictionary,
+        maps name and module descriptors.
+        """
         if self.__descriptors is None:
             self.__descriptors = {}
-            self.__filenames = {}
-            self.__failures = set()
             entries = list(self.refresh())
             LOGGER.debug("%d descriptoes" % len(entries))
         return self.__descriptors
 
     @require(descriptor=ModuleDescriptor)
     def remove(self, descriptor):
+        """Remove *descriptor*, and clear dependencies"""
+        descriptors, filenames = self.descriptors, self.__filenames
         filename = splitext(descriptor.filename)[0]
-        descriptors, filenames = self.__descriptors, self.__filenames
 
         if (descriptor.name not in descriptors or 
                 filename not in filenames):
@@ -92,6 +95,15 @@ class Monitor(object):
         descriptor.clear_dependencies()
         del descriptors[descriptor.name]
         del filenames[filename]
+
+    @require(descriptor=ModuleDescriptor)
+    def add(self, descriptor):
+        """Add *descriptor*, but doesn't update dependencies"""
+        descriptors, filenames = self.descriptors, self.__filenames
+        filename = splitext(descriptor.filename)[0]
+
+        descriptors[descriptor.name] = descriptor
+        filenames[filename] = descriptor
 
     def refresh(self):
         assert isinstance(self.paths, (tuple, list))
@@ -126,8 +138,7 @@ class Monitor(object):
                 continue
             else:
                 desc = ModuleDescriptor(mc)
-                descriptors[mc.name] = desc
-                filenames[filename] = desc
+                self.add(desc)
                 # modifieds += new entries
                 newcomers.append(desc)
                 LOGGER.debug("Added: %s" % desc.describe())

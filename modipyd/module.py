@@ -143,7 +143,7 @@ def read_module_code(filename, typebits=None, search_path=None,
 # ----------------------------------------------------------------
 
 # cached processor classes
-BYTECODE_PROCESSORS_CACHE = None
+BYTECODE_PROCESSORS_CACHE = []
 
 def load_bytecode_processors():
     """
@@ -151,9 +151,7 @@ def load_bytecode_processors():
     settings. Return ChainedBytecodeProcessor instance holds
     all loaded processors.
     """
-    global BYTECODE_PROCESSORS_CACHE
-    if BYTECODE_PROCESSORS_CACHE is None:
-        BYTECODE_PROCESSORS_CACHE = []
+    if not BYTECODE_PROCESSORS_CACHE and BYTECODE_PROCESSORS:
         for name in BYTECODE_PROCESSORS:
             LOGGER.info("Loading BytecodeProcesser '%s'" % name)
             klass = utils.import_component(name)

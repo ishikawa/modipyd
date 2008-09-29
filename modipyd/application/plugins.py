@@ -81,6 +81,7 @@ not required)a callable object. It is called with no arguments
 .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
 """
 
+# pylint: disable-msg=W0613
 def simple_plugin(event, monitor, context):
     """Simplest possible plugin object"""
     print "Event occurred:", event.type

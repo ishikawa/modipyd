@@ -127,7 +127,6 @@ import prisoners.b
 
     def test_deleted(self):
         descriptors = self.monitor.descriptors
-        init = descriptors['prisoners']
         b = descriptors['prisoners.b']
         c = descriptors['prisoners.c']
 

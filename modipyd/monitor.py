@@ -148,9 +148,14 @@ class Monitor(object):
                     "No monitoring descriptor '%s' for removal" % desc.name,
                     exc_info=True)
 
-    def start(self):
-        descriptors = self.descriptors
+    @require(interval=(int, float), refresh_factor=int)
+    def start(self, interval=1.0, refresh_factor=5):
+        if refresh_factor < 1:
+            raise RuntimeError("refresh_factor must be greater or eqaul to 1")
+        if interval <= 0:
+            raise RuntimeError("refresh_factor must not be negative or 0")
 
+        descriptors = self.descriptors
         # Logging
         if LOGGER.isEnabledFor(logging.INFO):
             desc = "\n".join([
@@ -163,9 +168,19 @@ class Monitor(object):
         # construct.
         try:
             self.monitoring = True
+
+            times = 0
             while descriptors and self.monitoring:
-                time.sleep(1)
-                for modified in self.refresh():
+
+                time.sleep(interval)
+                times += 1
+
+                if times % 5 == 0:
+                    monitor = self.refresh()
+                else:
+                    monitor = self.monitor()
+
+                for modified in monitor:
                     if not self.monitoring:
                         break
                     yield modified

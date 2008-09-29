@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from os.path import join, exists
+from os.path import abspath, join, exists
 from modipyd.utils import compile_python_source
 from modipyd.module import ModuleCode, compile_source, \
                            collect_module_code, \
@@ -112,12 +112,12 @@ class TestModipydModuleCode(TestCase):
         self.assertEqual('A', classdefs[3][1][0])
 
     def test_python_module_reload(self):
-        search_path = join(FILES_DIR, 'imports')
-        pypath = join(search_path, 'A', 'a.py')
+        search_path = abspath(join(FILES_DIR, 'imports'))
+        pypath = abspath(join(search_path, 'A', 'a.py'))
         assert exists(pypath)
 
-        pycpath = join(search_path, 'A', 'a.pyc')
-        pyopath = join(search_path, 'A', 'a.pyo')
+        pycpath = abspath(join(search_path, 'A', 'a.pyc'))
+        pyopath = abspath(join(search_path, 'A', 'a.pyo'))
         if not exists(pycpath) or not exists(pyopath):
             compile_python_source(pypath)
             compile_python_source(pypath, optimization=True)

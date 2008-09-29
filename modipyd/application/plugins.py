@@ -23,7 +23,7 @@ is a class:
         print "Event occurred:", event.type
         print "Modified module:", event.descriptor
     
-    class SimplePlugin:
+    class SimplePlugin(object):
         \"\"\"Produce the same output, but using a class\"\"\"
     
         def __init__(self, event, monitor, context):
@@ -91,7 +91,7 @@ def simple_plugin(event, monitor, context):
     print "Event occurred:", event.type
     print "Modified module:", event.descriptor
 
-class SimplePlugin:
+class SimplePlugin(object):
     """Produce the same output, but using a class"""
 
     def __init__(self, event, monitor, context):
@@ -100,3 +100,53 @@ class SimplePlugin:
     def __call__(self):
         print "Event occurred:", self.event.type
         print "Modified module:", self.event.descriptor
+
+
+# ----------------------------------------------------------------
+# Autotest Plugin
+# ----------------------------------------------------------------
+import os
+import sys
+import unittest
+from modipyd import LOGGER
+from modipyd.analysis import has_subclass
+
+
+class Autotest(object):
+
+    def __init__(self, event, monitor, context):
+        self.descriptor = event.descriptor
+
+    def __call__(self):
+
+        # Walking dependency graph in imported module to
+        # module imports order.
+        testables = []
+        for desc in self.descriptor.walk_dependency_graph(reverse=True):
+            LOGGER.info("-> Affected: %s" % desc.name)
+            if has_subclass(desc, unittest.TestCase):
+                LOGGER.debug("-> unittest.TestCase detected: %s" % desc.name)
+                testables.append(desc)
+
+        # Runntine tests
+        if testables:
+            # We can reload affected modules manually and run
+            # all TestCase in same process. Running another process,
+            # however, is simple and perfect solution.
+            self.spawn_unittest_runner(testables)
+
+    def spawn_unittest_runner(self, testables, extra_arguments=None):
+        """Spawn test runner process"""
+        args = [sys.executable, '-m', 'modipyd.tools.unittest_runner']
+        if extra_arguments:
+            args.extend(extra_arguments)
+        for t in testables:
+            args.append(t.name)
+
+        if sys.platform == "win32":
+            # Avoid argument parsing problem in
+            # windows, DOS platform
+            args = ['"%s"' % arg for arg in args]
+
+        LOGGER.debug("Spawn test runner process: %s" % ' '.join(args))
+        return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())

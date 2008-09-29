@@ -135,7 +135,6 @@ class Monitor(object):
         # Remove removal entries
         for desc in removals:
             try:
-                
                 self.remove(desc)
             except KeyError:
                 LOGGER.debug(

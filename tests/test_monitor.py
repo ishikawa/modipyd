@@ -56,8 +56,8 @@ money = 4321.09
         finally:
             f.close()
 
-        # c.py
-        path = join(PRISONERS_DIR, 'c.py')
+        # d.py
+        path = join(PRISONERS_DIR, 'd.py')
         if exists(path):
             os.remove(path)
 
@@ -111,14 +111,24 @@ money = 4321.09
 
     def test_deleted(self):
         descriptors = self.monitor.descriptors
-        a = descriptors['prisoners.a']
+        init = descriptors['prisoners']
+        b = descriptors['prisoners.b']
 
-        os.remove(join(PRISONERS_DIR, 'a.py'))
+        self.assertEqual(3, len(descriptors))
+        self.assert_(b in init.dependencies)
+        self.assert_(init in b.reverse_dependencies)
+
+        # remove
+        os.remove(join(PRISONERS_DIR, 'b.py'))
         time.sleep(0.1)
 
-        modified = list(self.monitor.monitor())
-        self.assertEqual(1, len(modified))
-        self.assertEqual(a, modified[0])
+        modified_it = iter(self.monitor.monitor())
+        modified = modified_it.next()
+
+        self.assertEqual(b, modified)
+        self.assertRaises(StopIteration, modified_it.next)
+        self.assert_(b in init.dependencies)
+        self.assert_(init in b.reverse_dependencies)
         self.assertEqual(2, len(descriptors))
 
     def test_refresh(self):
@@ -131,7 +141,7 @@ money = 4321.09
 
         for _ in range(2):
             # create new file
-            path = join(PRISONERS_DIR, 'c.py')
+            path = join(PRISONERS_DIR, 'd.py')
             f = open(path, 'w')
             try:
                 f.write("import prisoners.a")
@@ -141,25 +151,25 @@ money = 4321.09
                 assert exists(path)
 
             for m in self.monitor.refresh():
-                self.assertEqual(descriptors['prisoners.c'], m)
+                self.assertEqual(descriptors['prisoners.d'], m)
                 break
             else:
                 self.fail("Empty modifieds")
 
             self.assertEqual(4, len(descriptors))
             #a = descriptors['prisoners.a']
-            c = descriptors['prisoners.c']
+            d = descriptors['prisoners.d']
             self.assertEqual(0, len(a.dependencies))
             self.assertEqual(1, len(a.reverse_dependencies))
-            self.assertEqual(1, len(c.dependencies))
-            self.assertEqual(0, len(c.reverse_dependencies))
+            self.assertEqual(1, len(d.dependencies))
+            self.assertEqual(0, len(d.reverse_dependencies))
 
             # remove file
             os.remove(path)
             time.sleep(0.1)
             assert not exists(path)
             for m in self.monitor.refresh():
-                self.assertEqual(c, m)
+                self.assertEqual(d, m)
                 break
             else:
                 self.fail("Empty modifieds")
@@ -169,7 +179,7 @@ money = 4321.09
             #a = descriptors['prisoners.a']
             self.assertEqual(0, len(a.dependencies))
             self.assertEqual(0, len(a.reverse_dependencies))
-            self.assert_('prisoners.c' not in descriptors)
+            self.assert_('prisoners.d' not in descriptors)
 
 
 if __name__ == '__main__':

@@ -79,7 +79,8 @@ class Monitor(object):
         assert isinstance(self.__filenames, dict)
         assert isinstance(self.__failures, set)
 
-        # short variable names
+        # localize variable access to minimize overhead
+        # and to reduce the visual noise.
         descriptors = self.__descriptors
         filenames = self.__filenames
         failures = self.__failures

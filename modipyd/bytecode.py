@@ -1,5 +1,11 @@
 """
-This module provides a BytecodeProcessor, and standard processors.
+Modipyd BytecodeProcessor Architecture
+================================================
+
+This module provides a interface of Modypyd Bytecode processor,
+``BytecodeProcessor`` and standard processors.
+You can install your own processors by adding processor name
+into ``modipyd.BYTECODE_PROCESSORS`` variable.
 
     :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
     :license: MIT (See ``LICENSE`` file for more details)

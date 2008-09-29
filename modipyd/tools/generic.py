@@ -91,6 +91,16 @@ def make_application(options, filepath):
     for plugin in options.plugins:
         application.install_plugin(plugin)
 
+    # Predefine variables
+    variables = {}
+    for var in options.defines:
+        i = var.find('=')
+        if i == -1:
+            variables[var] = ''
+        else:
+            variables[var[:i]] = var[i+1:]
+    application.update_variables(variables)
+
     # Load configuration (startup) file
     for rcfile in startup_files(options.rcfile):
         LOGGER.info("Loading startup file from %s" % rcfile)
@@ -116,6 +126,10 @@ def make_option_parser():
              "Modipyd also looks $%s environment variable, and "
              "%s files in current directory" % (STARTUP_ENVIRON_NAME, 
              ', '.join(STARTUP_FILENAMES)))
+    parser.add_option("-D", default=[],
+        action="append", dest="defines", metavar='name(=value)',
+        help="Predefine name as a plugin context variable, "
+             "with specified value string (or empty string if omitted).")
 
     return parser
 

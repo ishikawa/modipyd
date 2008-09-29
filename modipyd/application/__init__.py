@@ -19,6 +19,7 @@ class Application(object):
     def __init__(self, paths):
         self.paths = paths
         self.plugins = []
+        self.variables = {}
 
     def install_plugin(self, plugin):
         """
@@ -48,7 +49,7 @@ class Application(object):
         self.plugins.append(plugin)
 
     def invoke_plugins(self, event, monitor):
-        context = {}
+        context = dict(self.variables)
         for plugin in self.plugins:
             try:
                 ret = plugin(event, monitor, context)
@@ -60,6 +61,9 @@ class Application(object):
                 LOGGER.warn(
                     "Exception occurred while invoking plugin",
                     exc_info=True)
+
+    def update_variables(self, variables):
+        self.variables.update(variables)
 
     def run(self):
         monitor = Monitor(self.paths)

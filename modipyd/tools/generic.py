@@ -86,7 +86,6 @@ def make_application(options, filepath):
     # in ``sys.path`` module search path variable for convenience.
     sys.path.insert(0, os.getcwd())
 
-
     # Create Application instance, Install plugins
     application = Application(filepath)
     for plugin in options.plugins:

@@ -24,7 +24,7 @@ class TestSimpleMonitor(TestCase):
         self.assert_(callable(modified_iter.next))
 
     def test_not_modified(self):
-        modified = self.monitor.monitor()
+        modified = list(self.monitor.monitor())
         self.assertEqual(0, len(modified))
 
 
@@ -92,7 +92,7 @@ money = 4321.09
         self.assertEqual(1, len(b.reverse_dependencies))
 
     def test_modified(self):
-        modified = self.monitor.monitor()
+        modified = list(self.monitor.monitor())
         self.assertEqual(0, len(modified))
         time.sleep(1)
 
@@ -102,7 +102,7 @@ money = 4321.09
         f.close()
         time.sleep(0.1)
 
-        modified = self.monitor.monitor()
+        modified = list(self.monitor.monitor())
         self.assertEqual(1, len(modified))
         m = modified[0]
         self.assertEqual('prisoners.b', m.name)
@@ -116,7 +116,7 @@ money = 4321.09
         os.remove(join(PRISONERS_DIR, 'a.py'))
         time.sleep(0.1)
 
-        modified = self.monitor.monitor()
+        modified = list(self.monitor.monitor())
         self.assertEqual(1, len(modified))
         self.assertEqual(a, modified[0])
         self.assertEqual(2, len(descriptors))

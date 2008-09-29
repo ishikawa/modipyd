@@ -24,10 +24,30 @@ from modipyd.descriptor import ModuleDescriptor
 from modipyd.utils.decorators import require
 
 
+class Event(object):
+    """
+    The ``Event`` class defines a interface to monitoring events.
+    """
+
+    # Enumeration that represents event types
+    TYPES = range(3)
+    MODULE_MODIFIED, MODULE_CREATED, MODULE_REMOVED = TYPES
+
+    @require(type=int, descriptor=ModuleDescriptor)
+    def __init__(self, event_type, descriptor):
+        if event_type not in Event.TYPES:
+            raise RuntimeError("illegal event type: %d" % event_type)
+        self.type = event_type
+        self.descriptor = descriptor
+
+
 class Monitor(object):
     """
     This class provides an interface to the mechanisms
     used to monitor Python module file modifications.
+    
+    ``start()``, ``refresh()``, ``monitor()`` return generator,
+    these generater yields ``Event`` instance.
     """
 
     def __init__(self, filepath_or_list, search_path=None):
@@ -118,8 +138,8 @@ class Monitor(object):
             desc.update_dependencies(descriptors)
 
         # Notify caller what entries are appended
-        for newcomer in newcomers:
-            yield newcomer
+        for desc in newcomers:
+            yield Event(Event.MODULE_CREATED, desc)
 
 
     def monitor(self):
@@ -130,7 +150,7 @@ class Monitor(object):
             try:
                 if desc.modified():
                     desc.reload(descriptors)
-                    yield desc
+                    yield Event(Event.MODULE_MODIFIED, desc)
             except os.error, e:
                 if e.errno == ENOENT:
                     # No such file
@@ -142,7 +162,7 @@ class Monitor(object):
         for desc in removals:
             try:
                 # yield before remove
-                yield desc
+                yield Event(Event.MODULE_REMOVED, desc)
                 self.remove(desc)
             except KeyError:
                 LOGGER.debug(

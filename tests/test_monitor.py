@@ -5,7 +5,7 @@ import os
 from os.path import join, exists
 
 from tests import TestCase, FILES_DIR
-from modipyd.monitor import Monitor
+from modipyd.monitor import Event, Monitor
 
 
 class TestSimpleMonitor(TestCase):
@@ -120,7 +120,11 @@ import prisoners.b
 
         modified = list(self.monitor.monitor())
         self.assertEqual(1, len(modified))
-        m = modified[0]
+
+        event = modified[0]
+        self.assertEqual(Event.MODULE_MODIFIED, event.type)
+
+        m = event.descriptor
         self.assertEqual('prisoners.b', m.name)
         self.assertEqual(0, len(m.dependencies))
         self.assertEqual(2, len(m.reverse_dependencies))
@@ -138,7 +142,10 @@ import prisoners.b
         time.sleep(0.1)
 
         modified_it = iter(self.monitor.monitor())
-        modified = modified_it.next()
+        event = modified_it.next()
+
+        self.assertEqual(Event.MODULE_REMOVED, event.type)
+        modified = event.descriptor
 
         self.assertEqual(c, modified)
         self.assert_(b in c.dependencies)
@@ -166,8 +173,9 @@ import prisoners.b
                 time.sleep(0.1)
                 assert exists(path)
 
-            for m in self.monitor.refresh():
-                self.assertEqual(descriptors['prisoners.d'], m)
+            for event in self.monitor.refresh():
+                self.assertEqual(Event.MODULE_CREATED, event.type)
+                self.assertEqual(descriptors['prisoners.d'], event.descriptor)
                 break
             else:
                 self.fail("Empty modifieds")
@@ -186,7 +194,7 @@ import prisoners.b
             assert not exists(path)
 
             it = self.monitor.refresh()
-            self.assertEqual(d, it.next())
+            self.assertEqual(d, it.next().descriptor)
             self.assertRaises(StopIteration, it.next)
             self.assertEqual(4, len(descriptors))
 

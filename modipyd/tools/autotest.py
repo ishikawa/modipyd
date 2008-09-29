@@ -83,7 +83,8 @@ def spawn_unittest_runner(testables, extra_arguments=None):
 # ----------------------------------------------------------------
 # Notification Observer
 # ----------------------------------------------------------------
-def observe(module_descriptor):
+def observe(event):
+    module_descriptor = event.descriptor
 
     # Walking dependency graph in imported module to
     # module imports order.
@@ -128,9 +129,9 @@ def main(options, filepath):
         try:
 
             monitor = Monitor(filepath)
-            for modified in monitor.start():
-                LOGGER.info("Modified:\n%s" % modified.describe(indent=4))
-                observe(modified)
+            for event in monitor.start():
+                LOGGER.info("Modified:\n%s" % event.descriptor.describe(indent=4))
+                observe(event)
 
         except KeyboardInterrupt:
             LOGGER.debug('KeyboardInterrupt', exc_info=True)

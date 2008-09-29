@@ -83,12 +83,14 @@ import prisoners.b
         self.assert_('prisoners' in descriptors)
         self.assert_('prisoners.a' in descriptors)
         self.assert_('prisoners.b' in descriptors)
+        self.assert_('prisoners.c' in descriptors)
 
     def test_init_dependencies(self):
         descriptors = self.monitor.descriptors
         init = descriptors['prisoners']
         a = descriptors['prisoners.a']
         b = descriptors['prisoners.b']
+        c = descriptors['prisoners.c']
 
         self.assertEqual(1, len(init.dependencies))
         self.assert_(b in init.dependencies)
@@ -99,6 +101,11 @@ import prisoners.b
 
         self.assertEqual(0, len(b.dependencies))
         self.assertEqual(2, len(b.reverse_dependencies))
+        self.assert_(init in b.reverse_dependencies)
+        self.assert_(c in b.reverse_dependencies)
+
+        self.assertEqual(1, len(c.dependencies))
+        self.assert_(b in c.dependencies)
 
     def test_modified(self):
         modified = list(self.monitor.monitor())
@@ -122,22 +129,23 @@ import prisoners.b
         descriptors = self.monitor.descriptors
         init = descriptors['prisoners']
         b = descriptors['prisoners.b']
+        c = descriptors['prisoners.c']
 
         self.assertEqual(4, len(descriptors))
-        self.assert_(b in init.dependencies)
-        self.assert_(init in b.reverse_dependencies)
+        self.assert_(b in c.dependencies)
 
         # remove
-        os.remove(join(PRISONERS_DIR, 'b.py'))
+        os.remove(join(PRISONERS_DIR, 'c.py'))
         time.sleep(0.1)
 
         modified_it = iter(self.monitor.monitor())
         modified = modified_it.next()
 
-        self.assertEqual(b, modified)
+        self.assertEqual(c, modified)
+        self.assert_(b in c.dependencies)
+
         self.assertRaises(StopIteration, modified_it.next)
-        self.assert_(b in init.dependencies)
-        self.assert_(init in b.reverse_dependencies)
+        self.assert_(b not in c.dependencies)
         self.assertEqual(3, len(descriptors))
 
     def test_refresh(self):
@@ -177,12 +185,10 @@ import prisoners.b
             os.remove(path)
             time.sleep(0.1)
             assert not exists(path)
-            for m in self.monitor.refresh():
-                self.assertEqual(d, m)
-                break
-            else:
-                self.fail("Empty modifieds")
 
+            it = self.monitor.refresh()
+            self.assertEqual(d, it.next())
+            self.assertRaises(StopIteration, it.next)
             self.assertEqual(4, len(descriptors))
 
             #a = descriptors['prisoners.a']

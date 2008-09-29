@@ -53,7 +53,8 @@ class Monitor(object):
             self.__descriptors = {}
             self.__filenames = {}
             self.__failures = set()
-            self.refresh()
+            entries = list(self.refresh())
+            LOGGER.debug("%d descriptoes" % len(entries))
         return self.__descriptors
 
     @require(descriptor=ModuleDescriptor)
@@ -85,10 +86,12 @@ class Monitor(object):
 
         # ``monitor()`` updates all entries and
         # removes deleted entries.
-        modifieds = self.monitor()
+        for modified in self.monitor():
+            yield modified
 
         # For now, only need to check new entries.
         resolver = ModuleNameResolver(self.search_path)
+        newcomers = []
         for filename, typebits in collect_python_module_file(self.paths):
             if filename in filenames or filename in failures:
                 continue
@@ -105,7 +108,7 @@ class Monitor(object):
                 descriptors[mc.name] = desc
                 filenames[filename] = desc
                 # modifieds += new entries
-                modifieds.append(desc)
+                newcomers.append(desc)
                 LOGGER.debug("Added: %s" % desc.describe())
 
         # Since there are some entries already refer new entry,
@@ -113,18 +116,20 @@ class Monitor(object):
         for desc in descriptors.itervalues():
             desc.update_dependencies(descriptors)
 
-        return modifieds
+        # Notify caller what entries are appended
+        for newcomer in newcomers:
+            yield newcomer
+
 
     def monitor(self):
         descriptors = self.descriptors
-        modifieds = []
         removals = []
 
         for desc in descriptors.itervalues():
             try:
                 if desc.modified():
                     desc.reload(descriptors)
-                    modifieds.append(desc)
+                    yield desc
             except os.error, e:
                 if e.errno == ENOENT:
                     # No such file
@@ -135,14 +140,13 @@ class Monitor(object):
         # Remove removal entries
         for desc in removals:
             try:
+                # yield before remove
+                yield desc
                 self.remove(desc)
             except KeyError:
                 LOGGER.debug(
                     "No monitoring descriptor '%s' for removal" % desc.name,
                     exc_info=True)
-
-        modifieds.extend(removals)
-        return modifieds
 
     def start(self):
         descriptors = self.descriptors

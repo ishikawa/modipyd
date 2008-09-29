@@ -1,16 +1,15 @@
 """
-Python module representation.
+Python module code representation.
 
     :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
     :license: MIT (See ``LICENSE`` file for more details)
 
 """
 
-import dis
-import sys
-from modipyd import disasm, utils, LOGGER
+from modipyd import utils, LOGGER, BYTECODE_PROCESSORS
 from modipyd.resolve import ModuleNameResolver
 from modipyd.utils.decorators import require
+from modipyd import bytecode as bc
 
 
 # ----------------------------------------------------------------
@@ -45,90 +44,6 @@ def compile_source(filepath):
         return compile(fp.read() + '\n', filepath, 'exec')
     finally:
         fp.close()
-
-
-# ----------------------------------------------------------------
-# Bytecode analysis
-# ----------------------------------------------------------------
-LOAD_CONST = dis.opname.index('LOAD_CONST')
-LOAD_NAME = dis.opname.index('LOAD_NAME')
-LOAD_ATTR = dis.opname.index('LOAD_ATTR')
-
-IMPORT_NAME = dis.opname.index('IMPORT_NAME')
-IMPORT_FROM = dis.opname.index('IMPORT_FROM')
-IMPORT_STAR = dis.opname.index('IMPORT_STAR')
-
-STORE_NAME = dis.opname.index('STORE_NAME')
-STORE_GLOBAL = dis.opname.index('STORE_GLOBAL')
-STORE_OPS = [STORE_NAME, STORE_GLOBAL]
-
-BUILD_CLASS = dis.opname.index('BUILD_CLASS')
-BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
-
-POP_TOP = dis.opname.index('POP_TOP')
-
-
-DEBUG = False
-
-def _print(*args):
-    for s in args:
-        sys.stderr.write(str(s))
-        sys.stderr.write(' ')
-    sys.stderr.write('\n')
-
-# pylint: disable-msg=C0321
-def scan_code(co, module):
-    if DEBUG: _print("scan_code: %s" % co.co_filename)
-
-    assert co and module
-    code_iter = disasm.code_iter(co)
-
-    imp_disasm = disasm.ImportDisassembler()
-    values = []
-    bases = None
-
-    for op in code_iter:
-        #if DEBUG: _print(dis.opname[op], argc)
-        argc = disasm.read_argc(op, code_iter)
-        imp_disasm.track(op, argc, co)
-
-        # classdefs
-        if LOAD_NAME == op:
-            if DEBUG: _print('LOAD_NAME %s' % co.co_names[argc])
-            values.append(co.co_names[argc])
-        elif LOAD_ATTR == op:
-            if DEBUG: _print('LOAD_ATTR %s' % co.co_names[argc])
-            if values and isinstance(values[-1], basestring):
-                values[-1] = "%s.%s" % (values[-1], co.co_names[argc])
-        elif BUILD_TUPLE == op:
-            if DEBUG: _print(argc, values)
-
-            # Because ``scan_code`` does not fully support
-            # python bytecode spec, stack can be illegal.
-            if len(values) >= argc:
-                values[-argc:] = [tuple(values[-argc:])]
-                if DEBUG: _print('BUILD_TUPLE', argc, values[-1])
-
-        elif BUILD_CLASS == op:
-            if values and isinstance(values[-1], tuple):
-                bases = values.pop()
-            else:
-                bases = ()
-            if DEBUG: _print('BUILD_CLASS', bases)
-        elif STORE_NAME == op:
-            if bases is not None:
-                assert isinstance(bases, tuple)
-                name = co.co_names[argc]
-                module.classdefs.append((name, bases))
-                if DEBUG:
-                    _print("class %s%s:" % (name, str(bases)))
-                bases = None
-                del values[:]
-
-    module.imports.extend(imp_disasm.imports)
-    for c in co.co_consts:
-        if isinstance(c, type(co)):
-            scan_code(c, module)
 
 
 # ----------------------------------------------------------------
@@ -226,6 +141,29 @@ def read_module_code(filename, typebits=None, search_path=None,
 # ----------------------------------------------------------------
 # Module class
 # ----------------------------------------------------------------
+
+# cached processor classes
+BYTECODE_PROCESSORS_CACHE = None
+
+def load_bytecode_processors():
+    """
+    Loading BytecodeProcessor from modipyd.BYTECODE_PROCESSORS
+    settings. Return ChainedBytecodeProcessor instance holds
+    all loaded processors.
+    """
+    global BYTECODE_PROCESSORS_CACHE
+    if BYTECODE_PROCESSORS_CACHE is None:
+        BYTECODE_PROCESSORS_CACHE = []
+        for name in BYTECODE_PROCESSORS:
+            LOGGER.info("Loading BytecodeProcesser '%s'" % name)
+            klass = utils.import_component(name)
+            BYTECODE_PROCESSORS_CACHE.append(klass)
+
+    processors = []
+    for klass in BYTECODE_PROCESSORS_CACHE:
+        processors.append(klass())
+    return bc.ChainedBytecodeProcessor(processors)
+
 class ModuleCode(object):
     """Python module representation"""
 
@@ -242,20 +180,20 @@ class ModuleCode(object):
         '__main__'
         >>> modcode.filename
         '<string>'
-        >>> len(modcode.imports)
+        >>> imports = modcode.context['imports']
+        >>> len(imports)
         2
-        >>> modcode.imports[0]
+        >>> imports[0]
         ('os', 'os', -1)
-        >>> modcode.imports[1]
+        >>> imports[1]
         ('join_path', 'os.path.join', -1)
         """
         super(ModuleCode, self).__init__()
         self.name = modulename
         self.package_name = packagename
         self.filename = filename
+        self.context = {}
 
-        self.imports = []
-        self.classdefs = []
         if code is None:
             # Maybe source file contains SyntaxError?
             pass
@@ -263,9 +201,9 @@ class ModuleCode(object):
             self.update_code(code)
 
     def update_code(self, co):
-        del self.imports[:]
-        del self.classdefs[:]
-        scan_code(co, self)
+        self.context.clear()
+        processor = load_bytecode_processors()
+        bc.scan_code(co, processor, self.context)
 
     def reload(self, co=None):
         if co is None:

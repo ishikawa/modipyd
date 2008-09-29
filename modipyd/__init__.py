@@ -48,3 +48,19 @@ LOGGER = __configure_logger()
 #
 # http://docs.python.org/whatsnew/pep-328.html
 HAS_RELATIVE_IMPORTS = (sys.hexversion >= 0x2050000)
+
+
+# ----------------------------------------------------------------
+# Bytecode Processors
+# ----------------------------------------------------------------
+# The modipyd.bytecode.BytecodeProcessor subclasses 
+# for disassembling bytecode, and populating properties.
+#
+# See modipyd.bytecode.BytecodeProcessor class and standard
+# processorsfor for more details.
+#
+BYTECODE_PROCESSORS = [
+    # Standard processors
+    'modipyd.bytecode.ImportProcessor',
+    'modipyd.bytecode.ClassDefinitionProcessor',
+]

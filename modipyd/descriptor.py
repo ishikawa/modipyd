@@ -28,7 +28,7 @@ def _update_module_dependencies(module_descriptor, descriptors):
 
     def _dependent_names(descriptor):
         #print "analyze_dependent_names: %s" % descriptor.name
-        for imp in descriptor.module_code.imports:
+        for imp in descriptor.context.get('imports'):
             #print "  import: %s" % str(imp)
             # name is the fully qualified name
             name, level = imp[1], imp[2]
@@ -153,6 +153,10 @@ class ModuleDescriptor(object):
     @property
     def filename(self):
         return self.module_code.filename
+
+    @property
+    def context(self):
+        return self.module_code.context
 
     def reload(self, descriptors, co=None):
         """

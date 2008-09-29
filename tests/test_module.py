@@ -18,7 +18,7 @@ class TestModipydModuleCode(TestCase):
 
         module = ModuleCode('a', None, py, code)
         self.assertNotNone(module)
-        self.assertEqual(0, len(module.imports))
+        self.assertEqual(0, len(module.context['imports']))
 
     def test_collect_module_code(self):
         modules = list(collect_module_code(
@@ -77,38 +77,39 @@ class TestModipydModuleCode(TestCase):
 
     def test_imports(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
-        self.assertEqual(5, len(modcode.imports))
+        imports = modcode.context['imports']
+        self.assertEqual(5, len(imports))
 
         # import sys
-        self.assertEqual(('sys', 'sys', -1), modcode.imports[0])
-        self.assertEqual(('join', 'os.path.join', -1), modcode.imports[1])
-        self.assertEqual(('dirname', 'os.path.dirname', -1),
-            modcode.imports[2])
-        self.assertEqual(('unittest', 'unittest', -1), modcode.imports[3])
-        self.assertEqual(('altos', 'os', -1), modcode.imports[4])
+        self.assertEqual(('sys', 'sys', -1), imports[0])
+        self.assertEqual(('join', 'os.path.join', -1), imports[1])
+        self.assertEqual(('dirname', 'os.path.dirname', -1), imports[2])
+        self.assertEqual(('unittest', 'unittest', -1), imports[3])
+        self.assertEqual(('altos', 'os', -1), imports[4])
 
     def test_classdefs(self):
         modcode = self.read_module_code('module_code.imports_classdefs')
-        self.assertEqual(4, len(modcode.classdefs))
+        classdefs = modcode.context['classdefs']
+        self.assertEqual(4, len(classdefs))
 
         # class A:
-        self.assertEqual('A', modcode.classdefs[0][0])
-        self.assertEqual(0, len(modcode.classdefs[0][1]))
+        self.assertEqual('A', classdefs[0][0])
+        self.assertEqual(0, len(classdefs[0][1]))
 
         # class B(object):
-        self.assertEqual('B', modcode.classdefs[1][0])
-        self.assertEqual(1, len(modcode.classdefs[1][1]))
-        self.assertEqual('object', modcode.classdefs[1][1][0])
+        self.assertEqual('B', classdefs[1][0])
+        self.assertEqual(1, len(classdefs[1][1]))
+        self.assertEqual('object', classdefs[1][1][0])
 
         # class C(unittest.TestCase):
-        self.assertEqual('C', modcode.classdefs[2][0])
-        self.assertEqual(1, len(modcode.classdefs[2][1]))
-        self.assertEqual('unittest.TestCase', modcode.classdefs[2][1][0])
+        self.assertEqual('C', classdefs[2][0])
+        self.assertEqual(1, len(classdefs[2][1]))
+        self.assertEqual('unittest.TestCase', classdefs[2][1][0])
 
         # class D(A, C):
-        self.assertEqual('D', modcode.classdefs[3][0])
-        self.assertEqual(2, len(modcode.classdefs[3][1]))
-        self.assertEqual('A', modcode.classdefs[3][1][0])
+        self.assertEqual('D', classdefs[3][0])
+        self.assertEqual(2, len(classdefs[3][1]))
+        self.assertEqual('A', classdefs[3][1][0])
 
     def test_python_module_reload(self):
         search_path = join(FILES_DIR, 'imports')
@@ -123,20 +124,20 @@ class TestModipydModuleCode(TestCase):
         assert exists(pycpath) and exists(pyopath)
 
         m = read_module_code(pypath, search_path=[search_path])
-        old_imports = m.imports[:]
-        old_classdefs = m.classdefs[:]
+        old_imports = m.context['imports'][:]
+        old_classdefs = m.context['classdefs'][:]
 
         for f in [pypath, pycpath, pyopath]:
             # ugly ...
-            del m.imports[:]
-            del m.classdefs[:]
+            del m.context['imports'][:]
+            del m.context['classdefs'][:]
             m.filename = f
 
             co = m.reload()
             self.assertNotNone(co)
             self.assertEqual(pypath, co.co_filename)
-            self.assertEqual(old_imports, m.imports)
-            self.assertEqual(old_classdefs, m.classdefs)
+            self.assertEqual(old_imports, m.context['imports'])
+            self.assertEqual(old_classdefs, m.context['classdefs'])
 
 
 if __name__ == '__main__':

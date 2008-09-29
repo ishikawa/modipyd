@@ -1,5 +1,5 @@
 """
-Python module representation.
+This module provides a BytecodeProcessor, and standard processors.
 
     :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
     :license: MIT (See ``LICENSE`` file for more details)
@@ -11,6 +11,9 @@ import dis
 from modipyd import HAS_RELATIVE_IMPORTS
 
 
+# ----------------------------------------------------------------
+# Opcode
+# ----------------------------------------------------------------
 LOAD_CONST = dis.opname.index('LOAD_CONST')
 LOAD_NAME = dis.opname.index('LOAD_NAME')
 LOAD_ATTR = dis.opname.index('LOAD_ATTR')
@@ -29,6 +32,9 @@ BUILD_TUPLE = dis.opname.index('BUILD_TUPLE')
 POP_TOP = dis.opname.index('POP_TOP')
 
 
+# ----------------------------------------------------------------
+# Utilities
+# ----------------------------------------------------------------
 def code_iter(co):
     code = array.array('B', co.co_code)
     return iter(code)
@@ -41,60 +47,90 @@ def read_argc(op, it):
         argc += (it.next() * 256)
     return argc
 
+def _scan_code(co, processor, context):
+    # print "scan_code: %s" % co.co_filename
+    assert co and context is not None
+    code_it = code_iter(co)
+    processor.enter(co)
+    for op in code_it:
+        # print dis.opname[op], argc
+        argc = read_argc(op, code_it)
+        processor.process(op, argc, co)
+    processor.exit(co)
 
-class ImportDisassembler(object):
+    for c in co.co_consts:
+        if isinstance(c, type(co)):
+            _scan_code(c, processor, context)
+
+def scan_code(co, processor, context):
+    _scan_code(co, processor, context)
+    processor.populate(context)
+
+
+# ----------------------------------------------------------------
+# Bytecode Processor Interface
+# ----------------------------------------------------------------
+class BytecodeProcessor(object):
     """
-    The disassembler for ``import`` statements
-
-    ImportDisassembler.imports attribute is a list such as:
-
-        [(symbol, fully qualified, level)]
-
-    *level*
-
-    level specifies whether to use absolute or relative imports.
-    The default is -1 which indicates both absolute and relative imports
-    will be attempted. 0 means only perform absolute imports.
-    Positive values for level indicate the number of parent directories
-    to search relative to the directory of the module..
-
-        e.g.
-        import os
-        --> [('os', 'os', -1)]
-        import os.path
-        --> [('os.path', 'os.path', -1)]
-        from os.path import join as os_path_join
-        --> [('os_path_join', 'os.path.join', -1)]
-
-    >>> disasm = ImportDisassembler()
-    >>> co = compile('import os', '<string>', 'exec')
-    >>> disasm.scan(co)[0]
-    ('os', 'os', -1)
-
-    >>> co = compile(
-    ...     'import os.path', '<string>', 'exec')
-    >>> disasm.scan(co)[0]
-    ('os.path', 'os.path', -1)
-
-    >>> co = compile(
-    ...     'import os.path as os_path', '<string>', 'exec')
-    >>> disasm.scan(co)[0]
-    ('os_path', 'os.path', -1)
-
-    >>> co = compile(
-    ...     'from os import path', '<string>', 'exec')
-    >>> disasm.scan(co)[0]
-    ('path', 'os.path', -1)
-
-    >>> # from ... import * is currently not fully supported
-    >>> co = compile(
-    ...     'from os.path import *', '<string>', 'exec')
-    >>> disasm.scan(co)[0]
-    ('*', 'os.path.*', -1)
+    The ``BytecodeProcessor`` disassembles the bytecode and
+    populates properties of the bytecode into context object.
     """
 
     def __init__(self):
-        super(ImportDisassembler, self).__init__()
+        super(BytecodeProcessor, self).__init__()
+
+    def enter(self, co):
+        pass
+
+    def exit(self, co):
+        pass
+
+    def process(self, op, argc, co):
+        pass
+
+    def populate(self, context):
+        """
+        Populate properties of the bytecode into *context* object.
+        *context* object need to be substitutable for dictionaries.
+        """
+        pass
+
+
+# ----------------------------------------------------------------
+# Bytecode Processor Chain
+# ----------------------------------------------------------------
+class ChainedBytecodeProcessor(BytecodeProcessor):
+
+    def __init__(self, processores):
+        super(ChainedBytecodeProcessor, self).__init__()
+        self.processores = list(processores)
+
+    def enter(self, co):
+        for processor in self.processores:
+            processor.enter(co)
+
+    def process(self, op, argc, co):
+        for processor in self.processores:
+            processor.process(op, argc, co)
+
+    def exit(self, co):
+        for processor in self.processores:
+            processor.exit(co)
+
+    def populate(self, context):
+        for processor in self.processores:
+            processor.populate(context)
+
+
+# ----------------------------------------------------------------
+# Standard Processors
+# ----------------------------------------------------------------
+
+class ImportProcessor(BytecodeProcessor):
+
+    def __init__(self):
+        super(ImportProcessor, self).__init__()
+
         self.import_name = None
         self.fromname = None
 
@@ -108,23 +144,13 @@ class ImportDisassembler(object):
         # ``import``s
         self.imports = []
 
-    def __scan(self, co):
-        code = code_iter(co)
-        for op in code:
-            argc = read_argc(op, code)
-            self.track(op, argc, co)
-        for c in co.co_consts:
-            if isinstance(c, type(co)):
-                self.__scan(c)
+    def enter(self, co):
+        pass
 
-    def scan(self, co):
-        del self.imports[:]
-        self.__scan(co)
-        ret = self.imports[:]
-        del self.imports[:]
-        return ret
+    def exit(self, co):
+        pass
 
-    def track(self, op, argc, co):
+    def process(self, op, argc, co):
         if LOAD_CONST == op:
             # An ``IMPORT_NAME`` is always preceded by a 2 ``LOAD_CONST``s,
             # they are:
@@ -228,7 +254,60 @@ class ImportDisassembler(object):
             #print "-> import %s" % str(self.imports[-1])
             self.fromname = None
 
+    def populate(self, context):
+        imports = context.setdefault('imports', [])
+        imports.extend(self.imports)
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+
+class ClassDefinitionProcessor(BytecodeProcessor):
+
+    def __init__(self):
+        super(ClassDefinitionProcessor, self).__init__()
+        self.classdefs = []
+        self.values = []
+        self.bases = None
+
+    def enter(self, co):
+        pass
+
+    def exit(self, co):
+        pass
+
+    def process(self, op, argc, co):
+        values = self.values
+
+        if LOAD_NAME == op:
+            # print 'LOAD_NAME %s' % co.co_names[argc]
+            values.append(co.co_names[argc])
+        elif LOAD_ATTR == op:
+            # print 'LOAD_ATTR %s' % co.co_names[argc]
+            if values and isinstance(values[-1], basestring):
+                values[-1] = "%s.%s" % (values[-1], co.co_names[argc])
+        elif BUILD_TUPLE == op:
+            # print argc, values
+
+            # Because ``scan_code`` does not fully support
+            # python bytecode spec, stack can be illegal.
+            if len(values) >= argc:
+                values[-argc:] = [tuple(values[-argc:])]
+                # print 'BUILD_TUPLE', argc, values[-1]
+
+        elif BUILD_CLASS == op:
+            if values and isinstance(values[-1], tuple):
+                self.bases = values.pop()
+            else:
+                self.bases = ()
+            # print 'BUILD_CLASS', bases
+        elif STORE_NAME == op:
+            bases = self.bases
+            if bases is not None:
+                assert isinstance(bases, tuple)
+                name = co.co_names[argc]
+                self.classdefs.append((name, bases))
+                # print "class %s%s:" % (name, str(bases))
+                self.bases = None
+                del values[:]
+
+    def populate(self, context):
+        classdefs = context.setdefault('classdefs', [])
+        classdefs.extend(self.classdefs)

@@ -43,10 +43,10 @@ def has_subclass(module_descriptor, baseclass):
 
     # Construct imported symbols.
     # This is used in phase 3.
-    symbols = dict([(imp[0], imp) for imp in modcode.imports])
+    symbols = dict([(imp[0], imp) for imp in modcode.context['imports']])
 
     # 1. For all class definition in module code
-    for klass in modcode.classdefs:
+    for klass in modcode.context['classdefs']:
 
         # 2. Check class is derived from base class(s)
         bases = klass[1]

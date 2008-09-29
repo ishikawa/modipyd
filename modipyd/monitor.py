@@ -79,7 +79,6 @@ class Monitor(object):
 
         # For now, only need to check new entries.
         resolver = ModuleNameResolver(self.search_path)
-        newcomers = []
         for filename, typebits in collect_python_module_file(self.paths):
             if filename in filenames or filename in failures:
                 continue
@@ -95,11 +94,14 @@ class Monitor(object):
                 desc = ModuleDescriptor(mc)
                 descriptors[mc.name] = desc
                 filenames[filename] = desc
-                newcomers.append(desc)
+                # modifieds += new entries
+                modifieds.append(desc)
+                LOGGER.debug("Added: %s" % desc.describe())
 
-        for desc in newcomers:
+        # Since there are some entries already refer new entry,
+        # we need to update dependencies of all entries
+        for desc in descriptors.itervalues():
             desc.update_dependencies(descriptors)
-            LOGGER.info("Added: %s" % desc.describe())
 
         return modifieds
 
@@ -115,7 +117,7 @@ class Monitor(object):
                 "No monitoring descriptor '%s'" % \
                 descriptor.name)
 
-        LOGGER.info("Removed: %s" % descriptor.describe())
+        LOGGER.debug("Removed: %s" % descriptor.describe())
         descriptor.clear_dependencies()
         del descriptors[descriptor.name]
         del filenames[filename]

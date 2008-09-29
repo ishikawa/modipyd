@@ -137,10 +137,13 @@ money = 4321.09
                 time.sleep(0.1)
                 assert exists(path)
 
-            self.monitor.refresh()
+            modifieds = self.monitor.refresh()
             self.assertEqual(4, len(descriptors))
             #a = descriptors['prisoners.a']
             c = descriptors['prisoners.c']
+
+            self.assertEqual(1, len(modifieds))
+            self.assertEqual(c, modifieds[0])
 
             self.assertEqual(0, len(a.dependencies))
             self.assertEqual(1, len(a.reverse_dependencies))

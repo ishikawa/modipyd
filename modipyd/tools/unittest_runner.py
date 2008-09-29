@@ -11,6 +11,7 @@ import sys
 import unittest
 
 from modipyd import LOGGER, utils
+from modipyd.utils import import_component
 
 
 def collect_unittest(module_names):
@@ -30,14 +31,14 @@ def collect_unittest(module_names):
                 LOGGER.info("Found unittest.TestCase: %s" % module.__name__)
     return suite
 
-def run_unittest(suite):
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
-def main(module_names):
+def main(module_names, test_runner_class='unittest.TextTestRunner'):
     suite = collect_unittest(module_names)
-    if suite.countTestCases():
-        run_unittest(suite)
+    if not suite.countTestCases():
+        return
+    
+    testRunner = import_component(test_runner_class)
+    runner = testRunner()
+    runner.run(suite)
 
 
 if __name__ == '__main__':

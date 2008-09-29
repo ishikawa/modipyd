@@ -20,10 +20,14 @@ class _Node(object):
         self.__prev = None
 
     def get_prev(self):
-        return self.__prev() if self.__prev is not None else None
+        if self.__prev is not None:
+            return self.__prev()
 
     def set_prev(self, node):
-        self.__prev = weakref.ref(node) if node is not None else None
+        if node is not None:
+            self.__prev = weakref.ref(node)
+        else:
+            self.__prev = None
 
     prev = property(get_prev, set_prev)
 

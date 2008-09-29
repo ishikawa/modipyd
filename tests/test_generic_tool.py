@@ -5,7 +5,15 @@ from tests import TestCase
 from modipyd.tools import generic
 
 
-class TestGenericTool(TestCase):
+class GenericToolTestCase(TestCase):
+
+    def parse_options(self, args):
+        parser = generic.make_option_parser()
+        self.assertNotNone(parser)
+        return parser.parse_args(args)
+
+
+class TestGenericTool(GenericToolTestCase):
 
     def test_startup_files(self):
         files = list(generic.startup_files(""))
@@ -18,13 +26,8 @@ class TestGenericTool(TestCase):
         self.assertNotNone(application)
 
 
-class TestGenericToolOptions(TestCase):
+class TestGenericToolOptions(GenericToolTestCase):
 
-    def parse_options(self, args):
-        parser = generic.make_option_parser()
-        self.assertNotNone(parser)
-        return parser.parse_args(args)
-        
     def test_empty(self):
         options, args = self.parse_options([])
         self.assertEqual(0, len(args))

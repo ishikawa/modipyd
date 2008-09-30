@@ -14,4 +14,4 @@ lint:
 	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=I0011,C0103,C0111,C0103,R0904,W0142,C0102 tests
 
 clean:
-	find . -name \*.py[co] -exec rm -f {} \;
+	-find . -name \*.py[co] -exec rm -f {} \;

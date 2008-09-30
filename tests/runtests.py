@@ -33,7 +33,8 @@ def gather_tests():
             tests.addTest(suite)
 
     # doctest
-    for modcode in collect_module_code(join(dirname(__file__), '..', 'modipyd')):
+    modipyd_dir = join(dirname(__file__), '..', 'modipyd')
+    for modcode in collect_module_code(modipyd_dir):
         module = import_module(modcode.name)
         try:
             suite = doctest.DocTestSuite(module)

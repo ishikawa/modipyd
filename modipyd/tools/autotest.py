@@ -20,16 +20,21 @@ from modipyd.tools import generic
 from modipyd.application.plugins import Autotest
 
 
-def run():
-    parser = generic.make_option_parser()
-    (options, args) = parser.parse_args()
-
+def make_application(options, args):
     # Create Application instance, and install Autotest plugin
-    application = generic.make_application(options, args or '.')
+    application = generic.make_application(options, args)
     application.install_plugin(Autotest)
+    return application
+
+def make_option_parser():
+    return generic.make_option_parser()
+
+def run():
+    parser = make_option_parser()
+    options, args = parser.parse_args()
 
     try:
-        application.run()
+        make_application(options, args or '.').run()
     except KeyboardInterrupt:
         LOGGER.debug('Keyboard Interrupt', exc_info=True)
 

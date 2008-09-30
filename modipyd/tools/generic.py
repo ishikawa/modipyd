@@ -56,6 +56,10 @@ MAJOR_VERSION = 0
 MINOR_VERSION = 1
 VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 
+
+# ----------------------------------------------------------------
+# Startup files
+# ----------------------------------------------------------------
 STARTUP_ENVIRON_NAME = 'MODIPYDRC'
 STARTUP_FILENAMES = ['modipydrc', '.modipydrc']
 
@@ -63,16 +67,13 @@ STARTUP_FILENAMES = ['modipydrc', '.modipydrc']
 def find_startup_files(environ=None, rcfile=None):
     if rcfile and os.path.isfile(rcfile):
         return [rcfile]
-
     for rcfile in STARTUP_FILENAMES:
         if os.path.isfile(rcfile):
             return [rcfile]
-
     if environ and STARTUP_ENVIRON_NAME in environ:
         rcfile = environ[STARTUP_ENVIRON_NAME]
         if os.path.isfile(rcfile):
             return [rcfile]
-
     return []
 
 def make_application(options, filepath):

@@ -14,6 +14,15 @@ So I named it modipyd (modified + python).
     :license: MIT, see LICENSE for more details.
 """
 
+__version__ = '1.0'
+__author__ = 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
+__url__ = 'http://github.com/ishikawa/modipyd/'
+__license__ = 'MIT License'
+__docformat__ = 'restructuredtext'
+
+__all__ = ['LOGGER', 'HAS_RELATIVE_IMPORTS', 'BYTECODE_PROCESSORS']
+
+
 import os
 import sys
 

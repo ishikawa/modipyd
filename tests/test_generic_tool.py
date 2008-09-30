@@ -14,8 +14,7 @@ class GenericToolTestCase(TestCase):
         return parser.parse_args(args)
 
     def make_application(self, args):
-        parser = generic.make_option_parser()
-        options, args = parser.parse_args(args)
+        options, args = self.parse_options(args)
         return generic.make_application(options, args or '.')
 
 

@@ -24,10 +24,19 @@ def make_application(options, args):
     # Create Application instance, and install Autotest plugin
     application = generic.make_application(options, args)
     application.install_plugin(Autotest)
+    if options.runner:
+        application.update_variables({
+            Autotest.CONTEXT_TEST_RUNNER: options.runner,
+        })
     return application
 
 def make_option_parser():
-    return generic.make_option_parser()
+    parser = generic.make_option_parser()
+    parser.add_option("-r", "--runner", default=None,
+        action="store", dest="runner", metavar='CLASS_NAME',
+        help="qualified name of the unittest.TestRunner subclass "
+             "(default: unittest.TextTestRunner)")
+    return parser
 
 def run():
     parser = make_option_parser()

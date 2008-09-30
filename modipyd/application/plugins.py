@@ -123,9 +123,12 @@ class Autotest(object):
             (default is unittest.TextTestRunner)
     """
 
+    # The qualified name of ``unittest.TestRunner`` class
+    CONTEXT_TEST_RUNNER = 'autotest.test_runner'
+
     def __init__(self, event, monitor, context):
         self.descriptor = event.descriptor
-        self.test_runner = context.get('autotest.test_runner')
+        self.test_runner = context.get(Autotest.CONTEXT_TEST_RUNNER)
 
     def __call__(self):
 

@@ -6,8 +6,15 @@
 
 all: lint test
 
-test:
+test: test24
 	PYTHONPATH=. python tests/runtests.py
+
+test24:
+	if [ -f "$(PYTHON24)" -a -x "$(PYTHON24)" ]; then \
+		$(MAKE) clean; \
+		PYTHONPATH=. "$(PYTHON24)" tests/runtests.py; \
+		$(MAKE) clean; \
+	fi
 
 lint:
 	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=I0011,C0103,C0111,W0142 modipyd

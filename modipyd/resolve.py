@@ -29,14 +29,13 @@ def resolve_relative_modulename(modulename, package, level):
 class ModuleNameResolver(object):
     """
     This class provides an interface to the mechanisms
-    used to resolve module name from mofule filepath.
+    used to resolve module name from a python source file path.
     """
 
     def __init__(self, search_paths=None):
         """
         The ``search_paths`` argument is module search path,
         if *search_paths* is omitted or ``None``, ``sys.path`` is used.
-        ``sys.path`` is used.
         """
         super(ModuleNameResolver, self).__init__()
 

@@ -1,10 +1,10 @@
 """
 Functions that help with dynamically creating decorators.
 
-    :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
-    :license: MIT (See ``LICENSE`` file for more details)
-
+    :copyright: 2008 by Takanori Ishikawa
+    :license: MIT, see LICENSE for more details.
 """
+
 from types import NoneType
 from modipyd.utils import wrap_sequence, unwrap_sequence
 

@@ -10,9 +10,8 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 > allowing you to get stuff done faster.
 > Focuses on running previous failures until you've fixed them.
 
-    :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
-    :license: MIT (See ``LICENSE`` file for more details)
-
+    :copyright: 2008 by Takanori Ishikawa
+    :license: MIT, see LICENSE for more details.
 """
 
 from modipyd import LOGGER

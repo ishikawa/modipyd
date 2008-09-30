@@ -1,10 +1,10 @@
 """
 Utilities
 
-    :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
-    :license: MIT (See ``LICENSE`` file for more details)
-
+    :copyright: 2008 by Takanori Ishikawa
+    :license: MIT, see LICENSE for more details.
 """
+
 import os
 import sys
 import stat

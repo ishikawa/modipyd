@@ -2,9 +2,8 @@
 The ``ordered_set`` module provides classes for constructing and
 manipulating **ordered** collections of unique elements.
 
-    :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
-    :license: MIT (See ``LICENSE`` file for more details)
-
+    :copyright: 2008 by Takanori Ishikawa
+    :license: MIT, see LICENSE for more details.
 """
 
 import weakref

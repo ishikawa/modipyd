@@ -2,4 +2,6 @@
 *.pyc
 *.pyo
 .pylintrc
+build
+dist
 _memo

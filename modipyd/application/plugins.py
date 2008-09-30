@@ -71,14 +71,14 @@ dictionary in any way it desires.
 When called by the runtime, the plugin object can return (but
 not required)a callable object. It is called with no arguments
 
-    :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
-    :license: MIT (See ``LICENSE`` file for more details)
-
 .. NOTE::
     Sorry I'm not a native speaker, many parts of this documentation are
     borrowed heavily from `PEP 333`_ documentation...
 
 .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+
+    :copyright: 2008 by Takanori Ishikawa
+    :license: MIT, see LICENSE for more details.
 """
 
 

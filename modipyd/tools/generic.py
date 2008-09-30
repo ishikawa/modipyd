@@ -20,22 +20,21 @@ manually:
     from myplugins import MyGreatPlugin
     application.install_plugin(MyGreatPlugin)
 
-You can specify startup file by one of these ways:
+There are three files where program will search for startup file,
+in the following order:
 
-1. Setting an environment variable named $MODIPYDRC to
-   the name of a file containing your start-up commands.
-   This is similar to the .profile feature of the Unix shells.
-
-2. Putting ``modipydrc`` or ``.modipydrc`` file in the current
-   directory. Modipyd looks these files and executes it if exists.
-
-3. Using ``--rcfile`` command option to specify the name of
+1. An environment variable named ``$MODIPYDRC`` to the name of
    a file containing your start-up commands.
 
-Each process is applied in order. That means, if one process alters
-a variable and a second process alters a variable with the same name,
-the second will override the first.
+2. ``modipydrc`` or ``.modipydrc`` file in the current
+   directory. Modipyd looks these files and executes it if exists.
 
+3. ``--rcfile`` command option to specify the name of a file
+   containing your start-up commands.
+
+The most recently found startup file has highest priority. For example,
+if a startup file is given on command line (``--rcfile`` option), other
+startup files will be ignored. 
 
     :copyright: 2008 by Takanori Ishikawa <takanori.ishikawa@gmail.com>
     :license: MIT (See ``LICENSE`` file for more details)
@@ -61,18 +60,20 @@ STARTUP_ENVIRON_NAME = 'MODIPYDRC'
 STARTUP_FILENAMES = ['modipydrc', '.modipydrc']
 
 
-def startup_files(rcfile):
-    if STARTUP_ENVIRON_NAME in os.environ:
-        f = os.environ[STARTUP_ENVIRON_NAME]
-        if os.path.isfile(f):
-            yield f
-
-    for f in STARTUP_FILENAMES:
-        if os.path.isfile(f):
-            yield f
-
+def find_startup_files(environ=None, rcfile=None):
     if rcfile and os.path.isfile(rcfile):
-        yield rcfile
+        return [rcfile]
+
+    for rcfile in STARTUP_FILENAMES:
+        if os.path.isfile(rcfile):
+            return [rcfile]
+
+    if environ and STARTUP_ENVIRON_NAME in environ:
+        rcfile = environ[STARTUP_ENVIRON_NAME]
+        if os.path.isfile(rcfile):
+            return [rcfile]
+
+    return []
 
 def make_application(options, filepath):
     # options handling
@@ -107,7 +108,7 @@ def make_application(options, filepath):
             "Predefined variables: %s" % pprint.pformat(variables))
 
     # Load configuration (startup) file
-    for rcfile in startup_files(options.rcfile):
+    for rcfile in find_startup_files(os.environ, options.rcfile):
         LOGGER.info("Loading startup file from %s" % rcfile)
         execfile(rcfile, globals(), {'application': application})
 
@@ -127,13 +128,14 @@ def make_option_parser():
              "the plugin must be callable object (e.g. function, class).")
     parser.add_option("--rcfile", default=None,
         action="store", dest="rcfile", metavar='FILE',
-        help="specify a startup script. "
+        help="specify a startup script. If a startup file is given on "
+             "command line, other startup files will be ignored. "
              "Modipyd also looks $%s environment variable, and "
              "%s files in current directory" % (STARTUP_ENVIRON_NAME, 
              ', '.join(STARTUP_FILENAMES)))
     parser.add_option("-D", default=[],
         action="append", dest="defines", metavar='name(=value)',
-        help="Predefine name as a plugin context variable, "
+        help="predefine name as a plugin context variable, "
              "with specified value string (or empty string if omitted).")
 
     return parser

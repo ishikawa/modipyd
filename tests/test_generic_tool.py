@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import unittest
-from tests import TestCase
+from os.path import join
+from tests import TestCase, FILES_DIR
 from modipyd.tools import generic
 
 
@@ -20,13 +21,29 @@ class GenericToolTestCase(TestCase):
 
 class TestGenericTool(GenericToolTestCase):
 
-    def test_startup_files(self):
-        files = list(generic.startup_files(""))
-        self.assertNotNone(files)
-
     def test_make_application(self):
         application = self.make_application([])
         self.assertNotNone(application)
+
+
+class TestGenericToolStartupFiles(GenericToolTestCase):
+
+    def test_empty(self):
+        files = list(generic.find_startup_files())
+        self.assertNotNone(files)
+
+    def test_environ(self):
+        environ = {generic.STARTUP_ENVIRON_NAME: __file__}
+        files = list(generic.find_startup_files(environ))
+        self.assert_(__file__ in files)
+
+    def test_rcfile(self):
+        environ = {generic.STARTUP_ENVIRON_NAME: __file__}
+        rcfile = join(FILES_DIR, 'python', 'a.py')
+        files = list(
+            generic.find_startup_files(environ, rcfile))
+        self.assert_(rcfile in files)
+        self.assert_(__file__ not in files)
 
 
 class TestGenericToolOptions(GenericToolTestCase):

@@ -45,16 +45,8 @@ import sys
 import logging
 from optparse import OptionParser
 
-from modipyd import LOGGER
+from modipyd import LOGGER, __version__
 from modipyd.application import Application
-
-
-# ----------------------------------------------------------------
-# Version
-# ----------------------------------------------------------------
-MAJOR_VERSION = 0
-MINOR_VERSION = 1
-VERSION_STRING = "%d.%d" % (MAJOR_VERSION, MINOR_VERSION)
 
 
 # ----------------------------------------------------------------
@@ -118,7 +110,7 @@ def make_application(options, filepath):
 def make_option_parser():
     parser = OptionParser(
         usage="usage: %prog [options] [files or directories]",
-        version=("%prog " + VERSION_STRING))
+        version=("%prog " + __version__))
 
     parser.add_option("-v", "--verbose",
         action="count", dest="verbosity", default=0,

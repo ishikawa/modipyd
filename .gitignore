@@ -1,6 +1,8 @@
 .DS_Store
 *.pyc
 *.pyo
+*.egg
+Modipyd.egg-info
 .pylintrc
 build
 dist

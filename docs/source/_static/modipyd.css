@@ -110,6 +110,7 @@ div.related li.right {
 
 div.related a {
   color: white;
+  text-decoration: none;
 }
 
 
@@ -120,8 +121,8 @@ a {
   text-decoration: underline;
 }
 
-a:hover { background-color: #ddd; }
-a:visited { text-decoration: none; }
+div.body a:hover { background-color: #ddd; }
+div.body a:visited { text-decoration: none; }
 
 h1,h2,h3,h4,h5,h6 {
   font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;

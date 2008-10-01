@@ -8,7 +8,49 @@ html * {
 }
 
 body {
-  font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+  font-family: "Gill Sans", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
   font-size: 81.25%; /* 13px */
+  font-size: 87.5%;  /* 14px */
   color: #444;
+}
+
+a {
+  color: #399;
+  font-weight: normal;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #699;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+  color: #39c;
+}
+h1 { font-size: 171.42%; /* 24px */ }
+h2 { font-size: 114.28%; /* 16px */ }
+
+
+a.headerlink {
+  margin-left: 3px;
+  color: #999;
+  padding: 0 4px 0 4px;
+  text-decoration: none;
+  visibility: hidden;
+}
+
+h1:hover > a.headerlink,
+h2:hover > a.headerlink,
+h3:hover > a.headerlink,
+h4:hover > a.headerlink,
+h5:hover > a.headerlink,
+h6:hover > a.headerlink,
+dt:hover > a.headerlink {
+    visibility: visible;
+}
+
+a.headerlink:hover {
+    background-color: #999;
+    color: white;
 }

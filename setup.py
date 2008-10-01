@@ -12,7 +12,7 @@ setup(
     license = modipyd.__license__,
     author = author,
     author_email = email,
-    description = '',
+    description = 'Modipyd is a Python module dependency analysis and monitoring modification framework',
     long_description = modipyd.__doc__,
     keywords = 'test autotest bytecode dependency analysis',
     packages = find_packages(exclude=['tests']),

@@ -14,7 +14,7 @@ So I named it modipyd (modified + python).
     :license: MIT, see LICENSE for more details.
 """
 
-__version__ = '1.0'
+__version__ = '1.0rc1'
 __author__ = 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
 __url__ = 'http://github.com/ishikawa/modipyd/'
 __license__ = 'MIT License'

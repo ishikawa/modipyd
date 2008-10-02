@@ -3,13 +3,13 @@
 Modipyd: Autotest for Python, and more
 =======================================
 
-**Modipyd** は石川尊教（いしかわ・たかのり）が開発した、Python モジュールの依存性解析と変更を監視するためのフレームワークです。\ `MIT ライセンス`_\ のもとで配布しています。
+**Modipyd** は石川尊教（いしかわ・たかのり）が開発した、\ `Python`_ モジュールの依存性解析、および、モジュールの変更を監視するためのフレームワークです。\ `MIT ライセンス`_\ のもとで配布しています。
 
 **このプロジェクトの目標：**
 
-* `ZenTest の autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ のような、ユニットテストの実行を自動化するためのツール **pyautotest** を `Python <http://www.python.org/>`_ プログラム向けに提供する
-* モジュールが変更されたときに実行するアクションを柔軟にカスタマイズするために、プラグインの仕組みを提供する
-* バイトコード解析、モジュールの依存性解析と変更を監視するための API を提供する
+* `ZenTest の autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ のような、ユニットテストの実行を自動化するためのツール **pyautotest** を Python プログラム向けに提供する
+* モジュールが変更されたときに実行するアクションを柔軟にカスタマイズできるように、プラグインの仕組みを提供する
+* バイトコード解析、モジュールの依存性解析、およびモジュールの変更を監視するための API を提供する
 
 **ユーザー向けのリソース**
 
@@ -38,6 +38,7 @@ Modipyd: Autotest for Python, and more
 * :ref:`modindex`
 * :ref:`search`
 
+.. _Python: http://www.python.org/
 .. _MIT ライセンス: http://www.opensource.org/licenses/mit-license.php
 .. _GitHub: http://github.com/
 .. _Lighthouse: http://lighthouseapp.com/

@@ -75,6 +75,7 @@ div.sphinxsidebar h3 {
   color: #777;
 }
 div.sphinxsidebar ul {
+  margin-left: .5em;
 }
 div.sphinxsidebar ul ul {
   margin-left: 1em;
@@ -131,6 +132,15 @@ div.related li.right {
 div.related a {
   color: white;
   text-decoration: none;
+}
+
+a {
+  color: #399;
+  font-weight: normal;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
 div.body a,

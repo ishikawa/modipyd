@@ -13,7 +13,7 @@ Modipyd: Autotest for Python and more
 **Things you can do as a public user:**
 
 * *Download latest release and use it*: `Version 1.0 release candidate <http://metareal.lighthouseapp.com/projects/17658-modipyd/milestones/current>`_ coming soon!
-* `Create a new ticket`_: Tickets are the life blood of a project. Report bugs and make feature requests. They can be anything from **bug reports** to todo items which can be assigned to folks involved in the project.
+* `Create a new ticket`_: Tickets are the life blood of a project. They can be anything from *bug reports* to *todo items*, *feature requests* which can be assigned to folks involved in the project.
 
 **For developers interested in this project:**
 

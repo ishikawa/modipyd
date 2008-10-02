@@ -167,14 +167,12 @@ div.body a.headerlink:hover {
   color: #369;
 }
 
-div.body p,
-div.body li {
-  line-height: 1.3;
-}
 div.body p {
   margin: 1em 0;
+  line-height: 1.3;
 }
 
+/*
 div.body ul {
   display: block;
   margin: 1em 0;
@@ -184,6 +182,25 @@ div.body li {
   display: list-item;
   margin-left: 3em;
 }
+*/
+div.body ul {
+  display: block;
+  margin: 1em 0;
+  list-style-type: none;
+}
+div.body li {
+  display: list-item;
+  margin-left: 2em;
+  padding-left: 22px;
+  line-height: 1.5;
+  background-repeat: no-repeat;
+  background-position: 0px 4px;
+  background-image: url(checkblue.png);
+  background-image: url(checkgray.png);
+  background-image: url(checkgreen.png);
+}
+
+
 
 dt:target,
 .highlight {

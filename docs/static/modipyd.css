@@ -169,7 +169,6 @@ h2 { font-size: 114.28%; /* 16px */ }
 
 a.headerlink {
   margin-left: 3px;
-  color: #999;
   padding: 0 4px 0 4px;
   text-decoration: none;
   visibility: hidden;
@@ -182,23 +181,28 @@ h4:hover > a.headerlink,
 h5:hover > a.headerlink,
 h6:hover > a.headerlink,
 dt:hover > a.headerlink {
-    visibility: visible;
+  color: #f60;
+  visibility: visible;
+  text-decoration: none;
 }
 
 div.body a.headerlink:hover {
   background-color: transparent;
-  color: #369;
+  color: #930;
+  text-decoration: none;
 }
 
 div.body strong {
   font-weight: normal;
   color: #f60;
+  color: #069;
 }
 div.body em {
   font-style: italic;
   font-family: 'Times New Roman', Times, serif;
   color: #333;
   color: #036;
+  color: #690;
 }
 
 div.body p {

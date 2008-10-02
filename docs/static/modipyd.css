@@ -18,7 +18,12 @@ fieldset,img {
 ol,ul {
   list-style-type: none;
 }
+address,caption,cite,code,dfn,em,strong,th,var {
+  font-style:normal;
+  font-weight:normal;
+}
 
+/* theme */
 body {
   font-family: "Gill Sans", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
   font-size: 81.25%; /* 13px */
@@ -128,7 +133,8 @@ div.related a {
   text-decoration: none;
 }
 
-a {
+div.body a,
+div.body a em {
   color: #399;
   font-weight: normal;
   text-decoration: underline;
@@ -165,6 +171,16 @@ dt:hover > a.headerlink {
 div.body a.headerlink:hover {
   background-color: transparent;
   color: #369;
+}
+
+div.body strong {
+  color: #f60;
+}
+div.body em {
+  font-style: italic;
+  font-family: 'Times New Roman', Times, serif;
+  color: #333;
+  color: #036;
 }
 
 div.body p {

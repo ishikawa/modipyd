@@ -25,6 +25,21 @@ body {
 
 
 /* layout */
+body {
+  text-align: center;
+}
+div.related,
+div.document,
+div.footer {
+  margin: 0 auto;
+  min-width: 50em;
+  max-width: 1024px;
+  text-align: left;
+
+  border: 1px solid #ccc;
+  border-width: 0 1px;
+}
+
 div.document {
   background-color: #cde;
   background-color: #ddd;

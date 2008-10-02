@@ -14,17 +14,16 @@ Modipyd: Autotest for Python, and more
 **ユーザー向けのリソース**
 
 * *最新のリリースをダウンロード*\ ：\ `バージョン 1.0 のリリース候補 <http://metareal.lighthouseapp.com/projects/17658-modipyd/milestones/current>`_\ を近いうちに公開予定です
-* `バグ報告や要望はこちら <http://metareal.lighthouseapp.com/projects/17658-modipyd/tickets/new>`_\ ：バグ報告や要望はリンク先のフォームから登録してください。\ Lighthouse_ という海外のサービスを利用しているため、インターフェースは英語になっていますが、報告する内容は日本語でもかまいません（そのうち、より詳しい手順の解説を書く予定です）。
+* `バグ報告や要望はこちら <http://metareal.lighthouseapp.com/projects/17658-modipyd/tickets/new>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。\ Lighthouse_ という海外のサービスを利用しているため、インターフェースは英語になっていますが、報告する内容は日本語でもかまいません（そのうち、より詳しい手順の解説を書く予定です）。
 
-**For developers interested in this project:**
+**このプロジェクトに興味がある開発者の方へ：**
 
-* `Getting the code <http://github.com/ishikawa/modipyd/>`_: See the full code via a Web interface. Modipyd code is stored in `the Git repository <http://github.com/ishikawa/modipyd/>`_, where you can find the latest development source code (thanks to GitHub_).
-* `Browse Tickets and Milestones <http://metareal.lighthouseapp.com/projects/17658/>`_: Report bugs and make feature requests (thanks to Lighthouse_).
+* `ソースコードをみる <http://github.com/ishikawa/modipyd/>`_\ ： Modipyd のソースコードは GitHub_ で管理しています。\ `こちら <http://github.com/ishikawa/modipyd/>`_\ から最新のソースコードを閲覧、取得できます。
+* `チケットやマイルストーンをみる <http://metareal.lighthouseapp.com/projects/17658/>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。
 
-
-AUTOTEST Related Links
+関連リンク
 -----------------------------------
-* `ZenTest: Automated test scaffolding for Ruby <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ The original autotest tool for Ruby
+* `ZenTest: Automated test scaffolding for Ruby <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ Modipyd を開発するきっかけともなったオリジナルの autotest です。
 * `pyautotest <http://github.com/dbr/pyautotest/>`_ Unittest notifier: Notification of unittest passes and failures, via Growl. Like autotest for Python
 * `Is there something like 'autotest' for Python unittests? - Stack Overflow <http://stackoverflow.com/questions/108892/is-there-something-like-autotest-for-python-unittests>`_
 
@@ -32,8 +31,8 @@ AUTOTEST Related Links
 .. toctree::
    :maxdepth: 2
 
-Indices and tables
-==================
+索引と検索
+-----------------------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

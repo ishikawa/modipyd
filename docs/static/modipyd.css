@@ -20,14 +20,14 @@ body {
   font-family: "Gill Sans", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
   font-size: 81.25%; /* 13px */
   font-size: 87.5%;  /* 14px */
+  font-size: 100%;
+  text-align: center;
   color: #444;
+  background-color: #555;
 }
 
 
 /* layout */
-body {
-  text-align: center;
-}
 div.related,
 div.document,
 div.footer {
@@ -35,9 +35,6 @@ div.footer {
   min-width: 50em;
   max-width: 1024px;
   text-align: left;
-
-  border: 1px solid #ccc;
-  border-width: 0 1px;
 }
 
 div.document {
@@ -91,9 +88,8 @@ div.footer a {
   color: #fff;
   text-decoration: underline;
 }
-div.related,
+
 div.footer {
-  background-color: #133f52;
   background-color: #999;
 }
 div.related {
@@ -102,6 +98,7 @@ div.related {
   height: 30px;
   line-height: 30px;
   font-size: 90%;
+  background: url(relatedbg.png) top left repeat-x;
 }
 
 div.related h3 {
@@ -127,8 +124,6 @@ div.related a {
   color: white;
   text-decoration: none;
 }
-
-
 
 a {
   color: #399;
@@ -164,9 +159,9 @@ dt:hover > a.headerlink {
     visibility: visible;
 }
 
-a.headerlink:hover {
-    background-color: #999;
-    color: white;
+div.body a.headerlink:hover {
+  background-color: transparent;
+  color: #369;
 }
 
 div.body ul {

@@ -17,7 +17,7 @@ Modipyd: Autotest for Python and more
 
 **For developers interested in this project:**
 
-* `Get Code <http://github.com/ishikawa/modipyd/>`_: The Modipyd source is stored in a `GitHub repository <http://github.com/ishikawa/modipyd/>`_, where you can find the latest development source code (thanks to GitHub_).
+* `Get Code <http://github.com/ishikawa/modipyd/>`_: The Modipyd source is stored in `the Git repository <http://github.com/ishikawa/modipyd/>`_, where you can find the latest development source code (thanks to GitHub_).
 * `Browse Tickets and Milestones <http://metareal.lighthouseapp.com/projects/17658/>`_: Report bugs and make feature requests (thanks to Lighthouse_).
 
 

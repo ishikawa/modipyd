@@ -109,7 +109,7 @@ div.related {
   height: 30px;
   line-height: 30px;
   font-size: 90%;
-  background: url(relatedbg.png) top left repeat-x;
+  background: #369 url(relatedbg.png) top left repeat-x;
 }
 
 div.related h3 {

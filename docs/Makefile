@@ -5,3 +5,4 @@
 
 all:
 	cd en; $(MAKE) html
+	cd ja; $(MAKE) html

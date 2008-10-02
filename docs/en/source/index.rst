@@ -8,7 +8,9 @@ Modipyd: Autotest for Python, and more
 **This project aims to provide:**
 
 * Automated testing tool **pyautotest** (like `ZenTest's autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_) for `Python <http://www.python.org/>`_
-* Highly customizable plugin architecture for *Python bytecode analysis*, *module dependency analysis*, and *monitoring module modification*
+* *Plugin architecture* of highly customizable action behavior when monitoring module is modified
+* API for *Bytecode analysis*, *Module dependency analysis*, and *Monitoring module modification*
+
 
 **Things you can do as a public user:**
 

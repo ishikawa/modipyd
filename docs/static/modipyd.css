@@ -75,9 +75,11 @@ div.sphinxsidebar h3 {
   color: #777;
 }
 div.sphinxsidebar ul {
+  margin-top: 5px;
   margin-left: .5em;
 }
 div.sphinxsidebar ul ul {
+  margin-top: 0;
   margin-left: 1em;
 }
 
@@ -149,6 +151,10 @@ div.body a em {
   font-weight: normal;
   text-decoration: underline;
 }
+div.body a:active,
+div.body a:active em {
+  color: #f60;
+}
 
 div.body a:hover { background-color: #ddd; }
 div.body a:visited { text-decoration: none; }
@@ -157,6 +163,7 @@ h1,h2,h3,h4,h5,h6 {
   font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
   color: #39c;
 }
+
 h1 { font-size: 171.42%; /* 24px */ }
 h2 { font-size: 114.28%; /* 16px */ }
 
@@ -184,6 +191,7 @@ div.body a.headerlink:hover {
 }
 
 div.body strong {
+  font-weight: normal;
   color: #f60;
 }
 div.body em {

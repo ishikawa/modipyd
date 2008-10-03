@@ -2,13 +2,18 @@
 Modipyd: Autotest for Python, and more
 =======================================
 
-**Modipyd** is a `Python`_ module dependency analysis and monitoring modification framework, written by Takanori Ishikawa and licensed under `the MIT license`_.
+**Modipyd** is a `Python`_ module dependency analysis and monitoring
+modification framework, written by Takanori Ishikawa and licensed
+under `the MIT license`_.
 
 **This project aims to provide:**
 
-* Automated testing tool **pyautotest** (like `ZenTest's autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_) for Python
-* *Plugin architecture* designed to be simple enough to allow user to customize action triggered by the module modification event
-* API for *Bytecode analysis*, *Module dependency analysis*, and *Monitoring module modification*
+* Automated testing tool **pyautotest** (like `ZenTest's autotest <http://
+www.zenspider.com/ZSS/Products/ZenTest/>`_) for Python
+* *Plugin architecture* designed to be simple enough to allow user to customize 
+action triggered by the module modification event
+* API for *Bytecode analysis*, *Module dependency analysis*, and *Monitoring 
+module modification*
 
     :copyright: 2008 by Takanori Ishikawa
     :license: MIT, see LICENSE for more details.

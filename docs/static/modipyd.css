@@ -238,6 +238,25 @@ div.body li {
   background-image: url(checkgreen.png);
 }
 
+#footer_links {
+  padding: 0;
+  padding-top: 10px;
+}
+#footer_links li {
+  color: #aaa;
+  display: inline;
+  margin-right: 5px;
+}
+
+#footer_links li a {
+  color: white;
+  text-decoration: none;
+}
+#footer_links li a:hover {
+  color: white;
+  text-decoration: none;
+}
+#footer_links li.polyphrase { margin-right: 15px; }
 
 
 dt:target,

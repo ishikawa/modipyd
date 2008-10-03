@@ -19,7 +19,7 @@ setup(
     entry_points = {
         'console_scripts': [
             'modipyd = modipyd.tools.generic:run',
-            'autotest = modipyd.tools.autotest:run',
+            'pyautotest = modipyd.tools.autotest:run',
         ],
     },
     platforms = 'any',

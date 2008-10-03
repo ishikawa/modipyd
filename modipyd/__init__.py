@@ -1,22 +1,25 @@
 """
-modipyd
-================================================
+Modipyd: Autotest for Python, and more
+=======================================
 
-How this software works:
+**Modipyd** is a `Python`_ module dependency analysis and monitoring modification framework, written by Takanori Ishikawa and licensed under `the MIT license`_.
 
-1. Generating python module dependency graphs
-2. Monitoring module (file) modification
-3. Notifying modified and dependent modules
+**This project aims to provide:**
 
-So I named it modipyd (modified + python).
+* Automated testing tool **pyautotest** (like `ZenTest's autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_) for Python
+* *Plugin architecture* designed to be simple enough to allow user to customize action triggered by the module modification event
+* API for *Bytecode analysis*, *Module dependency analysis*, and *Monitoring module modification*
 
     :copyright: 2008 by Takanori Ishikawa
     :license: MIT, see LICENSE for more details.
+
+.. _Python: http://www.python.org/
+.. _the MIT license: http://www.opensource.org/licenses/mit-license.php
 """
 
 __version__ = '1.0rc1'
 __author__ = 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
-__url__ = 'http://github.com/ishikawa/modipyd/'
+__url__ = 'http://www.metareal.org/p/modipyd/'
 __license__ = 'MIT License'
 __docformat__ = 'restructuredtext'
 

@@ -17,6 +17,7 @@ quoted from http://www.zenspider.com/ZSS/Products/ZenTest/
 from modipyd import LOGGER
 from modipyd.tools import generic
 from modipyd.application.plugins import Autotest
+from optparse import OptionGroup
 
 
 def make_application(options, args):
@@ -31,10 +32,14 @@ def make_application(options, args):
 
 def make_option_parser():
     parser = generic.make_option_parser()
-    parser.add_option("-r", "--runner", default=None,
+
+    group = OptionGroup(parser, 'Autotest Plugin')
+    group.add_option("-r", "--runner", default=None,
         action="store", dest="runner", metavar='CLASS_NAME',
         help="qualified name of the unittest.TestRunner subclass "
              "(default: unittest.TextTestRunner)")
+    parser.add_option_group(group)
+
     return parser
 
 def run():

@@ -43,7 +43,7 @@ startup files will be ignored.
 import os
 import sys
 import logging
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 
 from modipyd import LOGGER, __version__
 from modipyd.application import Application
@@ -112,24 +112,32 @@ def make_option_parser():
         usage="usage: %prog [options] [files or directories]",
         version=("%prog " + __version__))
 
-    parser.add_option("-v", "--verbose",
+    group = OptionGroup(parser, 'Debugging')
+    group.add_option("-v", "--verbose",
         action="count", dest="verbosity", default=0,
         help="make the operation more talkative")
-    parser.add_option("-x", "--plugin", default=[],
-        action="append", dest="plugins", metavar='PLUGIN_NAME',
-        help="qualified name of the plugin, "
-             "the plugin must be callable object (e.g. function, class).")
-    parser.add_option("--rcfile", default=None,
+    parser.add_option_group(group)
+
+    group = OptionGroup(parser, 'Configuration')
+    group.add_option("--rcfile", default=None,
         action="store", dest="rcfile", metavar='FILE',
         help="specify a startup script. If a startup file is given on "
              "command line, other startup files will be ignored. "
              "Modipyd also looks $%s environment variable, and "
              "%s files in current directory" % (STARTUP_ENVIRON_NAME, 
              ', '.join(STARTUP_FILENAMES)))
-    parser.add_option("-D", default=[],
+    group.add_option("-D", default=[],
         action="append", dest="defines", metavar='name(=value)',
         help="predefine name as a plugin context variable, "
              "with specified value string (or empty string if omitted).")
+    parser.add_option_group(group)
+
+    group = OptionGroup(parser, 'Plugin')
+    group.add_option("-x", "--plugin", default=[],
+        action="append", dest="plugins", metavar='PLUGIN_NAME',
+        help="qualified name of the plugin, "
+             "the plugin must be callable object (e.g. function, class).")
+    parser.add_option_group(group)
 
     return parser
 

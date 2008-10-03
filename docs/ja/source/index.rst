@@ -7,7 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **このプロジェクトの目標：**
 
-* `ZenTest の autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ のような、ユニットテストの実行を自動化するためのツール **pyautotest** を Python プログラム向けに提供する
+* `Ruby autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ のような、ユニットテストの実行を自動化するためのツール **pyautotest** を Python プログラム向けに提供する
 * モジュールが変更されたときに実行するアクションを柔軟にカスタマイズできるように、プラグインの仕組みを提供する
 * バイトコード解析、モジュールの依存性解析、およびモジュールの変更を監視するための API を提供する
 

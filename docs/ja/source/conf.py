@@ -177,3 +177,14 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+
+# ----------------------------------------------------------------
+sys.path.insert(0, 
+    os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from sphinxext import OnlineHTMLBuilder
+
+def setup(application):
+    application.add_builder(OnlineHTMLBuilder)
+    sys.stderr.write("OnlineHTMLBuilder was successfully installed.\n")

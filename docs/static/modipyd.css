@@ -107,7 +107,7 @@ div.related {
   height: 30px;
   line-height: 30px;
   font-size: 90%;
-  background: #369 url(relatedbg.png) top left repeat-x;
+  background: #369 url(navigation.png) top left repeat-x;
 }
 
 div.related h3 {
@@ -231,9 +231,7 @@ div.body li {
   line-height: 1.5;
   background-repeat: no-repeat;
   background-position: 0px 4px;
-  background-image: url(checkblue.png);
-  background-image: url(checkgray.png);
-  background-image: url(checkgreen.png);
+  background-image: url(checkgreen.gif);
 }
 
 #footer_links {

@@ -10,3 +10,7 @@ all:
 online:
 	cd en; $(MAKE) online
 	cd ja; $(MAKE) online
+
+clean:
+	cd en; $(MAKE) clean
+	cd ja; $(MAKE) clean

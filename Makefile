@@ -2,7 +2,7 @@
 # Common tasks for project
 #
 
-.PHONY: all test lint doc web clean
+.PHONY: all test lint doc web clean distclean realclean
 
 all: lint test
 
@@ -30,3 +30,7 @@ webdoc:
 
 clean:
 	-find . -name \*.py[co] -exec rm -f {} \;
+
+distclean: clean
+realclean: distclean
+	cd docs; $(MAKE) clean

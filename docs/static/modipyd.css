@@ -93,6 +93,7 @@ div.footer {
   padding: 9px 0 9px 0;
   text-align: center;
   font-size: 90%;
+  background-color: #06a;
 }
 
 div.footer a {
@@ -100,9 +101,6 @@ div.footer a {
   text-decoration: underline;
 }
 
-div.footer {
-  background-color: #167cba;
-}
 div.related {
   color: #fff;
   width: 100%;

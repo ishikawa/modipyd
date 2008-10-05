@@ -5,6 +5,12 @@ Modipyd: Autotest for Python, and more
 
 **Modipyd** is a `Python`_ module dependency analysis and monitoring modification framework, written by Takanori Ishikawa and licensed under `the MIT license`_.
 
+**What's New:**
+
+* `Version 1.0 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_ released *2008-10-03*
+* `Modipyd Home <http://www.metareal.org/p/modipyd/>`_ launched *2008-10-02*
+
+
 **This project aims to provide:**
 
 * Automated testing tool **pyautotest** (like `ZenTest's autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_) for Python
@@ -14,7 +20,7 @@ Modipyd: Autotest for Python, and more
 
 **Things you can do as a public user:**
 
-* *Download latest release and use it*: `Version 1.0 release candidate <http://metareal.lighthouseapp.com/projects/17658-modipyd/milestones/current>`_ coming soon!
+* *Download latest release and use it*: `Version 1.0 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_ released! *(2008-10-03)*
 * `Create a new ticket`_: Tickets are the life blood of a project. They can be anything from *bug reports* to *todo items*, *feature requests* which can be assigned to folks involved in the project.
 
 **For developers interested in this project:**

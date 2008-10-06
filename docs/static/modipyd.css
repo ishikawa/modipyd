@@ -52,36 +52,51 @@ div.related,
 div.document,
 div.footer {
   margin: 0 auto;
+  width: auto;
   min-width: 50em;
   max-width: 1024px;
   text-align: left;
 }
 
+/*
+div.document,
+div.body,
+div.sphinxsidebar {
+  border: 1px solid red;
+}
+div.documentwrapper,
+div.bodywrapper,
+div.sphinxsidebarwrapper {
+  border: 1px solid green;
+}
+*/
+
 div.document {
-  background-color: #cde;
   background-color: #ddd;
 }
 div.documentwrapper {
-  float: right;
-  width: 100%;
+  float: none;
+  width: auto;
 }
 div.bodywrapper {
-  margin: 0 230px 0 0;
+  float: left;
+  margin-right: 230px;
 }
 div.body {
   background-color: white;
   padding: 10px 20px 30px 20px;
 }
+div.sphinxsidebar {
+  float: left;
+  width: 230px;
+  margin-left: -230px;
+  font-size: 90%;
+}
 div.sphinxsidebarwrapper {
   padding: 10px 5px 0 10px;
 }
 
-div.sphinxsidebar {
-  float: right;
-  width: 230px;
-  margin-right: -100%;
-  font-size: 90%;
-}
+
 div.sphinxsidebar h3 {
   margin-top: 1em;
   color: #777;

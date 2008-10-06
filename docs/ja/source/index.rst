@@ -19,7 +19,7 @@ Modipyd: Autotest for Python, and more
 
 **ユーザー向けのリソース**
 
-* *最新のリリースをダウンロード*\ ：\ `バージョン 1.0 のリリース候補 <http://metareal.lighthouseapp.com/projects/17658-modipyd/milestones/current>`_\ を近いうちに公開予定です
+* *最新のリリースをダウンロード*\ ：\ `バージョン 1.0 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_\ を公開しました
 * `バグ報告や要望はこちら <http://metareal.lighthouseapp.com/projects/17658-modipyd/tickets/new>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。\ Lighthouse_ という海外のサービスを利用しているため、インターフェースは英語になっていますが、報告する内容は日本語でもかまいません（そのうち、より詳しい手順の解説を書く予定です）。
 
 **このプロジェクトに興味がある開発者の方へ：**

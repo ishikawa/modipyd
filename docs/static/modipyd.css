@@ -1,5 +1,17 @@
 @charset "UTF-8";
 
+/**
+ * sphinx theme: Modipyd 
+ *
+ *   Author:: Takanori Ishikawa <takanori.ishikawa@gmail.com>
+ *   License:: Creative Commons Attribution 3.0 <http://creativecommons.org/licenses/by/3.0/>
+ *
+ * Sphinx: http://sphinx.pocoo.org/
+ * Modipyd: http://www.metareal.org/p/modipyd/
+ *
+ */
+
+
 html * {
   font-size: 16px;
 /*\*/

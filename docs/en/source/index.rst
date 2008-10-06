@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **What's New:**
 
+* The stylesheet and image files used by this site are also available at `sphinx-theme-modipyd repository`_ and licensed under `the Creative Commons Attribution 3.0 license`_ *2008-10-06*
 * `Version 1.0 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_ released *2008-10-03*
 * `Modipyd Home <http://www.metareal.org/p/modipyd/>`_ launched *2008-10-02*
 
@@ -34,6 +35,7 @@ AUTOTEST Related Links
 * `ZenTest: Automated test scaffolding for Ruby <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ The original autotest tool for Ruby
 * `pyautotest <http://github.com/dbr/pyautotest/>`_ Unittest notifier: Notification of unittest passes and failures, via Growl. Like autotest for Python
 * `Is there something like 'autotest' for Python unittests? - Stack Overflow <http://stackoverflow.com/questions/108892/is-there-something-like-autotest-for-python-unittests>`_
+* `sphinx-theme-modipyd repository`_ The stylesheet and image files used by this site are freely available to download and use in your project.
 
 
 .. toctree::
@@ -51,3 +53,5 @@ Indices and tables
 .. _Create a new ticket: http://metareal.lighthouseapp.com/projects/17658-modipyd/tickets/new
 .. _GitHub: http://github.com/
 .. _Lighthouse: http://lighthouseapp.com/
+.. _sphinx-theme-modipyd repository: http://github.com/ishikawa/sphinx-theme-modipyd/
+.. _the Creative Commons Attribution 3.0 license: http://creativecommons.org/licenses/by/3.0/

@@ -5,6 +5,12 @@ Modipyd: Autotest for Python, and more
 
 **Modipyd** は石川尊教（いしかわ・たかのり）が開発した、\ `Python`_ モジュールの依存性解析、および、モジュールの変更を監視するためのフレームワークです。\ `MIT ライセンス`_\ のもとで配布しています。
 
+**最新情報：**
+
+* *2008-10-06* このサイトで使用しているスタイルシートと画像を `GItHub にて公開 <http://github.com/ishikawa/sphinx-theme-modipyd/>`_\ しました（\ `クリエイティブ・コモンズ Attribution 3.0 ライセンス <http://creativecommons.org/licenses/by/3.0/deed.ja>`_\ ）
+* *2008-10-03* `バージョン 1.0 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_\ を公開しました
+* *2008-10-02* `Modipyd プロジェクトのホームページ <http://www.metareal.org/p/modipyd/>`_\ を開設しました
+
 **このプロジェクトの目標：**
 
 * `Ruby autotest <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ のような、ユニットテストの実行を自動化するためのツール **pyautotest** を Python プログラム向けに提供する
@@ -26,6 +32,7 @@ Modipyd: Autotest for Python, and more
 * `ZenTest: Automated test scaffolding for Ruby <http://www.zenspider.com/ZSS/Products/ZenTest/>`_ Modipyd を開発するきっかけともなったオリジナルの autotest です。
 * `pyautotest <http://github.com/dbr/pyautotest/>`_ Unittest notifier: Notification of unittest passes and failures, via Growl. Like autotest for Python
 * `Is there something like 'autotest' for Python unittests? - Stack Overflow <http://stackoverflow.com/questions/108892/is-there-something-like-autotest-for-python-unittests>`_
+* `sphinx-theme-modipyd`_ このサイトで使用しているスタイルシートと画像を公開しています
 
 
 .. toctree::
@@ -42,3 +49,4 @@ Modipyd: Autotest for Python, and more
 .. _MIT ライセンス: http://www.opensource.org/licenses/mit-license.php
 .. _GitHub: http://github.com/
 .. _Lighthouse: http://lighthouseapp.com/
+.. _sphinx-theme-modipyd: http://github.com/ishikawa/sphinx-theme-modipyd/

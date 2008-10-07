@@ -9,7 +9,7 @@ Modipyd: Autotest for Python, and more
 
 * The stylesheet and image files used by this site are also available at `sphinx-theme-modipyd repository`_ and licensed under `the Creative Commons Attribution 3.0 license`_ *2008-10-06*
 * `Version 1.0 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_ released *2008-10-03*
-* `Modipyd Home <http://www.metareal.org/p/modipyd/>`_ launched *2008-10-02*
+* `Modipyd Home <http://www.metareal.org/p/modipyd/index.html>`_ launched *2008-10-02*
 
 
 **This project aims to provide:**

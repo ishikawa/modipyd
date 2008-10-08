@@ -7,7 +7,7 @@ Before you can use *Modipyd*, you'll need to get it installed. This document wil
 
 Prerequisites
 -----------------------------------
-Modipyd requires Python. It works with any **Python version 2.4** and higher. No other library/module is needed.
+Modipyd requires Python. It works with any **Python version 2.4** and higher. No other libraries/modules are needed.
 
 Get Python at `http://www.python.org <http://www.python.org>`_. If you’re running Linux or Mac OS X, you probably already have it installed.
 

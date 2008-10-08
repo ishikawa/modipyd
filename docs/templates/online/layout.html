@@ -1,5 +1,9 @@
 {% extends "!layout.html" %}
 
+{%- block relbaritems %}
+<li><a href="{{ pathto('contents') }}">Documentation</a></li>
+{% endblock %}
+
 {%- block footer %}
   <div id="footer_links" class="footer">
     <ul>

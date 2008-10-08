@@ -35,14 +35,24 @@ address,caption,cite,code,dfn,em,strong,th,var {
 
 /* theme */
 body {
-  font-family: "Gill Sans", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+  font-family: Verdana, Helvetica, Arial, sans-serif;
   font-size: 81.25%; /* 13px */
-  font-size: 87.5%;  /* 14px */
-  font-size: 100%;
+  font-size: 87.5%; /* 14px */
   text-align: center;
   color: #444;
   background: #555 url(background.png) top left repeat-x;
+  line-height: 1.5;
 }
+/*
+body {
+  font-family: "Gill Sans", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+  font-size: 100%;
+}
+div.body em {
+  font-style: italic;
+  font-family: 'Times New Roman', Times, serif;
+}
+*/
 
 
 /* layout */
@@ -65,16 +75,17 @@ div.documentwrapper {
 }
 div.bodywrapper {
   float: left;
-  margin-right: 230px;
+  width: 100%;
+  margin-right: -230px;
 }
 div.body {
-  background-color: white;
+  margin-right: 230px;
   padding: 10px 20px 30px 20px;
+  background-color: white;
 }
 div.sphinxsidebar {
   float: left;
   width: 230px;
-  margin-left: -230px;
   font-size: 90%;
 }
 div.sphinxsidebarwrapper {
@@ -96,7 +107,6 @@ div.sphinxsidebarwrapper {
 }
 * html div.sphinxsidebar {
   width: 25%;
-  margin-left: 0;
 }
 
 
@@ -176,9 +186,11 @@ a:hover {
 div.body a,
 div.body a em {
   color: #399;
-  font-weight: normal;
+  font-style: normal;
+  font-family: inherit;
   text-decoration: underline;
 }
+
 div.body a:active,
 div.body a:active em {
   color: #f60;
@@ -222,36 +234,52 @@ div.body a.headerlink:hover {
 
 div.body strong {
   font-weight: normal;
-  color: #f60;
   color: #069;
 }
 div.body em {
-  font-style: italic;
-  font-family: 'Times New Roman', Times, serif;
-  color: #333;
-  color: #036;
   color: #690;
 }
 
 div.body p {
-  margin: 1em 0;
-  line-height: 1.3;
+  margin: 0;
+  margin-bottom: 1em;
 }
 
-div.body ul {
+div.body ul, ol {
   display: block;
   margin: 1em 0;
-  list-style-type: none;
 }
 div.body li {
   display: list-item;
   margin-left: 2em;
+}
+
+div.body ul {
+  list-style-type: none;
+}
+div.body ol {
+  list-style-type: decimal;
+  margin-left: 1em;
+}
+div.body ul li {
   padding-left: 22px;
-  line-height: 1.5;
   background-repeat: no-repeat;
-  background-position: 0px 4px;
+  background-position: 0px 3px;
   background-image: url(checkgreen.gif);
 }
+
+div.body ul ul { margin: 0; }
+div.body ul ul li {
+  margin-left: 1em;
+  background-image: url(checkgray.gif);
+}
+
+div.body tt {
+  font-family: "Courier New", monospace;
+  background: transparent;
+  color: #369;
+}
+
 
 #footer_links {
   padding: 0;
@@ -487,7 +515,7 @@ tt.xref, a tt {
 .footnote:target  { background-color: #ffa }
 
 h1 tt, h2 tt, h3 tt, h4 tt, h5 tt, h6 tt {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 .optional {

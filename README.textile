@@ -1,6 +1,6 @@
 h2. Modipyd: Autotest for Python, and more
 
-"Modipyd":http://www.metareal.org/p/modipyd/index.html is a Python module dependency analysis and monitoring modification framework, written by Takanori Ishikawa and licensed under the MIT license.
+"Modipyd":http://www.metareal.org/p/modipyd/ is a Python module dependency analysis and monitoring modification framework, written by Takanori Ishikawa and licensed under the MIT license.
 
 This project aims to provide:
 
@@ -8,7 +8,7 @@ This project aims to provide:
 * Plugin architecture designed to be simple enough to allow user to customize action triggered by the module modification event
 * API for Bytecode analysis, Module dependency analysis, and Monitoring module modification
 
-Please visit "Modipyd website":http://www.metareal.org/p/modipyd/index.html (Japanese version "here":http://www.metareal.org/p/modipyd/ja/index.html) for more details.
+Please visit "Modipyd website":http://www.metareal.org/p/modipyd/ (Japanese version "here":http://www.metareal.org/p/modipyd/ja/) for more details.
 
 
 h3. Requirements

@@ -24,7 +24,7 @@ module modification*
 
 __version__ = '1.0rc1'
 __author__ = 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
-__url__ = 'http://www.metareal.org/p/modipyd/index.html'
+__url__ = 'http://www.metareal.org/p/modipyd/'
 __license__ = 'MIT License'
 __docformat__ = 'restructuredtext'
 

@@ -9,7 +9,7 @@ Modipyd: Autotest for Python, and more
 
 * *2008-10-06* このサイトで使用しているスタイルシートと画像を `GItHub にて公開 <http://github.com/ishikawa/sphinx-theme-modipyd/>`_\ しました（\ `クリエイティブ・コモンズ Attribution 3.0 ライセンス <http://creativecommons.org/licenses/by/3.0/deed.ja>`_\ ）
 * *2008-10-03* `バージョン 1.0 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_\ を公開しました
-* *2008-10-02* `Modipyd プロジェクトのホームページ <http://www.metareal.org/p/modipyd/index.html>`_\ を開設しました
+* *2008-10-02* `Modipyd プロジェクトのホームページ <http://www.metareal.org/p/modipyd/>`_\ を開設しました
 
 **このプロジェクトの目標：**
 

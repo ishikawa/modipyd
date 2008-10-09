@@ -15,7 +15,7 @@ Installing the latest release
 ---------------------------------------------------
 
 1. Download the latest release (zip_ or `tar.gz`_ release available).
-2. Unpack the downloaded file (e.g. ``unzip ishikawa-modipyd-XXX.tar.gz`` or ``tar xzvf ishikawa-modipyd-XXX.tar.gz``).
+2. Unpack the downloaded file (e.g. ``unzip ishikawa-modipyd-XXX.zip`` for zip archive or ``tar xzvf ishikawa-modipyd-XXX.tar.gz`` for tar.gz archive).
 3. Change into the directory created in step 2 (e.g. ``cd ishikawa-modipyd-XXX``).
 4. Enter the command ``sudo python setup.py install`` at the shell prompt.
 

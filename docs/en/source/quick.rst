@@ -3,4 +3,4 @@
 Getting started with Modipyd and Autotest tool
 =================================================
 
-Continuous Testing
+You can read :ref:`install` document, if you don't install *Modipyd* yet.

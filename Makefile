@@ -7,12 +7,12 @@
 all: lint test
 
 test: test24
-	PYTHONPATH=. python tests/runtests.py
+	python tests/runtests.py
 
 test24:
 	if [ -f "$(PYTHON24)" -a -x "$(PYTHON24)" ]; then \
 		$(MAKE) clean; \
-		PYTHONPATH=. "$(PYTHON24)" tests/runtests.py; \
+		"$(PYTHON24)" tests/runtests.py; \
 		$(MAKE) clean; \
 	fi
 

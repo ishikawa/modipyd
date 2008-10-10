@@ -5,9 +5,14 @@ Regression tests for modipyd
 """
 
 import os
+import sys
 import unittest
 import doctest
 from os.path import join, dirname
+
+# Bacause the installed Modipyd in site_packages directory is found
+# earlier than PYTHONPATH, I need to modify sys.path manually.
+sys.path.insert(0, join(dirname(__file__), '..'))
 
 from modipyd.utils import resolve_modulename, import_module
 from modipyd.module import collect_module_code

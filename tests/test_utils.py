@@ -3,7 +3,8 @@
 import unittest
 import os
 import sys
-from os.path import join, normpath, dirname, exists, isdir
+from os.path import basename, join, normpath, \
+                    dirname, exists, isdir
 from errno import ENOENT
 
 from modipyd import utils
@@ -75,6 +76,20 @@ class TestModipydCollectFiles(TestCase):
         for f in ['001', '002', '003']:
             f = normpath(join(directory, f))
             self.assert_(f in files)
+
+    def test_multiple_ignore_directories(self):
+        directory = join(FILES_DIR, 'imports')
+        files = list(utils.collect_files(directory, ['C', 'D']))
+
+        self.assertNotNone(files)
+        self.assertNotEqual(0, len(files))
+
+        scripts = sorted([basename(x) for x in files if x.endswith('.py')])
+        self.assertEqual(4, len(scripts))
+        self.assertEqual('__init__.py', scripts[0])
+        self.assertEqual('__init__.py', scripts[1])
+        self.assertEqual('a.py', scripts[2])
+        self.assertEqual('b.py', scripts[3])
 
 
 class TestModipyPathUtils(TestCase):

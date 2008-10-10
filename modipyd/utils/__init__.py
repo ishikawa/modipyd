@@ -128,10 +128,11 @@ def collect_files(filepath_or_list, ignore_list=None):
                 # For in-place deletion (avoids copying the list),
                 # Don't delete anything earlier in the list than
                 # the current element through.
+                count = len(dirnames)
                 for i, dirname in enumerate(reversed(dirnames)):
                     if ignore(dirname):
                         # don't visit ignore directory
-                        del dirnames[-(i+1)]
+                        del dirnames[count-1-i]
                 for filename in filenames:
                     if not ignore(filename):
                         yield os.path.join(dirpath, filename)

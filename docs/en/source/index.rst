@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **What's New:**
 
+* Added :ref:`quick` *2008-10-10*
 * Added :ref:`install` *2008-10-08*
 * The stylesheet and image files used by this site are also available at `sphinx-theme-modipyd repository`_ and licensed under `the Creative Commons Attribution 3.0 license`_ *2008-10-06*
 * `Version 1.0 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_ released *2008-10-03*
@@ -34,6 +35,7 @@ Modipyd: Autotest for Python, and more
 Documentation
 -----------------------------------
 * :ref:`install` Installation howto
+* :ref:`quick` Quick start guide
 * :ref:`contents` for a complete overview
 * :ref:`search` search the documentation
 

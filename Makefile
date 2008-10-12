@@ -33,6 +33,7 @@ clean:
 	python setup.py clean
 
 distclean: clean
+	rm -rf build/*
 	rm -rf dist/*
 
 realclean: distclean

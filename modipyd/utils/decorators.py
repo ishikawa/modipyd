@@ -6,7 +6,8 @@ Functions that help with dynamically creating decorators.
 """
 
 from types import NoneType
-from modipyd.utils import wrap_sequence, unwrap_sequence
+from modipyd.utils._core import wrap_sequence, \
+                                unwrap_sequence
 
 
 def require(**types):

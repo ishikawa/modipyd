@@ -12,42 +12,8 @@ import stat
 # pylint: disable-msg=W0401
 # Make 'from modipyd.utils import OrderedSet' statement works
 from modipyd.utils.ordered_set import *
-
-
-def wrap_sequence(obj, sequence_type=tuple):
-    """
-    Return a tuple whose item is obj.
-    If obj is already a list or tuple, it is returned unchanged.
-
-    >>> wrap_sequence(None)[0] is None
-    True
-    >>> wrap_sequence("")
-    ('',)
-    >>> wrap_sequence([])
-    []
-    >>> wrap_sequence(())
-    ()
-    >>> wrap_sequence(123, sequence_type=list)
-    [123]
-    """
-    if isinstance(obj, (list, tuple)):
-        return obj
-    else:
-        return sequence_type((obj,))
-
-def unwrap_sequence(obj):
-    """
-    >>> unwrap_sequence([None]) is None
-    True
-    >>> unwrap_sequence([1])
-    1
-    >>> unwrap_sequence([1, 2, 3])
-    [1, 2, 3]
-    """
-    if isinstance(obj, (list, tuple)) and len(obj) == 1:
-        return obj[0]
-    else:
-        return obj
+from modipyd.utils._core import *
+from modipyd.utils.decorators import require
 
 
 def split_module_name(module_name):

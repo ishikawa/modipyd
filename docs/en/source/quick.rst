@@ -5,8 +5,8 @@ Getting started with Modipyd and Autotest tool
 
 You can read :ref:`install` document, if you don't install *Modipyd* yet.
 
-Basic Example
--------------
+Basic Example: The :class:`Widget` class
+----------------------------------------------------
 Suppose you have two ``.py`` files.::
 
   [~/modipyd/examples/widget]
@@ -24,7 +24,7 @@ The file named ``widget.py`` is a normal Python script. On the other hand, ``tes
 .. literalinclude:: ../../../examples/widget/000/test_widget.py
 
 Running pyautotest
-~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 You can start monitoring modification by executing :command:`pyautotest` (The \ :option:``-v`` option is specified so that :command:`pyautotest` prints debugging messages)::
 
   % pyautotest -v
@@ -42,7 +42,7 @@ You can start monitoring modification by executing :command:`pyautotest` (The \ 
 As output message mentioned above, the :command:`pyautotest` tool is now monitoring :file:`widget.py` and :file:`test_widget.py`.
 
 Refactoring: Assigning multiple values at once in intialization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------------
 
 You have three assignment statements in :func:`Widget.__init__`, assigns function arguments to instance variables. You can perform multiple assignment using tuples.
 
@@ -66,7 +66,7 @@ When you edit :file:`widget.py`, :command:`pyautotest` automatically reloads mod
   OK
 
 Adding :func:`resize` method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 You decide to add :func:`Widget.resize` method. The :func:`Widget.resize` takes two arguments ``width`` and ``height``, then change the region with new rectangle. Along with test driven development, you write a test  before the :func:`Widget.resize` implementation.
 

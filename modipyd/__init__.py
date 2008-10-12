@@ -22,7 +22,7 @@ module modification*
 .. _the MIT license: http://www.opensource.org/licenses/mit-license.php
 """
 
-__version__ = '1.0rc1'
+__version__ = '1.0rc2'
 __author__ = 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
 __url__ = 'http://www.metareal.org/p/modipyd/'
 __license__ = 'MIT License'

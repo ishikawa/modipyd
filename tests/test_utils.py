@@ -140,6 +140,13 @@ class TestModipyPathUtils(TestCase):
         self.assert_(not utils.python_package(FILES_DIR))
 
 
+class TestRelativePath(TestCase):
+
+    def test_empty(self):
+        self.assertRaises(TypeError, utils.relativepath, None)
+        self.assertEqual("", utils.relativepath(""))
+
+
 class TestResolveModulename(TestCase):
 
     def test_empty(self):

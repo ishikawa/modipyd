@@ -12,7 +12,7 @@ import stat
 # pylint: disable-msg=W0401
 # Make 'from modipyd.utils import OrderedSet' statement works
 from modipyd.utils.ordered_set import *
-from modipyd.utils._core import *
+from modipyd.utils.core import *
 from modipyd.utils.decorators import require
 
 
@@ -160,6 +160,29 @@ def python_module_exists(dirpath, modulename):
     return (isfile(join(dirpath, '%s.py' % modulename)) or
                  isfile(join(dirpath, '%s.pyc' % modulename)) or
                  isfile(join(dirpath, '%s.pyo' % modulename)))
+
+# NOTE: This function is not perfect.
+# Please use only for debugging.
+def relativepath(path, base=None):
+    """
+    Return a relative version of the pathname ``path``.
+    >>> relativepath('')
+    ''
+    """
+    if not isinstance(path, basestring):
+        raise TypeError("path must be instance of basestring")
+
+    if not base:
+        base = os.getcwd()
+
+    # normalize
+    path = os.path.abspath(path)
+    base = os.path.abspath(base)
+
+    if path.startswith(base):
+        path = path[len(base):]
+
+    return path
 
 
 # ----------------------------------------------------------------

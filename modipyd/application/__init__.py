@@ -44,9 +44,9 @@ class Application(object):
             raise TypeError("The plugin must be callable object")
 
         if hasattr(plugin, 'func_code'):
-            LOGGER.info("Installing plugin: %s" % plugin.func_code.co_name)
+            LOGGER.info("Loading plugin: %s" % plugin.func_code.co_name)
         else:
-            LOGGER.info("Installing plugin: %s" % plugin)
+            LOGGER.info("Loading plugin: %s" % plugin)
 
         self.plugins.append(plugin)
 

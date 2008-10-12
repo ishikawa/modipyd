@@ -42,9 +42,14 @@ def __configure_logger():
     """Configure project-wide logger"""
     import logging
     handler = logging.StreamHandler()
+
     handler.setFormatter(logging.Formatter(
-        '%(asctime)s [%(levelname)s] %(message)s '
-        '(File "%(pathname)s", line %(lineno)d)'))
+        '[%(levelname)s] %(message)s '))
+    # Fully descriptive format
+    #handler.setFormatter(logging.Formatter(
+    #    '%(asctime)s [%(levelname)s] %(message)s '
+    #    '(File "%(pathname)s", line %(lineno)d)'))
+
     logger = logging.getLogger(__name__)
     logger.addHandler(handler)
     # If a line below is uncommented, LOGGER's level is accidentally

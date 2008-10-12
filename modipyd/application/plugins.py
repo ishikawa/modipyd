@@ -107,6 +107,7 @@ class SimplePlugin(object):
 # ----------------------------------------------------------------
 import os
 import sys
+import logging
 import unittest
 from modipyd import LOGGER
 from modipyd.analysis import has_subclass
@@ -146,6 +147,9 @@ class Autotest(object):
             # We can reload affected modules manually and run
             # all TestCase in same process. Running another process,
             # however, is simple and perfect solution.
+            if LOGGER.isEnabledFor(logging.INFO):
+                desc = ', '.join([x.name for x in testables])
+                LOGGER.info("Running unittests: %s" % desc)
             self.spawn_unittest_runner(testables)
 
     def spawn_unittest_runner(self, testables, extra_arguments=None):

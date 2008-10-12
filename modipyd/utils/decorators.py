@@ -56,5 +56,10 @@ def require(**types):
 
             return fn(*args, **kwargs)
 
+        type_checker.__name__ = fn.__name__
+        type_checker.__module__ = fn.__module__
+        type_checker.__dict__ = fn.__dict__
+        type_checker.__doc__ = fn.__doc__
         return type_checker
+
     return decorator

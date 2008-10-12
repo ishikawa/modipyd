@@ -69,6 +69,21 @@ class RequireDecoratorTestCase(TestCase):
         self.assertEqual(foo(123), 123)
         self.assertRaises(TypeError, foo, "123")
 
+    def test_docstring(self):
+
+        @require(x=int)
+        def foo(x):
+            """function foo()"""
+            return x
+
+        @require(x=int)
+        def hoge(x):
+            """function hoge()"""
+            return x
+
+        self.assertEqual("""function foo()""", foo.__doc__)
+        self.assertEqual("""function hoge()""", hoge.__doc__)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -161,13 +161,19 @@ def python_module_exists(dirpath, modulename):
                  isfile(join(dirpath, '%s.pyc' % modulename)) or
                  isfile(join(dirpath, '%s.pyo' % modulename)))
 
-# NOTE: This function is not perfect.
 # Please use only for debugging.
 def relativepath(path, base=None):
     """
     Return a relative version of the pathname ``path``.
+
     >>> relativepath('')
     ''
+    >>> relativepath('/usr/local/bin', '/usr')
+    'local/bin'
+    >>> relativepath('/usr/local/bin', '/usr/local/')
+    'bin'
+    >>> relativepath('/usr/local/bin2', '/usr/local/bin')
+    '/usr/local/bin2'
     """
     if not isinstance(path, basestring):
         raise TypeError("path must be instance of basestring")
@@ -179,10 +185,14 @@ def relativepath(path, base=None):
     path = os.path.abspath(path)
     base = os.path.abspath(base)
 
-    if path.startswith(base):
-        path = path[len(base):]
+    items = path.split('/')
+    if items:
+        for name in base.split('/'):
+            if items[0] != name:
+                return path
+            del items[0]
 
-    return path
+    return '/'.join(items)
 
 
 # ----------------------------------------------------------------

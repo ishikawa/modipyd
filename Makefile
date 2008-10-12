@@ -30,7 +30,10 @@ webdoc:
 
 clean:
 	-find . -name \*.py[co] -exec rm -f {} \;
+	python setup.py clean
 
 distclean: clean
+	rm -rf dist/*
+
 realclean: distclean
 	cd docs; $(MAKE) clean

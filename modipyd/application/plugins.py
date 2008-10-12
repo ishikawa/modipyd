@@ -149,7 +149,7 @@ class Autotest(object):
             # however, is simple and perfect solution.
             if LOGGER.isEnabledFor(logging.INFO):
                 desc = ', '.join([x.name for x in testables])
-                LOGGER.info("Running unittests: %s" % desc)
+                LOGGER.info("Running UnitTests: %s" % desc)
             self.spawn_unittest_runner(testables)
 
     def spawn_unittest_runner(self, testables, extra_arguments=None):

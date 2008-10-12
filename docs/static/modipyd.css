@@ -477,12 +477,13 @@ pre {
 }
 td pre {
   margin: 0;
+  padding-bottom: 1em;
   border: none;
 }
 td.linenos pre {
-  padding: 5px 0px;
   background-color: transparent;
   color: #999;
+  line-height: 1.3;
 }
 
 .highlight {

@@ -351,8 +351,8 @@ p.topic-title {
 /* Admonitions */
 
 div.admonition {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 1em 0;
+  margin-left: 2.5em;
   padding: 7px;
 }
 

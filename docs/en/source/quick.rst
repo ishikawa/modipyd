@@ -50,7 +50,13 @@ You have three assignment statements in :func:`Widget.__init__`, assigns functio
 
 .. literalinclude:: ../../../examples/widget/001/widget.py
 
-When you edit :file:`widget.py`, :command:`pyautotest` automatically reloads modified module (:file:`widget.py`), and then, automatically runs all dependent testcase (:file:`test_widget.py`).::
+When you edit :file:`widget.py`, :command:`pyautotest` automatically reloads modified module (:file:`widget.py`), and then, automatically runs all dependent testcase (:file:`test_widget.py`).
+
+.. note::
+
+  :command:`pyautotest` makes no assumptions about filename of test cases, you can have :file:`widget_test.py` or :file:`WidgetTest.py`, :file:`test/widget.py`, ... etc.
+
+::
 
   [INFO] Reload module descriptor 'widget' at widget.py 
   [INFO] Modified: widget: widget.py
@@ -74,7 +80,11 @@ You decide to add :func:`Widget.resize` method. The :func:`Widget.resize` takes 
 
 .. literalinclude:: ../../../examples/widget/002/test_widget.py
 
-This test must inevitably fail because :func:`Widget.resize` is missing. This validates that the test harness is working correctly and that the test does not mistakenly pass without requiring any new code. In addition, :command:`pyautotest` correctly finds new test case and its dependencies.
+The test must inevitably fail because :func:`Widget.resize` is missing. This validates that the test harness is working correctly and that the test does not mistakenly pass without requiring any new code.
+
+.. note::
+
+  :command:`pyautotest` automatically finds new :class:`unittest.TestCase` subclass and its dependencies.
 
 ::
 

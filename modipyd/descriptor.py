@@ -9,7 +9,7 @@ for managing annotations of module.
 
 import os
 from modipyd import LOGGER, utils
-from modipyd.utils import OrderedSet
+from modipyd.utils import OrderedSet, relativepath
 from modipyd.resolve import resolve_relative_modulename
 
 
@@ -122,7 +122,7 @@ class ModuleDescriptor(object):
             return re.sub(r'\[( +)', "[\n\\1 ", s)
 
         messages = []
-        messages.append('%s: %s' % (self.name, self.filename))
+        messages.append('%s: %s' % (self.name, relativepath(self.filename, )))
         messages.append('  Dependencies: %s' % _format_monitor_list(
             self.__dependencies))
         messages.append('  Reverse: %s' % _format_monitor_list(
@@ -163,7 +163,7 @@ class ModuleDescriptor(object):
         """
         LOGGER.info(
             "Reload module descriptor '%s' at %s" % \
-            (self.name, self.filename))
+            (self.name, relativepath(self.filename)))
 
         try:
             self.module_code.reload(co)

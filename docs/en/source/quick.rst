@@ -9,7 +9,7 @@ Basic Example
 -------------
 Suppose you have two ``.py`` files.::
 
-  [~/examples/widget]
+  [~/modipyd/examples/widget]
   % ls
   test_widget.py	widget.py
 
@@ -17,24 +17,31 @@ The file named ``widget.py`` is a normal Python script. On the other hand, ``tes
 
 ``widget.py``:
 
-.. literalinclude:: ../../../examples/widget/widget.py
+.. literalinclude:: ../../../examples/widget/000/widget.py
 
 ``test_widget.py``:
 
-.. literalinclude:: ../../../examples/widget/test_widget.py
+.. literalinclude:: ../../../examples/widget/000/test_widget.py
 
-You can start monitoring modification by executing :command:`pyautotest` (:option:``-v`` option is applied only for debugging)::
+Running pyautotest
+~~~~~~~~~~~~~~~~~~
+You can start monitoring modification by executing :command:`pyautotest` (The \ :option:``-v`` option is specified so that :command:`pyautotest` prints debugging messages)::
 
   % pyautotest -v
   [INFO] Loading plugin: <class 'modipyd.application.plugins.Autotest'> 
   [INFO] Loading BytecodeProcesser 'modipyd.bytecode.ImportProcessor' 
   [INFO] Loading BytecodeProcesser 'modipyd.bytecode.ClassDefinitionProcessor' 
   [INFO] Monitoring:
-  test_widget: /Users/ishikawa/Developer/Workspace/Modipyd/modipyd/examples/widget/test_widget.py
+  test_widget: test_widget.py
     Dependencies: ['widget']
     Reverse: []
-  widget: /Users/ishikawa/Developer/Workspace/Modipyd/modipyd/examples/widget/widget.py
+  widget: widget.py
     Dependencies: []
     Reverse: ['test_widget'] 
 
-As output message mentioned above, :file:`widget.py` and :file:`test_widget.py` are now monitored by :command:`pyautotest`.
+As output message mentioned above, the :command:`pyautotest` tool is now monitoring :file:`widget.py` and :file:`test_widget.py`.
+
+Refactoring: Assigning multiple values at once in intialization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+

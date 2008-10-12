@@ -1,6 +1,10 @@
 """
 The core functions module of ``modipyd.utils`` package.
-to prevent the package from cyclic import problem.
+
+.. note::
+   These functions are separated from ``modipyd.utils.__init__.py``
+   so that the package is prevented from cyclic import problem.
+
 """
 
 __all__ = ['wrap_sequence', 'unwrap_sequence']

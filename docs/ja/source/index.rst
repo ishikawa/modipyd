@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **最新情報：**
 
+* *2008-10-14* :ref:`install`\ を公開しました
 * *2008-10-06* このサイトで使用しているスタイルシートと画像を `GItHub にて公開 <http://github.com/ishikawa/sphinx-theme-modipyd/>`_\ しました（\ `クリエイティブ・コモンズ Attribution 3.0 ライセンス <http://creativecommons.org/licenses/by/3.0/deed.ja>`_\ ）
 * *2008-10-03* `バージョン 1.0 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_\ を公開しました
 * *2008-10-02* `Modipyd プロジェクトのホームページ <http://www.metareal.org/p/modipyd/>`_\ を開設しました
@@ -26,6 +27,13 @@ Modipyd: Autotest for Python, and more
 
 * `ソースコードをみる <http://github.com/ishikawa/modipyd/>`_\ ： Modipyd のソースコードは GitHub_ で管理しています。\ `こちら <http://github.com/ishikawa/modipyd/>`_\ から最新のソースコードを閲覧、取得できます。
 * `チケットやマイルストーンをみる <http://metareal.lighthouseapp.com/projects/17658/>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。
+
+
+ドキュメント
+-----------------------------------
+* :ref:`install` インストールの方法
+* :ref:`contents` すべてのドキュメントの目次
+
 
 関連リンク
 -----------------------------------

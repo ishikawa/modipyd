@@ -3,17 +3,17 @@
 Getting started with Modipyd and Autotest tool
 =================================================
 
-You can read :ref:`install` document, if you don't install *Modipyd* yet.
+You can read the :ref:`install` document, if you don't install *Modipyd* yet.
 
 Basic Example: The :class:`Widget` class
 ----------------------------------------------------
-Suppose you have two ``.py`` files.::
+Suppose you have two ``.py`` files::
 
   [~/modipyd/examples/widget]
   % ls
   test_widget.py	widget.py
 
-The file named ``widget.py`` is a normal Python script. On the other hand, ``test_widget.py`` is a test case  includes :class:`unittest.TestCase` subclasses.
+The file named ``widget.py`` is a normal Python script. On the other hand, ``test_widget.py`` is a test case  includes :class:`unittest.TestCase` subclass.
 
 ``widget.py``:
 
@@ -25,7 +25,7 @@ The file named ``widget.py`` is a normal Python script. On the other hand, ``tes
 
 Running pyautotest
 ----------------------------------------------------
-You can start monitoring modification by executing :command:`pyautotest` (The \ :option:``-v`` option is specified so that :command:`pyautotest` prints debugging messages)::
+You can start monitoring changes in these files by executing :command:`pyautotest` (With :option:`-v/--verbose` option flag, :command:`pyautotest` prints detailed information about its operations)::
 
   % pyautotest -v
   [INFO] Loading plugin: <class 'modipyd.application.plugins.Autotest'> 
@@ -99,7 +99,7 @@ The test must inevitably fail because :func:`Widget.resize` is missing. This val
   ----------------------------------------------------------------------
   Ran 3 tests in 0.001s
 
-So you can begin to write :func:`Widget.resize` code.
+So, let's begin to write :func:`Widget.resize` code.
 
 :file:`widget.py`:
 

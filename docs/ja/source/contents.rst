@@ -7,6 +7,7 @@ Modipyd ドキュメント
    :maxdepth: 2
 
    install
+   quick
 
 
 Indices and tables

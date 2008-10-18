@@ -7,7 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **最新情報：**
 
-* *2008-10-17* :ref:`quick`\ を公開しました
+* *2008-10-18* :ref:`quick`\ を公開しました
 * *2008-10-14* :ref:`install`\ を公開しました
 * *2008-10-06* このサイトで使用しているスタイルシートと画像を `GItHub にて公開 <http://github.com/ishikawa/sphinx-theme-modipyd/>`_\ しました（\ `クリエイティブ・コモンズ Attribution 3.0 ライセンス <http://creativecommons.org/licenses/by/3.0/deed.ja>`_\ ）
 * *2008-10-03* `バージョン 1.0 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_\ を公開しました

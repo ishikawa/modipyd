@@ -22,5 +22,7 @@ Python は `http://www.python.org <http://www.python.org>`_ から入手でき�
 * :mod:`modipyd` パッケージが Python の :file:`site-packages` 以下にインストールされます
 * :command:`modipyd`, :command:`pyautotest` のふたつのコマンドがインストールされます
 
+これでインストールは完了です。\ :ref:`チュートリアル <quick>`\ に進みましょう。
+
 .. _zip: http://github.com/ishikawa/modipyd/zipball/release-1-0-rc1
 .. _tar.gz: http://github.com/ishikawa/modipyd/tarball/release-1-0-rc1

@@ -3,17 +3,17 @@
 Modipyd の自動テストツールを使ってみよう
 =================================================
 
-*Modipyd* のインストールがまだなら、このドキュメントの前に\ :ref:`install`\ を参考にインストールすることをおすすめします。
+このチュートリアルを実際に試すには、なにはともあれ *Modipyd* をインストールしなくてはいけません。インストールの手順については\ :ref:`install`\ が参考になるはずです。
 
 簡単な例：\ :class:`Widget` クラス
 ----------------------------------------------------
-Suppose you have two ``.py`` files::
+これから、ふたつの簡単な Python スクリプトを例に、Modipyd の自動テストツールの使い方を説明していきます。::
 
   [~/modipyd/examples/widget]
   % ls
   test_widget.py	widget.py
 
-The file named ``widget.py`` is a normal Python script. On the other hand, ``test_widget.py`` is a test case  includes :class:`unittest.TestCase` subclass.
+``widget.py`` は :class:`Widget` クラスを含む Python スクリプトです。一方、\ ``test_widget.py`` はテストケースになります。
 
 ``widget.py``:
 
@@ -23,9 +23,10 @@ The file named ``widget.py`` is a normal Python script. On the other hand, ``tes
 
 .. literalinclude:: ../../../examples/widget/000/test_widget.py
 
-Running pyautotest
+pyautotest の実行
 ----------------------------------------------------
-You can start monitoring changes in these files by executing :command:`pyautotest` (With :option:`-v/--verbose` option flag, :command:`pyautotest` prints detailed information about its operations)::
+
+:command:`pyautotest` を実行すると、これらの Python ファイルの更新を監視するようになります（\ :option:`-v/--verbose` オプションを指定すると、プログラムの処理経過が分かるようになるので便利です）::
 
   % pyautotest -v
   [INFO] Loading plugin: <class 'modipyd.application.plugins.Autotest'> 
@@ -39,22 +40,24 @@ You can start monitoring changes in these files by executing :command:`pyautotes
     Dependencies: []
     Reverse: ['test_widget'] 
 
-As output message mentioned above, the :command:`pyautotest` tool is now monitoring :file:`widget.py` and :file:`test_widget.py`.
+最後の出力が示しているように、\ :command:`pyautotest` は :file:`widget.py` と :file:`test_widget.py` の監視を開始しています。
 
-Refactoring: Assigning multiple values at once in intialization
+リファクタリング：初期化での代入をひとつにする
 -----------------------------------------------------------------------
 
-You have three assignment statements in :func:`Widget.__init__`, assigns function arguments to instance variables. You can perform multiple assignment using tuples.
+ここで :file:`widget.py` を見てみましょう。\ :func:`Widget.__init__` では 3 つある引数をそれぞれ、インスタンス変数に代入していますね。Python ではタプルを使うことで、複数の代入文をひとつにまとめることができます。それでは、\ :file:`widget.py` をそのように編集します。
 
 :file:`widget.py`:
 
 .. literalinclude:: ../../../examples/widget/001/widget.py
 
-When you edit :file:`widget.py`, :command:`pyautotest` automatically reloads modified module (:file:`widget.py`), and then, automatically runs all dependent testcase (:file:`test_widget.py`).
+:file:`widget.py` を編集すると、\ :command:`pyautotest` は自動的に、変更されたファイル（個の場合 :file:`widget.py`\ ）を読み込み、関連するテストケースをすべて実行します（この場合 :file:`test_widget.py`\ ）。
 
 .. note::
 
-  :command:`pyautotest` makes no assumptions about filename of test cases, you can have :file:`widget_test.py` or :file:`WidgetTest.py`, :file:`test/widget.py`, ... etc.
+  関連するテストケースを特定するとき、\ :command:`pyautotest` はファイル名のパターンを使用しません。
+  そのため、テストケースのファイル名は :file:`widget_test.py`\ 、\ :file:`WidgetTest.py`\ 、
+  :file:`test/widget.py` など、自由につけることができます。
 
 ::
 
@@ -71,20 +74,21 @@ When you edit :file:`widget.py`, :command:`pyautotest` automatically reloads mod
 
   OK
 
-Adding :func:`resize` method
+:func:`resize` メソッドの追加
 ----------------------------------------------------
 
-You decide to add :func:`Widget.resize` method. The :func:`Widget.resize` takes two arguments ``width`` and ``height``, then change the region with new rectangle. Along with test driven development, you write a test  before the :func:`Widget.resize` implementation.
+:class:`Widget` クラスには足りない機能がたくさんあります。この節では :func:`resize` メソッドを追加しましょう。:func:`resize` メソッドはふたつの引数 ``width`` と ``height`` をとり、自身の大きさを変更します。テスト駆動開発の精神にのっとり、\ :func:`Widget.resize` を実装するまえにテストケースを書いていきます。
 
 :file:`test_widget.py`:
 
 .. literalinclude:: ../../../examples/widget/002/test_widget.py
 
-The test must inevitably fail because :func:`Widget.resize` is missing. This validates that the test harness is working correctly and that the test does not mistakenly pass without requiring any new code.
+新しいテストケースとして :class:`WidgetResizeTestCase` を追加しました。まだ :func:`Widget.resize` がないので、このテストは失敗するはずです。
 
 .. note::
 
-  :command:`pyautotest` automatically finds new :class:`unittest.TestCase` subclass and its dependencies.
+  :command:`pyautotest` は新しく追加された :class:`unittest.TestCase` のサブクラスを
+  自動的に検出します。
 
 ::
 
@@ -99,13 +103,13 @@ The test must inevitably fail because :func:`Widget.resize` is missing. This val
   ----------------------------------------------------------------------
   Ran 3 tests in 0.001s
 
-So, let's begin to write :func:`Widget.resize` code.
+予想通り、テストは失敗しました。それでは、\ :func:`Widget.resize` を実装しましょう。
 
 :file:`widget.py`:
 
 .. literalinclude:: ../../../examples/widget/002/widget.py
 
-Now all test cases pass.
+この変更を保存すると、\ :command:`pyautotest` が自動でテストケースを実行し、そのテストは成功します。
 
 ::
 

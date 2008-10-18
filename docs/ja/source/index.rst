@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **最新情報：**
 
+* *2008-10-18* `バージョン 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_\ を公開しました
 * *2008-10-18* :ref:`quick`\ を公開しました
 * *2008-10-14* :ref:`install`\ を公開しました
 * *2008-10-06* このサイトで使用しているスタイルシートと画像を `GItHub にて公開 <http://github.com/ishikawa/sphinx-theme-modipyd/>`_\ しました（\ `クリエイティブ・コモンズ Attribution 3.0 ライセンス <http://creativecommons.org/licenses/by/3.0/deed.ja>`_\ ）
@@ -21,7 +22,7 @@ Modipyd: Autotest for Python, and more
 
 **ユーザー向けのリソース**
 
-* *最新のリリースをダウンロード*\ ：\ `バージョン 1.0 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_\ を公開しました
+* *最新のリリースをダウンロード*\ ：\ `バージョン 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_\ を公開しました
 * `バグ報告や要望はこちら <http://metareal.lighthouseapp.com/projects/17658-modipyd/tickets/new>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。\ Lighthouse_ という海外のサービスを利用しているため、インターフェースは英語になっていますが、報告する内容は日本語でもかまいません（そのうち、より詳しい手順の解説を書く予定です）。
 
 **このプロジェクトに興味がある開発者の方へ：**

@@ -24,5 +24,5 @@ These commands will install:
 
 That's all. You can now move onto :ref:`quick`.
 
-.. _zip: http://github.com/ishikawa/modipyd/zipball/release-1-0-rc1
-.. _tar.gz: http://github.com/ishikawa/modipyd/tarball/release-1-0-rc1
+.. _zip: http://github.com/ishikawa/modipyd/zipball/release-1-0
+.. _tar.gz: http://github.com/ishikawa/modipyd/tarball/release-1-0

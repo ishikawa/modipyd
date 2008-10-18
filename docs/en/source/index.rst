@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **What's New:**
 
+* `Version 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_ released *2008-10-18*
 * Added :ref:`quick` *2008-10-12*
 * Added :ref:`install` *2008-10-08*
 * The stylesheet and image files used by this site are also available at `sphinx-theme-modipyd repository`_ and licensed under `the Creative Commons Attribution 3.0 license`_ *2008-10-06*
@@ -23,7 +24,7 @@ Modipyd: Autotest for Python, and more
 
 **Things you can do as a public user:**
 
-* *Download latest release and use it*: `Version 1.0 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-0-rc1>`_ released! *(2008-10-03)*
+* *Download latest release and use it*: `Version 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_ released! *(2008-10-18)*
 * `Create a new ticket`_: Tickets are the life blood of a project. They can be anything from *bug reports* to *todo items*, *feature requests* which can be assigned to folks involved in the project.
 
 **For developers interested in this project:**

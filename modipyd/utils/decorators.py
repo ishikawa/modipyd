@@ -28,6 +28,8 @@ def require(**types):
             constraints = [c is None and NoneType or c for c in constraints]
             types[name] = unwrap_sequence(tuple(constraints))
 
+        # pylint: disable-msg=W0621
+        # :W0621: *Redefining name %r from outer scope (line %s)*
         def type_checker(*args, **kwargs):
             for name in argmaps:
                 i = argmaps[name]

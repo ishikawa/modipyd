@@ -64,9 +64,7 @@ LOGGER = __configure_logger()
 # ----------------------------------------------------------------
 # Python version compatibility
 # ----------------------------------------------------------------
-# The Absolute and Relative Imports has been
-# implemented in Python 2.5
-#
+# The Absolute and Relative Imports has been implemented in Python 2.5
 # http://docs.python.org/whatsnew/pep-328.html
 HAS_RELATIVE_IMPORTS = (sys.hexversion >= 0x2050000)
 

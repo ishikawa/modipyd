@@ -40,6 +40,10 @@ class TestAnalysisModule(TestCase):
         mod = self.descriptors['tests_module.a2']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
+    def test_mixed_modules(self):
+        mod = self.descriptors['tests_module.mixed']
+        self.assert_(has_subclass(mod, unittest.TestCase))
+
     def test_module_not_in_package(self):
         test_script = self.descriptors['test_script']
         self.assert_(has_subclass(test_script, unittest.TestCase))

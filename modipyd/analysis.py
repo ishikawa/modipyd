@@ -92,8 +92,9 @@ def has_subclass(module_descriptor, baseclass):
                     exc_info=True)
             else:
                 # 5. Check loaded class is unittest.TestCase or its subclass
-                return (isinstance(klass, (type, types.ClassType)) and
-                        issubclass(klass, baseclass))
+                if isinstance(klass, (type, types.ClassType)) and \
+                        issubclass(klass, baseclass):
+                    return True
 
     return False
 

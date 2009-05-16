@@ -17,6 +17,7 @@ def require(**types):
     function invocation time.
     """
 
+    # pylint: disable-msg=W0622
     def decorator(fn):
         code = fn.func_code
         argnames = code.co_varnames[:code.co_argcount]

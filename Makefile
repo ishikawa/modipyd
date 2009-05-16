@@ -4,6 +4,8 @@
 
 .PHONY: all test lint doc web clean distclean realclean
 
+PYLINT_DISABLE_MSG = I0011,C0103,C0111,C0322,W0142
+
 all: lint test
 
 test: test24
@@ -17,8 +19,7 @@ test24:
 	fi
 
 lint:
-	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=I0011,C0103,C0111,W0142 modipyd
-	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=I0011,C0103,C0111,C0103,R0904,W0142,C0102 tests
+	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=$(PYLINT_DISABLE_MSG) modipyd
 
 # Generate offline documentation
 doc:

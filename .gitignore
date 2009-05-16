@@ -2,6 +2,7 @@
 *.pyc
 *.pyo
 *.egg
+*.swp
 Modipyd.egg-info
 .pylintrc
 build

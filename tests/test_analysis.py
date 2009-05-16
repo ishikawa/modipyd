@@ -12,18 +12,17 @@ from tests import TestCase, FILES_DIR
 
 class TestAnalysisModule(TestCase):
 
+    def import_modules(self, path):
+        sys.path.insert(0, path)
+        codes = list(collect_module_code(path, path))
+        self.descriptors.update(build_module_descriptors(codes))
+
     def setUp(self):
         self.syspath = sys.path[:]
-
+        self.descriptors = {}
+        self.import_modules(join(FILES_DIR, 'autotest'))
         if HAS_RELATIVE_IMPORTS:
-            self.search_path = join(FILES_DIR, 'autotest')
-        else:
-            self.search_path = join(FILES_DIR, 'autotest24')
-        sys.path.insert(0, self.search_path)
-
-        codes = list(collect_module_code(
-            self.search_path, self.search_path))
-        self.descriptors = build_module_descriptors(codes)
+            self.import_modules(join(FILES_DIR, 'relative_imports'))
 
     def tearDown(self):
         sys.path = self.syspath
@@ -49,16 +48,19 @@ class TestAnalysisModule(TestCase):
         self.assert_(has_subclass(test_script, unittest.TestCase))
 
     def test_package_relative_imports(self):
-        mod = self.descriptors['tests_module.B.b']
+        if not HAS_RELATIVE_IMPORTS:
+            return
+
+        mod = self.descriptors['RA.RB.b']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
-        mod = self.descriptors['tests_module.B.b2']
+        mod = self.descriptors['RA.RB.b2']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
-        mod = self.descriptors['tests_module.B.b3']
+        mod = self.descriptors['RA.RB.b3']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
-        mod = self.descriptors['tests_module.B']
+        mod = self.descriptors['RA.RB']
         self.assert_(has_subclass(mod, unittest.TestCase))
 
 

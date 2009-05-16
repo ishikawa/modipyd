@@ -1,4 +1,4 @@
-from tests_module.B import TestIt
+from ..RB import TestIt
 
 class TestMe(TestIt):
 

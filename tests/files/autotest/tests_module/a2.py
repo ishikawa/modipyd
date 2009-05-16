@@ -1,4 +1,4 @@
-from . import TestCase
+from tests_module import TestCase
 
 class TestA(TestCase):
 

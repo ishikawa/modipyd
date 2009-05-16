@@ -48,7 +48,7 @@ def compile_source(filepath):
 # ----------------------------------------------------------------
 # Python Module Finder
 # ----------------------------------------------------------------
-# Bit masks for collect_module_code_files
+# Bit masks for python relative file type
 PYTHON_SOURCE_MASK    = 1
 PYTHON_COMPILED_MASK  = 2
 PYTHON_OPTIMIZED_MASK = 4

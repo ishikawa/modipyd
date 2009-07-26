@@ -90,7 +90,7 @@ html_style = 'modipyd.css'
 html_title = 'Modipyd'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'Modipyd ホーム'
+html_short_title = 'Modipyd Home'
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.

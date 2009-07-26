@@ -1,4 +1,4 @@
-from sphinx.builder import StandaloneHTMLBuilder
+from sphinx.builders.html import StandaloneHTMLBuilder
 
 
 class OnlineHTMLBuilder(StandaloneHTMLBuilder):

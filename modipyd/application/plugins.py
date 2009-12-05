@@ -106,9 +106,11 @@ class SimplePlugin(object):
 # Autotest Plugin
 # ----------------------------------------------------------------
 import os
+import os.path
 import sys
 import logging
 import unittest
+import modipyd
 from modipyd import LOGGER
 from modipyd.analysis import has_subclass
 
@@ -163,7 +165,7 @@ class Autotest(object):
         if self.test_runner:
             args.extend(['-r', self.test_runner])
         for t in testables:
-            args.append(t.name)
+            args.append(t.filename)
 
         args = [str(arg) for arg in args]
         if sys.platform == "win32":
@@ -171,5 +173,16 @@ class Autotest(object):
             # windows, DOS platform
             args = ['"%s"' % arg for arg in args]
 
-        LOGGER.debug("Spawn test runner process: %s" % ' '.join(args))
-        return os.spawnve(os.P_WAIT, sys.executable, args, os.environ.copy())
+        # Manipulate PYTHONPATH environment variable so that
+        # the unittest runner can find an appropriate modipyd package.
+        environ = os.environ.copy()
+        path = os.path.join(os.path.dirname(modipyd.__file__), '..')
+
+        try:
+            environ['PYTHONPATH'] += (':' + path)
+        except KeyError:
+            environ['PYTHONPATH'] = path
+
+        LOGGER.debug("Spawn test runner process: PYTHONPATH=%s %s" % (path, ' '.join(args)))
+        return os.spawnve(os.P_WAIT, sys.executable, args, environ)
+

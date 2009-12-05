@@ -42,7 +42,9 @@ def collect_unittest(paths):
             tests = loader.loadTestsFromModule(module)
             if tests.countTestCases():
                 suite.addTest(tests)
-                LOGGER.info("Found %d test(s) in module '%s'" % (tests.countTestCases(), module.__name__))
+                LOGGER.info(
+                    "Found %d test(s) in module '%s'" %
+                    (tests.countTestCases(), module.__name__))
             else:
                 LOGGER.warn("No tests found in module '%s'" % module.__name__)
     return suite

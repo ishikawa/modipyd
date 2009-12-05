@@ -154,7 +154,7 @@ class Autotest(object):
                 LOGGER.info("Running UnitTests: %s" % desc)
             # Propagates the level of modipyd.LOGGER to
             # the unittest runner subprocess.
-            extra = ['--loglevel', LOGGER.getEffectiveLevel()];
+            extra = ['--loglevel', LOGGER.getEffectiveLevel()]
             self.spawn_unittest_runner(testables, extra)
 
     def spawn_unittest_runner(self, testables, extra_arguments=None):
@@ -183,6 +183,8 @@ class Autotest(object):
         except KeyError:
             environ['PYTHONPATH'] = path
 
-        LOGGER.debug("Spawn test runner process: PYTHONPATH=%s %s" % (path, ' '.join(args)))
+        LOGGER.debug(
+            "Spawn test runner process: PYTHONPATH=%s %s" %
+            (path, ' '.join(args)))
         return os.spawnve(os.P_WAIT, sys.executable, args, environ)
 

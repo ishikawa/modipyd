@@ -71,10 +71,10 @@ class ModuleNameResolver(object):
             module_path = list(self.search_paths)
             description = None
             for name in modname.split('.'):
-                file, pathname, description = imp.find_module(name, module_path)
+                fp, pathname, description = imp.find_module(name, module_path)
                 module_path = [ pathname ]
-                if file:
-                    file.close()
+                if fp:
+                    fp.close()
                 if description[2] != imp.PKG_DIRECTORY:
                     break
 

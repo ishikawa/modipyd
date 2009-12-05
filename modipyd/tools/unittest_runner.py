@@ -13,7 +13,7 @@ import unittest
 from optparse import OptionParser
 
 from modipyd import LOGGER, utils, resolve
-from modipyd.utils import import_component
+from modipyd.utils import import_component, filepath_to_identifier
 
 
 def collect_unittest(paths):
@@ -22,7 +22,13 @@ def collect_unittest(paths):
     resolver = resolve.ModuleNameResolver()
 
     for filepath in paths:
-        name, package = resolver.resolve(filepath)
+        try:
+            name, package = resolver.resolve(filepath)
+        except ImportError:
+            # .py file not in the search path
+            name = filepath_to_identifier(filepath)
+            package = None
+
         try:
             if package:
                 module = utils.import_module(name)

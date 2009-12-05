@@ -130,7 +130,9 @@ class Monitor(object):
             try:
                 mc = read_module_code(filename, typebits=typebits,
                         search_path=self.search_path,
-                        resolver=resolver, allow_compilation_failure=True)
+                        resolver=resolver,
+                        allow_compilation_failure=True,
+                        allow_standalone=True)
             except ImportError:
                 LOGGER.debug("Couldn't import file", exc_info=True)
                 failures.add(filename)

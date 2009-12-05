@@ -6,6 +6,7 @@ Utilities
 """
 
 import os
+import os.path
 import sys
 import stat
 
@@ -15,6 +16,17 @@ from modipyd.utils.ordered_set import *
 from modipyd.utils.core import *
 from modipyd.utils.decorators import require
 
+
+def filepath_to_identifier(filepath):
+    try:
+        import hashlib
+        digest = hashlib.sha1(filepath).hexdigest()
+    except ImportError:  # Python <2.5
+        import sha
+        digest = sha.new(filepath).hexdigest()
+    name = os.path.basename(filepath).replace('.', '_')
+    name = '_'.join((name, digest))
+    return name
 
 def split_module_name(module_name):
     """

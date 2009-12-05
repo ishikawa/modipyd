@@ -52,8 +52,9 @@ def _update_module_dependencies(module_descriptor, descriptors):
                     modulename = _modulename(name)
 
             else:
-                # Relative imports
-                assert descriptor.package_name
+                # The import declaration refers a relative package.
+                if not descriptor.package_name:
+                    continue
                 modulename = resolve_relative_modulename(
                     name, descriptor.package_name, level)
                 modulename = _modulename(modulename)

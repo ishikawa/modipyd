@@ -7,6 +7,7 @@ Python module code representation.
 
 from modipyd import utils, LOGGER, BYTECODE_PROCESSORS
 from modipyd.resolve import ModuleNameResolver
+from modipyd.utils import filepath_to_identifier
 from modipyd.utils.decorators import require
 from modipyd import bytecode as bc
 
@@ -97,7 +98,8 @@ def collect_module_code(filepath_or_list, search_path=None):
          resolver=(ModuleNameResolver, None))
 def read_module_code(filename, typebits=None, search_path=None,
         resolver=None,
-        allow_compilation_failure=False):
+        allow_compilation_failure=False,
+        allow_standalone=False):
     """
     Read python module file, and return ``ModuleCode`` instance.
     If *typebits* argument is not ``None``, *filename* must be
@@ -132,8 +134,14 @@ def read_module_code(filename, typebits=None, search_path=None,
         if not allow_compilation_failure:
             raise
 
-    # Resolve module name, may raise ImportError
-    module_name, package_name = resolver.resolve(sourcepath)
+    try:
+        module_name, package_name = resolver.resolve(sourcepath)
+    except ImportError:
+        if not allow_standalone:
+            raise
+        module_name = filepath_to_identifier(sourcepath)
+        package_name = None
+
     return ModuleCode(module_name, package_name, sourcepath, code)
 
 

@@ -7,13 +7,8 @@ from os.path import basename, join, normpath, \
                     dirname, exists, isdir
 from errno import ENOENT
 
-from modipyd import utils, resolve
+from modipyd import utils
 from tests import TestCase, FILES_DIR
-from modipyd.resolve import script_filename_to_modulename
-
-
-def _modname(filepath):
-    return script_filename_to_modulename(resolve.normalize_path(filepath))
 
 
 class TestModipydUtils(TestCase):
@@ -187,9 +182,10 @@ class TestResolveModulename(TestCase):
             join(FILES_DIR, 'python2/b.py'), FILES_DIR)
 
         # not a package
-        filepath = join(FILES_DIR, 'python3/c.py')
-        name = utils.resolve_modulename(filepath, [join(FILES_DIR, 'python3')])
-        self.assertEqual(_modname(filepath), name)
+        name = utils.resolve_modulename(
+            join(FILES_DIR, 'python3/c.py'),
+            [join(FILES_DIR, 'python3')])
+        self.assertEqual('c', name)
 
         self.assertRaises(
             ImportError,
@@ -204,8 +200,9 @@ class TestResolveModulename(TestCase):
         name = utils.resolve_modulename(
             script, [dirname(python_dir)])
         self.assertEqual("python.a", name)
-        name = utils.resolve_modulename(script, [python_dir])
-        self.assertEqual(_modname(script), name)
+        name = utils.resolve_modulename(
+            script, [python_dir])
+        self.assertEqual("a", name)
         name = utils.resolve_modulename(
             script, [dirname(python_dir), python_dir])
         self.assertEqual("python.a", name)
@@ -240,7 +237,7 @@ class TestResolveModulename(TestCase):
     def test_python_script(self):
         python_dir = join(FILES_DIR, 'python')
         script = join(python_dir, 'a.py')
-        self.assert_resolve_modulename_in_dir(_modname(script), script, python_dir)
+        self.assert_resolve_modulename_in_dir("a", script, python_dir)
         self.assert_resolve_modulename_in_dir("python.a",
             script, dirname(python_dir))
 
@@ -272,10 +269,10 @@ class TestResolveModulename(TestCase):
         python2_dir = join(FILES_DIR, 'python2')
         search_path = [python_dir, python2_dir]
 
-        filepath = join(python2_dir, "b.py")
-        self.assertEqual(
-            _modname(filepath),
-            utils.resolve_modulename(filepath, search_path))
+        self.assertEqual("b",
+            utils.resolve_modulename(
+                join(python2_dir, "b.py"),
+                search_path))
 
 
 if __name__ == '__main__':

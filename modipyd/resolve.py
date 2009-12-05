@@ -8,7 +8,7 @@ used to resolve module name from mofule filepath.
 
 import os
 import sys
-from os.path import isdir, abspath, expanduser, basename
+from os.path import isdir, abspath, expanduser
 from modipyd import utils
 
 
@@ -16,18 +16,6 @@ def normalize_path(filepath):
     """Normalize path name"""
     #return os.path.realpath(abspath(expanduser(filepath)))
     return abspath(expanduser(filepath))
-
-def script_filename_to_modulename(filepath):
-    try:
-        import hashlib
-        digest = hashlib.sha1(filepath).hexdigest()
-    except ImportError:
-        import sha
-        digest = sha.new(filepath).hexdigest()
-    name = basename(filepath).replace('.', '_')
-    name = '_'.join((name, digest))
-    return name
-
 
 def resolve_relative_modulename(modulename, package, level):
     if level <= 0:
@@ -62,24 +50,14 @@ class ModuleNameResolver(object):
             assert isdir(d)
 
         # caches
-        self.cache_package    = {}
-        self.cache_script_mod = {}
+        self.cache_package = {}
 
     def python_package(self, directory):
-        try:
-            return self.cache_package[directory]
-        except KeyError:
-            name = utils.python_package(directory)
-            self.cache_package[directory] = name
-            return name
-
-    def script_filename_to_modulename(self, filepath):
-        try:
-            return self.cache_script_mod[filepath]
-        except KeyError:
-            name = script_filename_to_modulename(filepath)
-            self.cache_script_mod[filepath] = name
-            return name
+        p = self.cache_package.get(directory)
+        if p is None:
+            p = utils.python_package(directory)
+            self.cache_package[directory] = p
+        return p
 
     def resolve(self, filepath):
         """
@@ -87,6 +65,7 @@ class ModuleNameResolver(object):
         Return (module name, package name), if the module is not
         in a package, package name is ``None``.
         """
+
         if not filepath:
             raise ImportError("filepath is empty")
 
@@ -94,17 +73,6 @@ class ModuleNameResolver(object):
         if not utils.python_module_file(filepath):
             raise ImportError("Not a python script: %s" % filepath)
 
-        modname, package = self._resolve(filepath)
-
-        if not package:
-            # The file located at filepath is a script (not in a package).
-            # For avoiding name collision with other packages, scripts,
-            # rename with the SHA1 hash value of its filepath.
-            modname = self.script_filename_to_modulename(filepath)
-
-        return modname, package
-
-    def _resolve(self, filepath):
         # Searching...
         #
         # split path components
@@ -117,7 +85,7 @@ class ModuleNameResolver(object):
         compiled_forms = [(dirpath, [modname])]
 
         for syspath in self.search_paths:
-
+            
             i = 0
             while not compiled_forms[i][0] == syspath:
                 # compile

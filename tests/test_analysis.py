@@ -44,7 +44,7 @@ class TestAnalysisModule(TestCase):
         self.assert_(has_subclass(mod, unittest.TestCase))
 
     def test_module_not_in_package(self):
-        test_script = self.descriptors['test_script_py_34f93f0096acc6d87d16159f822a4cef675dd6d5']
+        test_script = self.descriptors['test_script']
         self.assert_(has_subclass(test_script, unittest.TestCase))
 
     def test_package_relative_imports(self):

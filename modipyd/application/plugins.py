@@ -163,7 +163,7 @@ class Autotest(object):
         if self.test_runner:
             args.extend(['-r', self.test_runner])
         for t in testables:
-            args.append(t.filename)
+            args.append(t.name)
 
         args = [str(arg) for arg in args]
         if sys.platform == "win32":

@@ -1,6 +1,6 @@
 """
 This module provides an interface to the mechanisms
-used to resolve module name from mofule filepath.
+used to resolve module name from module filepath.
 
     :copyright: 2008 by Takanori Ishikawa
     :license: MIT, see LICENSE for more details.
@@ -8,13 +8,13 @@ used to resolve module name from mofule filepath.
 
 import os
 import sys
+import imp
 from os.path import isdir, abspath, expanduser
 from modipyd import utils
 
 
 def normalize_path(filepath):
     """Normalize path name"""
-    #return os.path.realpath(abspath(expanduser(filepath)))
     return abspath(expanduser(filepath))
 
 def resolve_relative_modulename(modulename, package, level):
@@ -62,10 +62,36 @@ class ModuleNameResolver(object):
 
     def resolve(self, filepath):
         """
-        Resolve the module name from *filepath* on search_paths.
-        Return (module name, package name), if the module is not
-        in a package, package name is ``None``.
+        Resolves the name of the module located at *filepath*.
+        If successful, returns names of module and package.
         """
+        modname, package = self._resolve(filepath)
+        if modname:
+            # validates resolved module name with imp.find_module
+            module_path = list(self.search_paths)
+            description = None
+            for name in modname.split('.'):
+                file, pathname, description = imp.find_module(name, module_path)
+                module_path = [ pathname ]
+                if file:
+                    file.close()
+                if description[2] != imp.PKG_DIRECTORY:
+                    break
+
+            module_path = module_path[0]
+            assert description
+            if description[2] == imp.PKG_DIRECTORY:
+                module_path = os.path.join(module_path, '__init__.py')
+
+            pt1, _ = os.path.splitext(normalize_path(filepath))
+            pt2, _ = os.path.splitext(normalize_path(module_path))
+
+            if pt1 != pt2:
+                raise ImportError("Can't resolve module name: %s" % filepath)
+
+        return modname, package
+
+    def _resolve(self, filepath):
 
         if not filepath:
             raise ImportError("filepath is empty")

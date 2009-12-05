@@ -50,7 +50,8 @@ class ModuleNameResolver(object):
             assert isdir(d)
 
         # caches
-        self.cache_package = {}
+        self.cache_package     = {}
+        self.cache_find_module = {}
 
     def python_package(self, directory):
         try:
@@ -60,6 +61,21 @@ class ModuleNameResolver(object):
             self.cache_package[directory] = package
             return package
 
+    def _find_module(self, names, path):
+        key = '.'.join(names)
+        try:
+            return self.cache_find_module[key]
+        except KeyError:
+            module_path = list(utils.wrap_sequence(path))
+            fp, pathname, description = imp.find_module(names[-1], module_path)
+            try:
+                result = (pathname, description[2])
+                self.cache_find_module[key] = result
+                return result
+            finally:
+                if fp:
+                    fp.close()
+
     def resolve(self, filepath):
         """
         Resolves the name of the module located at *filepath*.
@@ -68,19 +84,18 @@ class ModuleNameResolver(object):
         modname, package = self._resolve(filepath)
         if modname:
             # validates resolved module name with imp.find_module
-            module_path = list(self.search_paths)
-            description = None
+            module_path = self.search_paths
+            type = imp.PY_SOURCE
+            names = []
+
             for name in modname.split('.'):
-                fp, pathname, description = imp.find_module(name, module_path)
-                module_path = [ pathname ]
-                if fp:
-                    fp.close()
-                if description[2] != imp.PKG_DIRECTORY:
+                names.append(name)
+                pathname, type = self._find_module(names, module_path)
+                module_path = pathname
+                if type != imp.PKG_DIRECTORY:
                     break
 
-            module_path = module_path[0]
-            assert description
-            if description[2] == imp.PKG_DIRECTORY:
+            if type == imp.PKG_DIRECTORY:
                 module_path = os.path.join(module_path, '__init__.py')
 
             pt1, _ = os.path.splitext(normalize_path(filepath))

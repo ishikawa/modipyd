@@ -27,7 +27,9 @@ def collect_unittest(module_names):
             tests = loader.loadTestsFromModule(module)
             if tests.countTestCases():
                 suite.addTest(tests)
-                LOGGER.info("Found unittest.TestCase: %s" % module.__name__)
+                LOGGER.info("Found %d test(s) in module '%s'" % (tests.countTestCases(), module.__name__))
+            else:
+                LOGGER.warn("No tests found in module '%s'" % module.__name__)
     return suite
 
 def main(module_names, test_runner_class='unittest.TextTestRunner'):
@@ -46,6 +48,13 @@ if __name__ == '__main__':
         action="store", dest="runner", metavar='CLASS_NAME',
         help="qualified name of the unittest.TestRunner subclass "
              "(default: unittest.TextTestRunner)")
+    parser.add_option("--loglevel",
+        action="store", type="int", dest="loglevel", metavar='LOG_LEVEL',
+        help="Specifies the lowest-severity log message a logger will handle")
 
     options, args = parser.parse_args()
+
+    if options.loglevel is not None:
+        LOGGER.setLevel(options.loglevel)
+
     main(args, options.runner)

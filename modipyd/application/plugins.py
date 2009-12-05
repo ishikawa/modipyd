@@ -150,7 +150,10 @@ class Autotest(object):
             if LOGGER.isEnabledFor(logging.INFO):
                 desc = ', '.join([x.name for x in testables])
                 LOGGER.info("Running UnitTests: %s" % desc)
-            self.spawn_unittest_runner(testables)
+            # Propagates the level of modipyd.LOGGER to
+            # the unittest runner subprocess.
+            extra = ['--loglevel', LOGGER.getEffectiveLevel()];
+            self.spawn_unittest_runner(testables, extra)
 
     def spawn_unittest_runner(self, testables, extra_arguments=None):
         """Spawn test runner process"""
@@ -162,6 +165,7 @@ class Autotest(object):
         for t in testables:
             args.append(t.name)
 
+        args = [str(arg) for arg in args]
         if sys.platform == "win32":
             # Avoid argument parsing problem in
             # windows, DOS platform

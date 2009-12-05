@@ -37,11 +37,19 @@ class TestModuleNameResolver(TestCase):
 
     def test_not_package(self):
         d = join(FILES_DIR, 'python3')
-        path = join(d, 'c.py')
         resolver = ModuleNameResolver([d])
-        mod, package = resolver.resolve(path)
-        self.assertEqual('c', mod)
+        c1 = join(d, 'c.py')
+        c2 = join(d, 'c/__init__.py')
+
+        # script and package file
+        name1, package = resolver.resolve(c1)
         self.assertNone(package)
+        name2, package = resolver.resolve(c2)
+        self.assertEqual('c', name2)
+        self.assertEqual('c', package)
+
+        # distinct name
+        self.assertNotEqual(name1, name2)
 
 
 if __name__ == '__main__':

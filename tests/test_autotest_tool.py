@@ -4,6 +4,7 @@ import unittest
 from tests import TestCase
 import logging
 
+from modipyd import LOGGER
 from modipyd.tools import autotest
 from modipyd.application.plugins import Autotest
 
@@ -55,7 +56,7 @@ class TestAutotestTool(TestCase):
 
         plugin()
         self.assertEqual([descriptor], plugin.testables)
-        self.assertEqual(['--loglevel', logging.WARN], plugin.extra_arguments)
+        self.assertEqual(['--loglevel', LOGGER.getEffectiveLevel()], plugin.extra_arguments)
 
 
 if __name__ == '__main__':

@@ -53,11 +53,12 @@ class ModuleNameResolver(object):
         self.cache_package = {}
 
     def python_package(self, directory):
-        p = self.cache_package.get(directory)
-        if p is None:
-            p = utils.python_package(directory)
-            self.cache_package[directory] = p
-        return p
+        try:
+            return self.cache_package[directory]
+        except KeyError:
+            package = utils.python_package(directory)
+            self.cache_package[directory] = package
+            return package
 
     def resolve(self, filepath):
         """

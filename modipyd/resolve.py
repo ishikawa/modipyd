@@ -86,7 +86,7 @@ class ModuleNameResolver(object):
         compiled_forms = [(dirpath, [modname])]
 
         for syspath in self.search_paths:
-            
+
             i = 0
             while not compiled_forms[i][0] == syspath:
                 # compile

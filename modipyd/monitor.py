@@ -142,15 +142,15 @@ class Monitor(object):
                 newcomers.append(desc)
                 LOGGER.debug("Added: %s" % desc.describe())
 
-        # Since there are some entries already refer new entry,
-        # we need to update dependencies of all entries
-        for desc in descriptors.itervalues():
-            desc.update_dependencies(descriptors)
+        if newcomers:
+            # Since there are some entries already refer new entry,
+            # we need to update dependencies of all entries
+            for desc in descriptors.itervalues():
+                desc.update_dependencies(descriptors)
 
-        # Notify caller what entries are appended
-        for desc in newcomers:
-            yield Event(Event.MODULE_CREATED, desc)
-
+            # Notify caller what entries are appended
+            for desc in newcomers:
+                yield Event(Event.MODULE_CREATED, desc)
 
     def monitor(self):
         descriptors = self.descriptors
@@ -184,17 +184,17 @@ class Monitor(object):
         if refresh_factor < 1:
             raise RuntimeError("refresh_factor must be greater or eqaul to 1")
         if interval <= 0:
-            raise RuntimeError("refresh_factor must not be negative or 0")
+            raise RuntimeError("interval must not be negative or 0")
 
         descriptors = self.descriptors
-        # Logging
+
         if LOGGER.isEnabledFor(logging.INFO):
             desc = "\n".join([
                 desc.describe(indent=4)
                 for desc in descriptors.itervalues()])
             LOGGER.info("Monitoring:\n%s" % desc)
 
-        # Prior to Python 2.5, the ``yiled`` statement is not
+        # Prior to Python 2.5, the ``yield`` statement is not
         # allowed in the ``try`` clause of a ``try ... finally``
         # construct.
         try:
@@ -206,7 +206,7 @@ class Monitor(object):
                 time.sleep(interval)
                 times += 1
 
-                if times % 5 == 0:
+                if times % refresh_factor == 0:
                     monitor = self.refresh()
                 else:
                     monitor = self.monitor()

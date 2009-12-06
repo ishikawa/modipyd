@@ -46,7 +46,8 @@ def require(**types):
 
                 try:
                     constraint = types[name]
-                    if callable(constraint) and not isinstance(constraint, type):
+                    if (callable(constraint) and
+                            not isinstance(constraint, type)):
                         if not constraint(value): 
                             raise TypeError("Type checking of '%s' was failed: "
                                 "%s(%s)" % (name, value, type(value)))

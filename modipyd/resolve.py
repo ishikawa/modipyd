@@ -85,17 +85,17 @@ class ModuleNameResolver(object):
         if modname:
             # validates resolved module name with imp.find_module
             module_path = self.search_paths
-            type = imp.PY_SOURCE
+            pytype = imp.PY_SOURCE
             names = []
 
             for name in modname.split('.'):
                 names.append(name)
-                pathname, type = self._find_module(names, module_path)
+                pathname, pytype = self._find_module(names, module_path)
                 module_path = pathname
-                if type != imp.PKG_DIRECTORY:
+                if pytype != imp.PKG_DIRECTORY:
                     break
 
-            if type == imp.PKG_DIRECTORY:
+            if pytype == imp.PKG_DIRECTORY:
                 module_path = os.path.join(module_path, '__init__.py')
 
             pt1, _ = os.path.splitext(normalize_path(filepath))

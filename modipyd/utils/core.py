@@ -10,26 +10,37 @@ The core functions module of ``modipyd.utils`` package.
 __all__ = ['wrap_sequence']
 
 
-def wrap_sequence(obj, sequence_type=tuple):
+def sequence(obj, copy=None):
     """
-    Return a tuple whose item is obj.
-    If obj is already a list or tuple, it is returned unchanged.
+    Returns a sequence (usually tuple) whose element is ``obj``.
+    If a callable argument ``copy`` is specified, it is called
+    with the sequence as 1st argument, and returns its result.
 
-    >>> wrap_sequence(None)[0] is None
+    >>> sequence(None)[0] is None
     True
-    >>> wrap_sequence("")
+    >>> sequence("")
     ('',)
-    >>> wrap_sequence([])
+    >>> sequence([])
     []
-    >>> wrap_sequence(())
+    >>> sequence(())
     ()
-    >>> wrap_sequence(123, sequence_type=list)
+    >>> sequence(123, copy=tuple)
+    (123,)
+    >>> sequence(123, copy=list)
     [123]
     """
     if isinstance(obj, (list, tuple)):
-        return obj
+        seq = obj
     else:
-        return sequence_type((obj,))
+        seq = (obj,)
+
+    if copy is not tuple and callable(copy):
+        seq = copy(seq)
+
+    return seq
+
+def wrap_sequence(obj, sequence_type=tuple):
+    return sequence(obj, copy=sequence_type)
 
 
 if __name__ == "__main__":

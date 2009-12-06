@@ -6,8 +6,7 @@ Functions that help with dynamically creating decorators.
 """
 
 from types import NoneType
-from modipyd.utils.core import wrap_sequence, \
-                               unwrap_sequence
+from modipyd.utils.core import wrap_sequence
 
 
 def require(**types):
@@ -27,7 +26,10 @@ def require(**types):
         for name, constraints in types.iteritems():
             constraints = wrap_sequence(constraints)
             constraints = [c is None and NoneType or c for c in constraints]
-            types[name] = unwrap_sequence(tuple(constraints))
+            if len(constraints) == 1:
+                types[name] = constraints[0]
+            else:
+                types[name] = tuple(constraints)
 
         # pylint: disable-msg=W0621
         # :W0621: *Redefining name %r from outer scope (line %s)*
@@ -42,20 +44,18 @@ def require(**types):
                     # maybe default value
                     continue
 
-                constraint = types.get(name)
-                if constraint is not None:
-                    if (callable(constraint) and
-                            not isinstance(constraint, type)):
-                        check = constraint(value)
-                        if not check in (True, False):
-                            raise RuntimeError("Callable constraint must return"
-                                " True or False, but was %s." % type(check))
+                try:
+                    constraint = types[name]
+                    if callable(constraint) and not isinstance(constraint, type):
                         if not constraint(value): 
                             raise TypeError("Type checking of '%s' was failed: "
                                 "%s(%s)" % (name, value, type(value)))
                     elif not isinstance(value, constraint):
-                        raise TypeError, "Expected '%s' to be %s,"\
-                            " but was %s." % (name, types[name], type(value))
+                        raise TypeError(
+                                "Expected '%s' to be %s, but was %s." %
+                                (name, types[name], type(value)))
+                except KeyError:
+                    pass
 
             return fn(*args, **kwargs)
 

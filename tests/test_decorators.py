@@ -50,15 +50,6 @@ class RequireDecoratorTestCase(TestCase):
         self.assertEqual(foo(x='check me'), 'check me')
         self.assertRaises(TypeError, foo, 'check you')
 
-    def test_callable_type_constraint(self):
-        """``int`` is type and callable"""
-
-        @require(x=lambda x: int(x))
-        def foo(x):
-            return x
-
-        self.assertRaises(RuntimeError, foo, 123)
-
     def test_default_value(self):
 
         @require(x=int)

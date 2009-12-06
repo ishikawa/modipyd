@@ -7,7 +7,7 @@ The core functions module of ``modipyd.utils`` package.
 
 """
 
-__all__ = ['wrap_sequence', 'unwrap_sequence']
+__all__ = ['wrap_sequence']
 
 
 def wrap_sequence(obj, sequence_type=tuple):
@@ -30,20 +30,6 @@ def wrap_sequence(obj, sequence_type=tuple):
         return obj
     else:
         return sequence_type((obj,))
-
-def unwrap_sequence(obj):
-    """
-    >>> unwrap_sequence([None]) is None
-    True
-    >>> unwrap_sequence([1])
-    1
-    >>> unwrap_sequence([1, 2, 3])
-    [1, 2, 3]
-    """
-    if isinstance(obj, (list, tuple)) and len(obj) == 1:
-        return obj[0]
-    else:
-        return obj
 
 
 if __name__ == "__main__":

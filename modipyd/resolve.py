@@ -64,17 +64,26 @@ class ModuleNameResolver(object):
     def _find_module(self, names, path):
         key = '.'.join(names)
         try:
-            return self.cache_find_module[key]
+            pathname, pytype = self.cache_find_module[key]
+
+            if pathname is None and pytype is None:
+                raise ImportError, "No module named '%s' found" % key
+
+            return pathname, pytype
+
         except KeyError:
             module_path = utils.sequence(path, copy=list)
-            fp, pathname, description = imp.find_module(names[-1], module_path)
             try:
-                result = (pathname, description[2])
-                self.cache_find_module[key] = result
-                return result
-            finally:
-                if fp:
-                    fp.close()
+                fp, pathname, description = imp.find_module(names[-1], module_path)
+                try:
+                    result = (pathname, description[2])
+                    self.cache_find_module[key] = result
+                    return result
+                finally:
+                    if fp:
+                        fp.close()
+            except ImportError:
+                self.cache_find_module[key] = (None, None)
 
     def resolve(self, filepath):
         """

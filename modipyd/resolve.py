@@ -41,7 +41,7 @@ class ModuleNameResolver(object):
 
         # Cofigure module search path (copy it)
         syspaths = (search_paths or sys.path)
-        syspaths = utils.wrap_sequence(syspaths)
+        syspaths = utils.sequence(syspaths)
         assert isinstance(syspaths, (list, tuple))
 
         self.search_paths = [normalize_path(d) for d in syspaths if isdir(d)]
@@ -66,7 +66,7 @@ class ModuleNameResolver(object):
         try:
             return self.cache_find_module[key]
         except KeyError:
-            module_path = list(utils.wrap_sequence(path))
+            module_path = utils.sequence(path, copy=list)
             fp, pathname, description = imp.find_module(names[-1], module_path)
             try:
                 result = (pathname, description[2])

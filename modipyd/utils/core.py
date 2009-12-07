@@ -7,7 +7,7 @@ The core functions module of ``modipyd.utils`` package.
 
 """
 
-__all__ = ['wrap_sequence']
+__all__ = ['sequence']
 
 
 def sequence(obj, copy=None):
@@ -38,9 +38,6 @@ def sequence(obj, copy=None):
         seq = copy(seq)
 
     return seq
-
-def wrap_sequence(obj, sequence_type=tuple):
-    return sequence(obj, copy=sequence_type)
 
 
 if __name__ == "__main__":

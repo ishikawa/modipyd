@@ -13,11 +13,11 @@ from tests import TestCase, FILES_DIR
 
 class TestModipydUtils(TestCase):
 
-    def test_wrap_sequence(self):
-        self.assertEqual([], utils.wrap_sequence([]))
-        self.assertEqual([1, 2, 3], utils.wrap_sequence([1, 2, 3]))
-        self.assertEqual((1,), utils.wrap_sequence(1))
-        self.assertEqual([1], utils.wrap_sequence(1, list))
+    def test_sequence(self):
+        self.assertEqual([], utils.sequence([]))
+        self.assertEqual([1, 2, 3], utils.sequence([1, 2, 3]))
+        self.assertEqual((1,), utils.sequence(1))
+        self.assertEqual([1], utils.sequence(1, list))
 
     def test_filepath_to_identifier(self):
         self.assertEqual('foo_py_0f5843fe4a2bd32647fb23a438d1e43b1342c4aa', utils.filepath_to_identifier('foo.py'))

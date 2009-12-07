@@ -6,7 +6,7 @@ Functions that help with dynamically creating decorators.
 """
 
 from types import NoneType
-from modipyd.utils.core import wrap_sequence
+from modipyd.utils.core import sequence
 
 
 def require(**types):
@@ -24,7 +24,7 @@ def require(**types):
 
         # None -> NoneType convertion
         for name, constraints in types.iteritems():
-            constraints = wrap_sequence(constraints)
+            constraints = sequence(constraints)
             constraints = [c is None and NoneType or c for c in constraints]
             if len(constraints) == 1:
                 types[name] = constraints[0]

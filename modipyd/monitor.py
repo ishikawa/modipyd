@@ -57,7 +57,7 @@ class Monitor(object):
 
         # paths will be used as dictionary key,
         # so make it normalized.
-        paths = utils.wrap_sequence(filepath_or_list)
+        paths = utils.sequence(filepath_or_list)
         self.paths = [normalize_path(i) for i in paths]
         assert not isinstance(self.paths, basestring)
 

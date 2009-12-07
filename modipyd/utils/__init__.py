@@ -90,7 +90,7 @@ def collect_files(filepath_or_list, ignore_list=None):
                     return True
         return False
 
-    for filepath in wrap_sequence(filepath_or_list):
+    for filepath in sequence(filepath_or_list):
 
         if ignore(os.path.basename(filepath)):
             continue

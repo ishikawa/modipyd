@@ -2,6 +2,7 @@
 
 import imp
 import sys
+import os.path
 import unittest
 from os.path import abspath, splitext, join, dirname
 
@@ -54,6 +55,20 @@ class TestModuleNameResolver(TestCase):
         self.assertEqual(path, pathname)
 
         self.assertRaises(ImportError, resolver._find_module, 'modipyd.xxx', sys.path)
+
+    def test_name_collision(self):
+        directory = join(FILES_DIR, 'name_collision')
+        resolver = ModuleNameResolver(directory)
+
+        # The package 'test' precedes 'test.py'
+        path = join(directory, 'test', '__init__.py')
+        modname, package = resolver.resolve(path)
+        self.assertEqual('test', modname)
+        self.assertEqual('test', package)
+
+        path = join(directory, 'test.py')
+        self.assert_(os.path.exists(path))
+        self.assertRaises(ImportError, resolver.resolve, path)
 
 
 if __name__ == '__main__':

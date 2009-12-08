@@ -9,7 +9,8 @@ used to resolve module name from module filepath.
 import os
 import sys
 import imp
-from os.path import isdir, abspath, expanduser
+import os.path
+from os.path import abspath, expanduser
 from modipyd import utils
 
 
@@ -42,12 +43,7 @@ class ModuleNameResolver(object):
         # Cofigure module search path (copy it)
         syspaths = (search_paths or sys.path)
         syspaths = utils.sequence(syspaths)
-        assert isinstance(syspaths, (list, tuple))
-
-        self.search_paths = [normalize_path(d) for d in syspaths if isdir(d)]
-        for d in self.search_paths:
-            assert isinstance(d, basestring)
-            assert isdir(d)
+        self.search_paths = [normalize_path(d) for d in syspaths if os.path.isdir(d)]
 
         # caches
         self.cache_package     = {}
@@ -124,8 +120,11 @@ class ModuleNameResolver(object):
             raise ImportError("filepath is empty")
 
         filepath = normalize_path(filepath)
+
+        if not os.path.exists(filepath):
+            raise ImportError, "No such file or directory found at %s" % filepath
         if not utils.python_module_file(filepath):
-            raise ImportError("Not a python script: %s" % filepath)
+            raise ImportError, "Not a python script at %s" % filepath
 
         # Searching...
         #

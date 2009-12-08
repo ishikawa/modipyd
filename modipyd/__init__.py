@@ -15,14 +15,14 @@ action triggered by the module modification event
 * API for *Bytecode analysis*, *Module dependency analysis*, and *Monitoring 
 module modification*
 
-    :copyright: 2008 by Takanori Ishikawa
+    :copyright: 2008-2009 by Takanori Ishikawa
     :license: MIT, see LICENSE for more details.
 
 .. _Python: http://www.python.org/
 .. _the MIT license: http://www.opensource.org/licenses/mit-license.php
 """
 
-__version__ = '1.1'
+__version__ = '1.1rc1'
 __author__ = 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
 __url__ = 'http://www.metareal.org/p/modipyd/'
 __license__ = 'MIT License'

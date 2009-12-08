@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import imp
+import sys
 import unittest
-from os.path import abspath, splitext, join
+from os.path import abspath, splitext, join, dirname
 
 from modipyd import utils
 from modipyd.resolve import ModuleNameResolver
@@ -42,6 +44,16 @@ class TestModuleNameResolver(TestCase):
         mod, package = resolver.resolve(path)
         self.assertEqual('c', mod)
         self.assertNone(package)
+
+    def test_find_module(self):
+        resolver = ModuleNameResolver(sys.path)
+
+        pathname, kind = resolver._find_module('modipyd.resolve', sys.path)
+        self.assert_(kind in (imp.PY_SOURCE, imp.PY_COMPILED))
+        path = abspath(join(dirname(__file__), '..', 'modipyd', 'resolve.py'))
+        self.assertEqual(path, pathname)
+
+        self.assertRaises(ImportError, resolver._find_module, 'modipyd.xxx', sys.path)
 
 
 if __name__ == '__main__':

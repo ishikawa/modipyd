@@ -61,29 +61,41 @@ class ModuleNameResolver(object):
             self.cache_package[directory] = package
             return package
 
-    def _find_module(self, names, path):
-        key = '.'.join(names)
-        try:
-            pathname, pytype = self.cache_find_module[key]
 
-            if pathname is None and pytype is None:
-                raise ImportError, "No module named '%s' found" % key
+    def _find_module(self, modname, path):
+        kind = imp.PY_SOURCE
+        names = []
 
-            return pathname, pytype
+        for name in modname.split('.'):
+            names.append(name)
+            key = '.'.join(names)
 
-        except KeyError:
-            module_path = utils.sequence(path, copy=list)
             try:
-                fp, pathname, description = imp.find_module(names[-1], module_path)
+                pathname, kind = self.cache_find_module[key]
+
+                if kind != imp.PKG_DIRECTORY and key != modname:
+                    self.cache_find_module[key] = (None, None)
+                    raise ImportError, "No module named %s" % modname
+
+            except KeyError:
+                module_path = utils.sequence(path, copy=list)
                 try:
-                    result = (pathname, description[2])
-                    self.cache_find_module[key] = result
-                    return result
-                finally:
+                    fp, pathname, description = imp.find_module(names[-1], module_path)
                     if fp:
                         fp.close()
-            except ImportError:
-                self.cache_find_module[key] = (None, None)
+                    kind = description[2]
+                    self.cache_find_module[key] = (pathname, kind)
+                except ImportError:
+                    self.cache_find_module[key] = (None, None)
+                    raise
+
+            if pathname is None and kind is None:
+                raise ImportError, "No module named %s" % modname
+
+            path = pathname
+
+        return pathname, kind
+
 
     def resolve(self, filepath):
         """
@@ -93,22 +105,13 @@ class ModuleNameResolver(object):
         modname, package = self._resolve(filepath)
         if modname:
             # validates resolved module name with imp.find_module
-            module_path = self.search_paths
-            pytype = imp.PY_SOURCE
-            names = []
+            pathname, kind = self._find_module(modname, self.search_paths)
 
-            for name in modname.split('.'):
-                names.append(name)
-                pathname, pytype = self._find_module(names, module_path)
-                module_path = pathname
-                if pytype != imp.PKG_DIRECTORY:
-                    break
-
-            if pytype == imp.PKG_DIRECTORY:
-                module_path = os.path.join(module_path, '__init__.py')
+            if kind == imp.PKG_DIRECTORY:
+                pathname = os.path.join(pathname, '__init__.py')
 
             pt1, _ = os.path.splitext(normalize_path(filepath))
-            pt2, _ = os.path.splitext(normalize_path(module_path))
+            pt2, _ = os.path.splitext(normalize_path(pathname))
 
             if pt1 != pt2:
                 raise ImportError("Can't resolve module name: %s" % filepath)

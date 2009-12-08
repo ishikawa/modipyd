@@ -20,6 +20,7 @@ def collect_unittest(paths):
     suite = unittest.TestSuite()
     loader = unittest.defaultTestLoader
     resolver = resolve.ModuleNameResolver()
+    paths = utils.sequence(paths)
 
     for filepath in paths:
         try:
@@ -74,5 +75,6 @@ if __name__ == '__main__':
     if options.loglevel is not None:
         LOGGER.setLevel(options.loglevel)
 
+    LOGGER.debug("Execute modipyd.tools.unittest_runner: %s" % " ".join(args))
     sys.path.insert(0, os.getcwd())
     main(args, options.runner)

@@ -21,13 +21,8 @@ test24:
 lint:
 	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=$(PYLINT_DISABLE_MSG) modipyd
 
-# Generate offline documentation
 doc:
 	cd docs; $(MAKE)
-
-# Generate online documentation
-webdoc:
-	cd docs; $(MAKE) online
 
 clean:
 	-find . -name \*.py[co] -exec rm -f {} \;

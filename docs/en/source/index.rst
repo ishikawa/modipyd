@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **What's New:**
 
+* `Version 1.1 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-1-rc1>`__ released (`Release Notes <http://github.com/ishikawa/modipyd/blob/release-1-1-rc1/CHANGES.textile>`__) *2009-12-09*
 * `Version 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_ released *2008-10-18*
 * Added :ref:`quick` *2008-10-12*
 * Added :ref:`install` *2008-10-08*

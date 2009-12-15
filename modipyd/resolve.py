@@ -49,6 +49,7 @@ class ModuleNameResolver(object):
         # caches
         self._cache_package     = {}
         self._cache_find_module = {}
+        self._cache_resolve     = {}
 
     def _resolve_package(self, directory):
         try:
@@ -90,18 +91,30 @@ class ModuleNameResolver(object):
         Resolves the name of the module located at *filepath*.
         If successful, returns the name of the module and its package.
         """
-        modname, package = self._resolve(filepath)
-        if modname:
-            # validates resolved module name with imp.find_module
-            pathname, kind = self._find_module(modname, self.path)
+        try:
+            modname, package = self._cache_resolve[filepath]
+        except KeyError:
+            try:
+                modname, package = self._resolve(filepath)
+                if modname:
+                    # validates resolved module name with imp.find_module
+                    pathname, kind = self._find_module(modname, self.path)
 
-            if kind == imp.PKG_DIRECTORY:
-                pathname = os.path.join(pathname, '__init__.py')
+                    if kind == imp.PKG_DIRECTORY:
+                        pathname = os.path.join(pathname, '__init__.py')
 
-            pt1, _ = os.path.splitext(normalize_path(filepath))
-            pt2, _ = os.path.splitext(normalize_path(pathname))
+                    pt1, _ = os.path.splitext(normalize_path(filepath))
+                    pt2, _ = os.path.splitext(normalize_path(pathname))
 
-            if pt1 != pt2:
+                    if pt1 != pt2:
+                        raise ImportError("Can't resolve module name: %s" % filepath)
+            except ImportError:
+                self._cache_resolve[filepath] = (None, None)
+                raise
+            else:
+                self._cache_resolve[filepath] = (modname, package)
+        else:
+            if not modname:
                 raise ImportError("Can't resolve module name: %s" % filepath)
 
         return modname, package

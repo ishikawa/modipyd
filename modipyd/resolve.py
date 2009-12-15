@@ -29,34 +29,34 @@ def resolve_relative_modulename(modulename, package, level):
 
 class ModuleNameResolver(object):
     """
-    This class provides an interface to the mechanisms
-    used to resolve module name from a python source file path.
+    The ModuleNameResolver class provides the interface to
+    the mechanism of resolving a fully qualified module name
+    from a its source filepath.
     """
 
-    def __init__(self, search_paths=None):
+    def __init__(self, path=None):
         """
-        The ``search_paths`` argument is module search path,
-        if *search_paths* is omitted or ``None``, ``sys.path`` is used.
+        The ``path`` argument is module search path,
+        if *path* is omitted or ``None``, ``sys.path`` is used.
         """
         super(ModuleNameResolver, self).__init__()
 
-        # Cofigure module search path (copy it)
-        syspaths = (search_paths or sys.path)
+        # list of module search paths
+        syspaths = (path or sys.path)
         syspaths = utils.sequence(syspaths)
-        self.search_paths = [normalize_path(d) for d in syspaths if os.path.isdir(d)]
+        self.path = [normalize_path(d) for d in syspaths if os.path.isdir(d)]
 
         # caches
-        self.cache_package     = {}
-        self.cache_find_module = {}
+        self._cache_package     = {}
+        self._cache_find_module = {}
 
-    def python_package(self, directory):
+    def _resolve_package(self, directory):
         try:
-            return self.cache_package[directory]
+            return self._cache_package[directory]
         except KeyError:
             package = utils.python_package(directory)
-            self.cache_package[directory] = package
+            self._cache_package[directory] = package
             return package
-
 
     def _find_module(self, modname, path):
         kind = imp.PY_SOURCE
@@ -67,10 +67,10 @@ class ModuleNameResolver(object):
             key = '.'.join(names)
 
             try:
-                pathname, kind = self.cache_find_module[key]
+                pathname, kind = self._cache_find_module[key]
 
                 if kind != imp.PKG_DIRECTORY and key != modname:
-                    self.cache_find_module[key] = (None, None)
+                    self._cache_find_module[key] = (None, None)
                     raise ImportError, "No module named %s" % modname
 
             except KeyError:
@@ -80,9 +80,9 @@ class ModuleNameResolver(object):
                     if fp:
                         fp.close()
                     kind = description[2]
-                    self.cache_find_module[key] = (pathname, kind)
+                    self._cache_find_module[key] = (pathname, kind)
                 except ImportError:
-                    self.cache_find_module[key] = (None, None)
+                    self._cache_find_module[key] = (None, None)
                     raise
 
             if pathname is None and kind is None:
@@ -92,16 +92,15 @@ class ModuleNameResolver(object):
 
         return pathname, kind
 
-
     def resolve(self, filepath):
         """
         Resolves the name of the module located at *filepath*.
-        If successful, returns names of module and package.
+        If successful, returns the name of the module and its package.
         """
         modname, package = self._resolve(filepath)
         if modname:
             # validates resolved module name with imp.find_module
-            pathname, kind = self._find_module(modname, self.search_paths)
+            pathname, kind = self._find_module(modname, self.path)
 
             if kind == imp.PKG_DIRECTORY:
                 pathname = os.path.join(pathname, '__init__.py')
@@ -137,7 +136,7 @@ class ModuleNameResolver(object):
         package_name = None
         compiled_forms = [(dirpath, [modname])]
 
-        for syspath in self.search_paths:
+        for syspath in self.path:
 
             i = 0
             while not compiled_forms[i][0] == syspath:
@@ -148,7 +147,7 @@ class ModuleNameResolver(object):
 
                     # Encountered not a package, or not found in
                     # the module search path
-                    if not self.python_package(d) or d == '/':
+                    if not self._resolve_package(d) or d == '/':
                         break
 
                     names = names[:] # copy
@@ -158,13 +157,13 @@ class ModuleNameResolver(object):
                     compiled_forms.append((d, names))
             else:
                 d, names = compiled_forms[i]
-                if self.python_package(dirpath):
+                if self._resolve_package(dirpath):
                     package_name = '.'.join(names[:-1])
                 else:
                     package_name = None
 
                 if i == 0:
-                    if self.python_package(d):
+                    if self._resolve_package(d):
                         # script is created under a package,
                         # but its module name is not a package style
                         # (e.g. 'package.module').

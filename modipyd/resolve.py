@@ -72,14 +72,16 @@ class ModuleNameResolver(object):
                     self._cache_find_module[modname] = (None, None)
                     raise ImportError, "No module named %s" % modname
             try:
-                fp, pathname, description = imp.find_module(name, utils.sequence(path, copy=list))
+                fp, pathname, description = imp.find_module(
+                                    name,
+                                    utils.sequence(path, copy=list))
                 if fp:
                     fp.close()
                 kind = description[2]
                 self._cache_find_module[modname] = (pathname, kind)
             except ImportError:
-                    self._cache_find_module[modname] = (None, None)
-                    raise
+                self._cache_find_module[modname] = (None, None)
+                raise
         else:
             if not pathname:
                 raise ImportError, "No module named %s" % modname
@@ -96,26 +98,26 @@ class ModuleNameResolver(object):
         except KeyError:
             try:
                 modname, package = self._resolve(filepath)
-                if modname:
-                    # validates resolved module name with imp.find_module
-                    pathname, kind = self._find_module(modname, self.path)
-
-                    if kind == imp.PKG_DIRECTORY:
-                        pathname = os.path.join(pathname, '__init__.py')
-
-                    pt1, _ = os.path.splitext(normalize_path(filepath))
-                    pt2, _ = os.path.splitext(normalize_path(pathname))
-
-                    if pt1 != pt2:
-                        raise ImportError("Can't resolve module name: %s" % filepath)
             except ImportError:
                 self._cache_resolve[filepath] = (None, None)
                 raise
             else:
                 self._cache_resolve[filepath] = (modname, package)
-        else:
-            if not modname:
-                raise ImportError("Can't resolve module name: %s" % filepath)
+
+        if not modname:
+            raise ImportError("Can't resolve module name: %s" % filepath)
+
+        # validates resolved module name with imp.find_module
+        pathname, kind = self._find_module(modname, self.path)
+
+        if kind == imp.PKG_DIRECTORY:
+            pathname = os.path.join(pathname, '__init__.py')
+
+        pt1, _ = os.path.splitext(normalize_path(filepath))
+        pt2, _ = os.path.splitext(normalize_path(pathname))
+
+        if pt1 != pt2:
+            raise ImportError("Can't resolve module name: %s" % filepath)
 
         return modname, package
 
@@ -127,7 +129,7 @@ class ModuleNameResolver(object):
         filepath = normalize_path(filepath)
 
         if not os.path.exists(filepath):
-            raise ImportError, "No such file or directory found at %s" % filepath
+            raise ImportError, "No such file or directory: %s" % filepath
         if not utils.python_module_file(filepath):
             raise ImportError, "Not a python script at %s" % filepath
 

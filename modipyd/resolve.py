@@ -59,36 +59,29 @@ class ModuleNameResolver(object):
             return package
 
     def _find_module(self, modname, path):
-        kind = imp.PY_SOURCE
-        names = []
-
-        for name in modname.split('.'):
-            names.append(name)
-            key = '.'.join(names)
-
-            try:
-                pathname, kind = self._cache_find_module[key]
-
-                if kind != imp.PKG_DIRECTORY and key != modname:
-                    self._cache_find_module[key] = (None, None)
+        try:
+            pathname, kind = self._cache_find_module[modname]
+        except KeyError:
+            name = modname
+            i = modname.rfind('.')
+            if i != -1:
+                path, _kind = self._find_module(modname[:i], path)
+                name = modname[i+1:]
+                if _kind != imp.PKG_DIRECTORY or not name:
+                    self._cache_find_module[modname] = (None, None)
                     raise ImportError, "No module named %s" % modname
-
-            except KeyError:
-                module_path = utils.sequence(path, copy=list)
-                try:
-                    fp, pathname, description = imp.find_module(names[-1], module_path)
-                    if fp:
-                        fp.close()
-                    kind = description[2]
-                    self._cache_find_module[key] = (pathname, kind)
-                except ImportError:
-                    self._cache_find_module[key] = (None, None)
+            try:
+                fp, pathname, description = imp.find_module(name, utils.sequence(path, copy=list))
+                if fp:
+                    fp.close()
+                kind = description[2]
+                self._cache_find_module[modname] = (pathname, kind)
+            except ImportError:
+                    self._cache_find_module[modname] = (None, None)
                     raise
-
-            if pathname is None and kind is None:
+        else:
+            if not pathname:
                 raise ImportError, "No module named %s" % modname
-
-            path = pathname
 
         return pathname, kind
 

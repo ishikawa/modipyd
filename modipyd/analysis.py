@@ -5,6 +5,7 @@ Module Dependency Analysis
     :license: MIT, see LICENSE for more details.
 """
 
+import sys
 import types
 
 from modipyd import LOGGER, utils
@@ -61,10 +62,9 @@ def has_subclass(module_descriptor, baseclass):
 
             import_ = symbols.get(symbol)
             if import_ is None:
-                # Not an imported base class
                 continue
 
-            # Make name a qualified class name
+            # Convert name to a qualified module name
             name, level = base, import_[2]
             parent = split_module_name(import_[1])[0]
             if parent:
@@ -72,26 +72,39 @@ def has_subclass(module_descriptor, baseclass):
             name = resolve_relative_modulename(
                 name, modcode.package_name, level)
 
-            assert '.' in name, "names must be a qualified name"
-            LOGGER.debug("'%s' is derived from "
-                "imported class '%s'" % (base, name))
+            assert '.' in name, "name must be a qualified module name"
+            LOGGER.debug("'%s' is derived from '%s'" % (base, name))
 
             try:
-                try:
-                    klass = utils.import_component(name)
-                except ImportError:
-                    if level == -1 and modcode.package_name:
-                        # Relative import
-                        name = '.'.join((modcode.package_name, name))
-                        klass = utils.import_component(name)
-                    else:
-                        raise
-            except (ImportError, AttributeError):
-                LOGGER.warn("Exception occurred "
-                    "while importing component '%s'" % name,
+                klass = utils.import_component(name)
+            except ImportError:
+                klass = None
+                exc = sys.exc_info()[:]
+
+                if level == -1 and modcode.package_name:
+                    # Try to resolve a name as relative module name.
+                    try:
+                        name2 = '.'.join((modcode.package_name, name))
+                        klass = utils.import_component(name2)
+                    except:
+                        LOGGER.warn(
+                            "Exception occurred while importing module '%s'" % name2,
+                            exc_info=True)
+
+                if not klass:
+                    LOGGER.warn(
+                        "Exception occurred while importing module '%s'" % name,
+                        exc_info=exc)
+
+                # Make sure to delete the traceback to avoid creating cycles.
+                del exc
+
+            except AttributeError:
+                LOGGER.warn(
+                    "Exception occurred while importing module '%s'" % name,
                     exc_info=True)
             else:
-                # 5. Check loaded class is unittest.TestCase or its subclass
+                # 5. Check loaded class is specified class or its subclass
                 if isinstance(klass, (type, types.ClassType)) and \
                         issubclass(klass, baseclass):
                     return True

@@ -55,39 +55,44 @@ def has_subclass(module_descriptor, baseclass):
         # 3. Check base class(s) is imported from another module
         for base in bases:
             # Search imported symbol that is class name or module name
-            symbol = base
-            if '.' in symbol:
-                symbol = split_module_name(symbol)[0]
+            if '.' in base:
+                names = list(split_module_name(base))
+            else:
+                names = [base]
 
-            import_ = symbols.get(symbol)
+            import_ = symbols.get(names[0])
             if import_ is None:
                 # Not an imported base class
                 continue
 
-            # Convert name to a qualified module name
-            name, level = base, import_[2]
-            parent = split_module_name(import_[1])[0]
-            if parent:
-                name = '.'.join((parent, name))
-            name = resolve_relative_modulename(
-                name, modcode.package_name, level)
+            # Convert a name to a qualified module name
+            #
+            #   1. Resolve import alias if exists
+            #   2. Qualify name as full module name
+            #   3. Resolve relative module name
+            #
+            level = import_[2]
+            names[0] = import_[1]
 
-            assert '.' in name, "name must be a qualified module name"
-            LOGGER.debug("'%s' is derived from '%s'" % (base, name))
+            fqn = '.'.join(names)
+            fqn = resolve_relative_modulename(fqn, modcode.package_name, level)
+
+            assert '.' in fqn, "fqn must be a qualified module fqn"
+            LOGGER.debug("'%s' is derived from '%s'" % (module_descriptor.name, fqn))
 
             try:
                 try:
-                    klass = utils.import_component(name)
+                    klass = utils.import_component(fqn)
                 except ImportError:
                     if level == -1 and modcode.package_name:
-                        # Relative import
-                        name = '.'.join((modcode.package_name, name))
-                        klass = utils.import_component(name)
+                        # The qualified name may be relative to current package.
+                        fqn = '.'.join((modcode.package_name, fqn))
+                        klass = utils.import_component(fqn)
                     else:
                         raise
             except (ImportError, AttributeError):
                 LOGGER.warn("Exception occurred "
-                    "while importing component '%s'" % name,
+                    "while importing component '%s'" % fqn,
                     exc_info=True)
             else:
                 # 5. Check loaded class is specified class or its subclass

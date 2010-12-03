@@ -10,6 +10,29 @@ from modipyd.analysis import has_subclass
 from tests import TestCase, FILES_DIR
 
 
+class TestImportAlias(TestCase):
+
+    def test_import_alias(self):
+        path = join(FILES_DIR, 'import_alias')
+        codes = list(collect_module_code(path, path))
+        descriptors = build_module_descriptors(codes)
+
+        foo = descriptors['foo']
+        bar = descriptors['bar']
+
+        # import foo module
+        syspath = sys.path[:]
+        try:
+            sys.path.insert(0, path)
+            import foo as f
+
+            self.assert_(
+                has_subclass(bar, f.Foo),
+                "The module 'bar' should contain a subclass of 'foo.Foo'")
+        finally:
+            sys.path = syspath
+
+
 class TestAnalysisModule(TestCase):
 
     def import_modules(self, path):

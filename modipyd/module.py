@@ -83,8 +83,6 @@ def collect_python_module_file(filepath_or_list):
 def collect_module_code(filepath_or_list, search_path=None):
     resolver = ModuleNameResolver(search_path)
     for filename, typebits in collect_python_module_file(filepath_or_list):
-        # Since changing .py file is not reflected by .pyc, .pyo quickly,
-        # the plain .py file takes first prioriry.
         try:
             yield read_module_code(filename,
                 search_path=search_path, typebits=typebits,
@@ -114,6 +112,8 @@ def read_module_code(filename, typebits=None, search_path=None,
 
     code = None
     try:
+        # Since editing .py files will not affect .pyc and .pyo files soon,
+        # give priority to .py files.
         if typebits & PYTHON_SOURCE_MASK:
             # .py
             sourcepath = filename + '.py'

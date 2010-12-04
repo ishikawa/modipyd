@@ -2,6 +2,7 @@
 -------
 
 * Fixed `#9 pyautotest doesn't use module aliases`_ reported by Kevin Clark.
+* Added test targets for Python 2.x in Makefile.
 * Minor code cleanup.
 
 1.1 rc1

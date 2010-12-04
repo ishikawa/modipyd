@@ -7,7 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **What's New:**
 
-* `Version 1.1`_ released (`Release Notes <https://github.com/ishikawa/modipyd/blob/release-1-1/CHANGES.rst>`__) *2010-12-04*
+* `Version 1.1 <https://github.com/ishikawa/modipyd/zipball/release-1-1>`__ released (`Release Notes <https://github.com/ishikawa/modipyd/blob/release-1-1/CHANGES.rst>`__) *2010-12-04*
 * `Version 1.1 release candidate <http://github.com/ishikawa/modipyd/tree/release-1-1-rc1>`__ released (`Release Notes <http://github.com/ishikawa/modipyd/blob/release-1-1-rc1/CHANGES.textile>`__) *2009-12-09*
 * `Version 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_ released *2008-10-18*
 * Added :ref:`quick` *2008-10-12*
@@ -26,7 +26,7 @@ Modipyd: Autotest for Python, and more
 
 **Things you can do as a public user:**
 
-* *Download latest release and use it*: `Version 1.1`_ released!
+* *Download latest release and use it*: `Version 1.1 <https://github.com/ishikawa/modipyd/zipball/release-1-1-rc1>`__ released!
 * `Create a new ticket`_: Tickets are the life blood of a project. They can be anything from *bug reports* to *todo items*, *feature requests* which can be assigned to folks involved in the project.
 
 **For developers interested in this project:**
@@ -66,4 +66,3 @@ Indices and tables
 .. _Lighthouse: http://lighthouseapp.com/
 .. _sphinx-theme-modipyd repository: http://github.com/ishikawa/sphinx-theme-modipyd/
 .. _the Creative Commons Attribution 3.0 license: http://creativecommons.org/licenses/by/3.0/
-.. _Version 1.1: https://github.com/ishikawa/modipyd/archives/release-1-1

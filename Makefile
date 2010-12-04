@@ -2,21 +2,23 @@
 # Common tasks for project
 #
 
-.PHONY: all test lint doc web clean distclean realclean
+.PHONY: all test test2x lint doc web clean distclean realclean
 
 PYLINT_DISABLE_MSG = I0011,C0103,C0111,C0322,W0142
 
 all: lint test
 
-test: test24
+test:
 	python tests/runtests.py
 
-test24:
-	if [ -f "$(PYTHON24)" -a -x "$(PYTHON24)" ]; then \
-		$(MAKE) clean; \
-		"$(PYTHON24)" tests/runtests.py; \
-		$(MAKE) clean; \
-	fi
+test2x:
+	for version in $(PYTHON24) $(PYTHON25) $(PYTHON26) $(PYTHON27); do \
+		if [ -f "$${version}" -a -x "$${version}" ]; then \
+			$(MAKE) clean; \
+			"$${version}" tests/runtests.py; \
+		fi \
+	done; \
+	$(MAKE) clean;
 
 lint:
 	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=$(PYLINT_DISABLE_MSG) modipyd

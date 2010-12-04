@@ -7,6 +7,7 @@ Modipyd: Autotest for Python, and more
 
 **最新情報：**
 
+* *2010-12-04* `バージョン 1.1 <https://github.com/ishikawa/modipyd/archives/release-1-1>`_\ を公開しました
 * *2009-12-09* `バージョン 1.1 のリリース候補版 <http://github.com/ishikawa/modipyd/tree/release-1-1-rc1>`_\ を公開しました
 * *2008-10-18* `バージョン 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`_\ を公開しました
 * *2008-10-18* :ref:`quick`\ を公開しました
@@ -23,12 +24,12 @@ Modipyd: Autotest for Python, and more
 
 **ユーザー向けのリソース**
 
-* *最新のリリースをダウンロード*\ ：\ `バージョン 1.0 <http://github.com/ishikawa/modipyd/tree/release-1-0>`__ を公開しました
+* *最新のリリースをダウンロード*\ ：\ `バージョン 1.1 <https://github.com/ishikawa/modipyd/archives/release-1-1>`__ を公開しました
 * `バグ報告や要望はこちら <http://metareal.lighthouseapp.com/projects/17658-modipyd/tickets/new>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。\ Lighthouse_ という海外のサービスを利用しているため、インターフェースは英語になっていますが、報告する内容は日本語でもかまいません（そのうち、より詳しい手順の解説を書く予定です）。
 
 **このプロジェクトに興味がある開発者の方へ：**
 
-* `ソースコードをみる <http://github.com/ishikawa/modipyd/>`_\ ： Modipyd のソースコードは GitHub_ で管理しています。\ `こちら <http://github.com/ishikawa/modipyd/>`_\ から最新のソースコードを閲覧、取得できます。
+* `ソースコードをみる <https://github.com/ishikawa/modipyd>`_\ ： Modipyd のソースコードは GitHub_ で管理しています。\ `こちら <https://github.com/ishikawa/modipyd>`_\ から最新のソースコードを閲覧、取得できます。
 * `チケットやマイルストーンをみる <http://metareal.lighthouseapp.com/projects/17658/>`_\ ：バグ報告や要望はリンク先のフォームからおねがいします。
 
 

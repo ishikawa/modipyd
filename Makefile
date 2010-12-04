@@ -6,6 +6,8 @@
 
 PYTHON = python
 PYLINT = pylint
+
+PYLINTRC = .pylintrc
 PYLINT_DISABLE_MSG = I0011,C0103,C0111,C0322,W0142
 
 all: lint test
@@ -23,7 +25,7 @@ test2x:
 	$(MAKE) clean;
 
 lint:
-	$(PYLINT) --rcfile .pylintrc --disable-msg-cat=R --disable-msg=$(PYLINT_DISABLE_MSG) modipyd
+	$(PYLINT) --rcfile $(PYLINTRC) --disable=$(PYLINT_DISABLE_MSG) modipyd
 
 doc:
 	cd docs; $(MAKE)

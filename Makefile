@@ -4,12 +4,14 @@
 
 .PHONY: all test test2x lint doc web clean distclean realclean
 
+PYTHON = python
+PYLINT = pylint
 PYLINT_DISABLE_MSG = I0011,C0103,C0111,C0322,W0142
 
 all: lint test
 
 test:
-	python tests/runtests.py
+	$(PYTHON) tests/runtests.py
 
 test2x:
 	for version in $(PYTHON24) $(PYTHON25) $(PYTHON26) $(PYTHON27); do \
@@ -21,14 +23,14 @@ test2x:
 	$(MAKE) clean;
 
 lint:
-	pylint --rcfile .pylintrc --disable-msg-cat=R --disable-msg=$(PYLINT_DISABLE_MSG) modipyd
+	$(PYLINT) --rcfile .pylintrc --disable-msg-cat=R --disable-msg=$(PYLINT_DISABLE_MSG) modipyd
 
 doc:
 	cd docs; $(MAKE)
 
 clean:
 	-find . -name \*.py[co] -exec rm -f {} \;
-	python setup.py clean
+	$(PYTHON) setup.py clean
 
 distclean: clean
 	rm -rf build/*

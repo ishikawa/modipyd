@@ -36,7 +36,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'Modipyd'
-copyright = '2008, Takanori Ishikawa'
+copyright = '2008-2010, Takanori Ishikawa'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.

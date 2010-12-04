@@ -24,7 +24,7 @@ Developer Notes
 Copyright
 ---------
 
-Copyright (c) 2008-2009 **Takanori Ishikawa**, All rights reserved.
+Copyright (c) 2008-2010 **Takanori Ishikawa**, All rights reserved.
 
 License
 -------
